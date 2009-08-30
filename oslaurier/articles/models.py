@@ -10,6 +10,7 @@ class Article(models.Model):
     slug = models.SlugField()
     content = models.TextField()
     disable_comments = models.BooleanField('disable comments?', default=False)
+    permalink_title = models.CharField(max_length=50, unique=True)
 
     def __unicode__(self):
         return self.title
