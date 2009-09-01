@@ -2,7 +2,6 @@
 # Django settings for oslaurier project.
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     ('Jeffrey Charles', 'webmaster@oslaurier.com'),
@@ -54,8 +53,7 @@ SECRET_KEY = 'RImQ:Yp)24e[C^B7DBnH5?*Szci>ak^;v)+XgLZSP+uj7&C?<U'
 # Custom settings I have added
 DEFAULT_FROM_EMAIL = 'django@oslaurier.org'
 FILE_UPLOAD_PERMISSIONS = 0666
-PREPEND_WWW = True
-SEND_BROKEN_LINK_EMAILS = True
+SEND_BROKEN_LINK_EMAILS = False
 SERVER_EMAIL = 'django@oslaurier.org'
 SESSION_COOKIE_NAME = 'oslaurier_session'
 TEMPLATE_DEBUG = True
@@ -75,7 +73,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    'django.contrib.humanize',
     'django.contrib.redirects.middleware.RedirectFallbackMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
 )
@@ -83,15 +80,18 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'oslaurier.urls'
 
 TEMPLATE_DIRS = (
-    "/home/jeff/projects/osl/oslaurier/templates/",
+    "/home/jeff/projects/osl/main-website/oslaurier/templates/",
 )
 
 INSTALLED_APPS = (
+    'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.flatpages',
+    'django.contrib.humanize',
     'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'oslaurier.articles',
 )

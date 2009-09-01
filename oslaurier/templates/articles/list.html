@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <title>List of articles</title>
+    </head>
+    <body>
+        <h1>List of Articles</h1>
+        {% if not articles.object_list %}
+            <p>Sorry, there do not appear to be any articles here.</p>
+        {% else %}
+            <ul>
+            {% for article in articles.object_list %}
+                <li>{{ article.title }} - {{ article.description }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </body>
+</html>
