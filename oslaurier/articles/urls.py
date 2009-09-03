@@ -5,6 +5,6 @@ urlpatterns = patterns('oslaurier.articles.views',
     (r'^$', 'index'),
     (r'^(?P<year>\d{4})/$', 'index'),
     (r'^(?P<year>\d{4})/(?P<month>\d{1,2})/$', 'index'),
-    (r'^(?P<username_filter>)/$', 'index'),
-    (r'^view/(?P<permalink_title_filter>)/$', 'view')
+    (r'^(?P<username>\w+)/$', 'index'),
+    (r'^view/(?P<slug_filter>[A-Za-z0-9_-]+)/$', 'view')
 )

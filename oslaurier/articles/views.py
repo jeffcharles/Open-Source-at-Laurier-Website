@@ -2,6 +2,7 @@
 from datetime import date
 from django.core.paginator import EmptyPage, InvalidPage, Paginator
 from django.shortcuts import get_object_or_404, render_to_response
+from django.template import RequestContext
 from oslaurier.articles.models import Article
 
 def __get_articles(request, article_list):
@@ -51,7 +52,7 @@ def __get_number_per_page(request):
         num_per_page = 10
     return num_per_page
 
-def index(request, month=None, username_filter=None, year=None):
+def index(request, month=None, username=None, year=None):
     """
     Render a response with a list of articles
     """
@@ -63,21 +64,28 @@ def index(request, month=None, username_filter=None, year=None):
 
     if month is not None and year is not None:
         article_list = \
-            Article.objects.filter(date_created__year=year).filter(date_created__month=month).order_by(order)
+            (Article.objects.filter(date_created__year=year).
+            filter(date_created__month=month).order_by(order))
     elif year is not None:
-        article_list = Article.objects.filter(date_created__year=year).order_by(order)
-    elif username_filter is not None:
         article_list = \
-            Article.objects.filter(username=username_filter).order_by(order)
+            Article.objects.filter(date_created__year=year).order_by(order)
+    elif username is not None:
+        article_list = \
+            Article.objects.filter(authors__username=username).order_by(order)
     else:
         article_list = Article.objects.all().order_by(order)
 
     articles = __get_articles(request, article_list)
-    return render_to_response('articles/list.html', {'articles': articles})
+    return render_to_response('articles/list.html', {'articles': articles},
+        context_instance=RequestContext(request))
 
 def view(request, slug_filter):
     """
     Render a response with the specified articles
     """
     article = get_object_or_404(Article, slug=slug_filter)
-    return render_to_response('articles/view.html', {'article': article})
+    authors = ", ".join([" ".join([author.first_name, author.last_name])
+        for author in article.authors.all()])
+    return render_to_response('articles/view.html',
+        {'article': article, 'authors': authors},
+        context_instance=RequestContext(request))

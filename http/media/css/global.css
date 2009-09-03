@@ -1,0 +1,92 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #999999;
+    color: #FFFFFF;
+    font-family: Arial;
+    height: 100%;
+}
+
+#clear-footer {
+    height: -2.0em;
+}
+
+#container {
+    background-color: #FFFFFF;
+    min-height: 100%;
+    margin-left: 6%;
+    margin-right: 6%;
+}
+
+#content {
+    background-color: #FFFFFF;
+    color: #333333;
+    margin-top: 5px;
+    margin-bottom: 30px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 2.0em;
+}
+
+#footer {
+    background-color: #333333;
+    color: #CCCCCC;
+    height: 1.5em;
+    margin-top: -2.0em;
+    margin-left: 6%;
+    margin-right: 6%;
+    padding-top: 0.5em;
+}
+
+h1 {
+    border-bottom: thin dotted black;
+    color: black;
+    margin: 10px 0px 15px 0px;
+}
+
+.horizontal-navbar a {
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.horizontal-navbar a:hover {
+    text-decoration: underline;
+}
+
+.horizontal-navbar ul {
+    list-style-type: none;
+    padding: 3px 0px 3px 0px;
+}
+
+.horizontal-navbar li {
+    display: inline;
+    padding: 0px 20px 0px 20px;
+}
+
+html {
+    height: 100%;
+}
+
+#log-in-navbar {
+    font-size: 1.2em;
+    float: right;
+}
+
+#primary-navbar {
+    float: left;
+    font-size: 1.2em;
+}
+
+#secondary-navbar {
+    font-size: 1.0em;
+}
+
+#top-navbar {
+    background-color: #FF6600;
+}

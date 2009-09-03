@@ -18,6 +18,9 @@ class Article(models.Model):
     def __unicode__(self):
         return self.title
 
+    def get_absolute_url(self):
+        return "/articles/view/%s/" % self.slug
+
 class ArticleForm(ModelForm):
     class Meta:
         model = Article
