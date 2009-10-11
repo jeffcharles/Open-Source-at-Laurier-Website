@@ -1,0 +1,8 @@
+{% if articles %}
+    <h2>Recent articles:</h2>
+    <ul>
+    {% for article in articles %}
+        <li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a> - {{ article.description }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
