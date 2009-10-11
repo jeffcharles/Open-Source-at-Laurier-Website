@@ -62,18 +62,18 @@ def index(request, month=None, username=None, year=None):
     else:
         order = '-date_created'
 
+    article_list = \
+        Article.objects.exclude(draft=True).exclude(hidden=True).order_by(order)
+
     if month is not None and year is not None:
-        article_list = \
-            (Article.objects.filter(date_created__year=year).
-            filter(date_created__month=month).order_by(order))
+        article_list = (article_list.filter(date_created__year=year)
+            .filter(date_created__month=month))
     elif year is not None:
         article_list = \
-            Article.objects.filter(date_created__year=year).order_by(order)
+            article_list.filter(date_created__year=year).order_by(order)
     elif username is not None:
         article_list = \
-            Article.objects.filter(authors__username=username).order_by(order)
-    else:
-        article_list = Article.objects.all().order_by(order)
+            article_list.filter(authors__username=username).order_by(order)
 
     articles = __get_articles(request, article_list)
     return render_to_response('articles/list.html', {'articles': articles},
