@@ -44,6 +44,10 @@ body {
     padding-top: 0.5em;
 }
 
+#footer p {
+    margin: 0px 0px 0px 0px;
+}
+
 h1 {
     border-bottom: thin dotted black;
     color: black;
@@ -76,6 +80,10 @@ html {
 #log-in-navbar {
     font-size: 1.2em;
     float: right;
+}
+
+p {
+    margin: 15px 0px 15px 0px;
 }
 
 #primary-navbar {
