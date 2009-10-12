@@ -2,6 +2,7 @@
 from datetime import date
 from django.core.paginator import EmptyPage, InvalidPage, Paginator
 from django.http import Http404
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from oslaurier.articles.models import Article
@@ -91,6 +92,12 @@ def view(request, slug_filter):
     Render a response with the specified articles
     """
     article = get_object_or_404(Article, slug=slug_filter)
+
+    # if article is hidden or a draft, return 403 error
+    if article.hidden or article.draft:
+        return HttpResponseForbidden("<h1>You are not authorized to view this \
+            page</h1>")
+
     authors = ", ".join([" ".join([author.first_name, author.last_name])
         for author in article.authors.all()])
     return render_to_response('articles/view.html',
