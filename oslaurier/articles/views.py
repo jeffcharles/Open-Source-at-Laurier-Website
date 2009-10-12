@@ -2,7 +2,7 @@
 from datetime import date
 from django.core.paginator import EmptyPage, InvalidPage, Paginator
 from django.http import Http404
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseServerError
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from oslaurier.articles.models import Article
@@ -23,6 +23,27 @@ def __get_articles(request, article_list):
     except (EmptyPage, InvalidPage):
         articles = paginator.page(paginator.num_pages)
     return articles
+
+def __get_authors(article):
+    """
+    Returns a string containing all of the articles authors
+    """
+    number_of_authors = len(article.authors.all())
+    if number_of_authors == 1:
+        authors = article.authors.all()[0].get_full_name()
+    elif number_of_authors == 2:
+        authors = " and ".join([author.get_full_name()
+            for author in article.authors.all()])
+    elif number_of_authors > 2:
+        authors = ", and ".join(
+            [", ".join([author.get_full_name()
+            for author in article.authors.all()[1:]]),
+            article.authors.all()[0].get_full_name()])
+    else:
+        return HttpResponseServerError("<h1>A server error has occurred</h1> \
+            <p>Please contact the webmaster with the url you attempted to \
+            access.</p>")
+    return authors
 
 def __get_order_by_title(request):
     """
@@ -98,8 +119,7 @@ def view(request, slug_filter):
         return HttpResponseForbidden("<h1>You are not authorized to view this \
             page</h1>")
 
-    authors = ", ".join([" ".join([author.first_name, author.last_name])
-        for author in article.authors.all()])
+    authors = __get_authors(article)
     return render_to_response('articles/view.html',
         {'article': article, 'authors': authors},
         context_instance=RequestContext(request))

@@ -154,7 +154,7 @@ class ArticleTestCase(TestCase):
         """
         response = self.client.get('/articles/view/multi-author-article/')
         self.assertEqual(response.context['authors'],
-            u'Jeffrey Charles, Siraj Mithoowani, and Blake Vollbrecht')
+            u'Siraj Mithoowani, Blake Vollbrecht, and Jeffrey Charles')
 
     def test_view_single_author_formatting(self):
         """
