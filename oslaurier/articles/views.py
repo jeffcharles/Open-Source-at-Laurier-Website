@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import date
 from django.core.paginator import EmptyPage, InvalidPage, Paginator
+from django.http import Http404
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from oslaurier.articles.models import Article
@@ -51,6 +52,12 @@ def __get_number_per_page(request):
     except:
         num_per_page = 10
     return num_per_page
+
+def blank(request):
+    """
+    If user requests an article without supplying a slug, then throw a 404 error
+    """
+    raise Http404()
 
 def index(request, month=None, username=None, year=None):
     """
