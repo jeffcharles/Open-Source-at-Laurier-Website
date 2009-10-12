@@ -70,10 +70,10 @@ def index(request, month=None, username=None, year=None):
             .filter(date_created__month=month))
     elif year is not None:
         article_list = \
-            article_list.filter(date_created__year=year).order_by(order)
+            article_list.filter(date_created__year=year)
     elif username is not None:
         article_list = \
-            article_list.filter(authors__username=username).order_by(order)
+            article_list.filter(authors__username=username)
 
     articles = __get_articles(request, article_list)
     return render_to_response('articles/list.html', {'articles': articles},
