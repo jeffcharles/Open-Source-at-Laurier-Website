@@ -7,14 +7,15 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from oslaurier.articles.models import Article
 
-def __get_articles(request, article_list):
+def __get_articles(request, article_list, number_per_page):
     """
     Returns a list of articles based on page given and number of articles to
     display
 
     Parameters:
-        request      - the http request
-        article_list - a list of articles from the database
+        request         - the http request
+        article_list    - a list of articles from the database
+        number_per_page - the number of articles to display on a page
     """
     paginator = Paginator(article_list, __get_number_per_page(request))
     page = __get_page(request)
@@ -104,8 +105,10 @@ def index(request, month=None, username=None, year=None):
         article_list = \
             article_list.filter(authors__username=username)
 
-    articles = __get_articles(request, article_list)
-    return render_to_response('articles/list.html', {'articles': articles},
+    number_per_page = __get_number_per_page(request)
+    articles = __get_articles(request, article_list, number_per_page)
+    return render_to_response('articles/list.html',
+        {'articles': articles, 'num_per_page': number_per_page},
         context_instance=RequestContext(request))
 
 def view(request, slug_filter):

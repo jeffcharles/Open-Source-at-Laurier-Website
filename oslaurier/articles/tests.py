@@ -264,7 +264,7 @@ class ArticlePaginationTestCase(TestCase):
         """
         response = self.client.get('/articles/?num_per_page=10')
         self.assertNotEqual(response.content.find(
-            '<a href="/articles/?page=2>Next</a>'), -1)
+            '<a href="?num_per_page=10&amp;page=2">Next</a>'), -1)
 
     def test_first_set_not_has_previous(self):
         """
@@ -280,7 +280,7 @@ class ArticlePaginationTestCase(TestCase):
         """
         response = self.client.get('/articles/?num_per_page=10')
         self.assertEqual(response.content.find(
-            '<a href="/articles/?page=0>Previous</a>'), -1)
+            '<a href="?num_per_page=10&amp;page=0">Previous</a>'), -1)
 
     def test_invalid_page(self):
         """
@@ -318,7 +318,7 @@ class ArticlePaginationTestCase(TestCase):
         """
         response = self.client.get('/articles/?num_per_page=10&page=2')
         self.assertNotEqual(response.content.find(
-            '<a href="/articles/?page=3>Next</a>'), -1)
+            '<a href="?num_per_page=10&amp;page=3">Next</a>'), -1)
 
     def test_second_set_has_previous(self):
         """
@@ -333,7 +333,7 @@ class ArticlePaginationTestCase(TestCase):
         """
         response = self.client.get('/articles/?num_per_page=10&page=2')
         self.assertNotEqual(response.content.find(
-            '<a href="/articles/?page=1>Previous</a>'), -1)
+            '<a href="?num_per_page=10&amp;page=1">Previous</a>'), -1)
 
     def test_third_set_not_has_next(self):
         """
@@ -348,7 +348,7 @@ class ArticlePaginationTestCase(TestCase):
         """
         response = self.client.get('/articles/?num_per_page=10&page=3')
         self.assertEqual(response.content.find(
-            '<a href="/articles/?num_per_page=10&page=4">Next</a>'), -1)
+            '<a href="?num_per_page=10&amp;page=4">Next</a>'), -1)
 
     def test_third_set_has_previous(self):
         """
@@ -361,9 +361,9 @@ class ArticlePaginationTestCase(TestCase):
         """
         Test that third set of articles does have a previous set
         """
-        response = self.client.get('/artcles/?num_per_page=10&page=3')
+        response = self.client.get('/articles/?num_per_page=10&page=3')
         self.assertNotEqual(response.content.find(
-            '<a href="/articles/?num_per_page=10&page=2">Previous</a>'), -1)
+            '<a href="?num_per_page=10&amp;page=2">Previous</a>'), -1)
 
     def test_valid_per_page_setting(self):
         """
