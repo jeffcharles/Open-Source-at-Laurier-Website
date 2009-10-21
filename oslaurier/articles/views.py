@@ -22,7 +22,7 @@ def __get_articles(request, article_list, number_per_page):
     try:
         articles = paginator.page(page)
     except (EmptyPage, InvalidPage):
-        articles = paginator.page(paginator.num_pages)
+        articles = None
     return articles
 
 def __get_authors(article):

@@ -297,13 +297,22 @@ class ArticlePaginationTestCase(TestCase):
         response = self.client.get('/articles/?num_per_page=a')
         self.assertEqual(len(response.context['articles'].object_list), 10)
 
-    def test_page_beyond_end(self):
+    def test_page_beyond_end_content(self):
         """
-        Test that a 404 is returned if a page beyond the number of articles is
+        Test that an error message is displayed if a page beyond the number of
+        articles is requested
+        """
+        response = self.client.get('/articles/?num_per_page=10&page=4')
+        self.assertNotEqual(response.content.find(
+            '<p>There doesn\'t seem to be anything here</p>'), -1)
+
+    def test_page_beyond_end_status(self):
+        """
+        Test that a 200 is returned if a page beyond the number of articles is
         requested
         """
         response = self.client.get('/articles/?num_per_page=10&page=4')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
 
     def test_second_set_has_next(self):
         """
