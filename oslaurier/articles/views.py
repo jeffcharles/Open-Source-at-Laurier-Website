@@ -54,6 +54,7 @@ def __get_order_by_title(request):
         order_by_title = int(request.GET.get('order_by_title', 0))
     except:
         order_by_title = 0
+    order_by_title = bool(order_by_title)
     return order_by_title
 
 def __get_page(request):
@@ -86,7 +87,7 @@ def index(request, month=None, username=None, year=None):
     """
     Render a response with a list of articles
     """
-    order_by_title = __get_order_by_title
+    order_by_title = __get_order_by_title(request)
     if order_by_title:
         order = 'title'
     else:
