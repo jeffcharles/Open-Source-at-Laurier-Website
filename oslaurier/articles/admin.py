@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from oslaurier.articles.models import Article, ArticleForm
+from articles.models import Article, ArticleForm
 
 class ArticleAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_updated'

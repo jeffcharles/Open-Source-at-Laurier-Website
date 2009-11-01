@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
 from django.test.client import Client
-from oslaurier.articles.models import Article
+from articles.models import Article
 
 class ArticleTestCase(TestCase):
     # fixture data:

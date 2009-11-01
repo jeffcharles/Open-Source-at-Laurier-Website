@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('oslaurier.articles.views',
+urlpatterns = patterns('articles.views',
     (r'^articles/$', 'index'),
     (r'^articles/view/$', 'blank'),
     (r'^articles/(?P<year>\d{4})/$', 'index'),

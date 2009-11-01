@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django import template
-from oslaurier.articles.models import Article
+from articles.models import Article
 
 register = template.Library()
 

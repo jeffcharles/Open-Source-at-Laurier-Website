@@ -5,7 +5,7 @@ from django.http import Http404
 from django.http import HttpResponseForbidden, HttpResponseServerError
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
-from oslaurier.articles.models import Article
+from articles.models import Article
 
 def __get_articles(request, article_list, number_per_page):
     """
