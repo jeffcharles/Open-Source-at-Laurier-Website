@@ -17,16 +17,10 @@
             </div>
             <div id="top-navbar" class="horizontal-navbar">
                 <ul id="primary-navbar">
-                    <li><a href="" title="OSL Home Page">Home</a></li>
-                    <li><a href="" title="OSL Articles">Articles</a></li>
-                    <li><a href="" title="OSL User Submitted Links">Links</a></li>
-                    <li><a href="" title="OSL Wiki">Wiki</a></li>
-                    <li><a href="" title="OSL Forum">Forum</a></li>
-                    <li><a href="" title="OSL Software Projects">Development</a></li>
-                    <li><a href="" title="About OSL">About Us</a></li>
-                </ul>
-                <ul id="log-in-navbar">
-                    <li><a href="" title="Log-in Page">Log-in</a></li>
+                    <li><a href="{% url home %}" title="OSL Home Page">Home</a></li>
+                    <li><a href="{% url articles.views.index %}" title="OSL Articles">Articles</a></li>
+                    <li><a href="{% url development %}" title="OSL Software Projects">Development</a></li>
+                    <li><a href="{% url about %}" title="About OSL">About Us</a></li>
                 </ul>
                 <div style="clear: both"></div>
             </div>
@@ -39,8 +33,8 @@
             <p style="float: left; margin-left: 20px; margin-right: 20px;">&copy;2009 OSL</p>
             <div class="navbar">
                 <ul id="secondary-navbar" class="horizontal-navbar">
-                    <li><a href="" title="Terms of Use of the OSL Site">Terms and Conditions</a></li>
-                    <li><a href="" title="OSL Privacy Policy">Privacy</a></li>
+                    <li><a href="{% url terms %}" title="Terms of Use of the OSL Site">Terms and Conditions</a></li>
+                    <li><a href="{% url privacy %}" title="OSL Privacy Policy">Privacy</a></li>
                 </ul>
             </div>
         </div>
