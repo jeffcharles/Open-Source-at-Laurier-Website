@@ -67,7 +67,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.http.ConditionalGetMiddleware',
 )
 
-ROOT_URLCONF = 'oslaurier.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     "",
@@ -83,7 +83,7 @@ INSTALLED_APPS = (
     'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'oslaurier.articles',
+    'articles',
 )
 
 try:
