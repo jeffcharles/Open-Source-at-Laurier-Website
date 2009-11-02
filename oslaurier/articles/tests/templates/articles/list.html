@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}List of Articles{% endblock %}
+
+{% block content %}
+<h1>List of Articles</h1>
+
+{% if not articles %}
+    <p>There doesn't seem to be anything here</p>
+{% else %}
+    {% if not articles.object_list %}
+        <p>Sorry, there do not appear to be any articles here.</p>
+    {% else %}
+        <ul>
+        {% for article in articles.object_list %}
+            <li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a> - {{ article.description }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <div class="pagination">
+        {% if articles.has_previous %}
+            <a href="?num_per_page={{ num_per_page }}&amp;page={{ articles.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        Page {{ articles.number }} of {{ articles.paginator.num_pages }}.
+
+        {% if articles.has_next %}
+            <a href="?num_per_page={{ num_per_page }}&amp;page={{ articles.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}

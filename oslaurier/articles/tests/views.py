@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
+
+from django.conf import settings
 from django.test import TestCase
 from django.test.client import Client
 from articles.models import Article
@@ -16,10 +19,27 @@ class ArticleTestCase(TestCase):
     #       Two author article (two-author-article)
     #       Multi-author article (multi-author-article), most recent
     fixtures = ['test_fixture.json']
-    urls = 'articles.test_urls'
+    urls = 'articles.tests.urls'
 
     def setUp(self):
+        self.old_LANGUAGES = settings.LANGUAGES
+        self.old_LANGUAGE_CODE = settings.LANGUAGE_CODE
+        settings.LANGUAGES = (('en', 'English'),)
+        settings.LANGUAGE_CODE = 'en'
+        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = (
+            os.path.join(
+                os.path.dirname(__file__),
+                'templates'
+            )
+        ,)
+
         self.client = Client()
+
+    def tearDown(self):
+        settings.LANGUAGES = self.old_LANGUAGES
+        settings.LANGUAGE_CODE = self.old_LANGUAGE_CODE
+        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
 
     def test_index(self):
         """
@@ -218,31 +238,29 @@ class ArticleTestCase(TestCase):
 
 class ArticlePaginationTestCase(TestCase):
     fixtures = ['pagination.json']
-    urls = 'articles.test_urls'
+    urls = 'articles.tests.urls'
 
     def setUp(self):
+        self.old_LANGUAGES = settings.LANGUAGES
+        self.old_LANGUAGE_CODE = settings.LANGUAGE_CODE
+        settings.LANGUAGES = (('en', 'English'),)
+        settings.LANGUAGE_CODE = 'en'
+        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = (
+            os.path.join(
+                os.path.dirname(__file__),
+                'templates'
+            )
+        ,)
+
         self.client = Client()
-        self.article1 = Article.objects.get(slug='hello-world')
-        self.article2 = Article.objects.get(slug='two-author-article')
-        self.article3 = Article.objects.get(slug='multi-author-article')
-        self.article4 = Article.objects.get(slug='article-4')
-        self.article5 = Article.objects.get(slug='article-5')
-        self.article6 = Article.objects.get(slug='article-6')
-        self.article7 = Article.objects.get(slug='article-7')
-        self.article8 = Article.objects.get(slug='article-8')
-        self.article9 = Article.objects.get(slug='article-9')
-        self.article10 = Article.objects.get(slug='article-10')
-        self.article11 = Article.objects.get(slug='article-11')
-        self.article12 = Article.objects.get(slug='article-12')
-        self.article13 = Article.objects.get(slug='article-13')
-        self.article14 = Article.objects.get(slug='article-14')
-        self.article15 = Article.objects.get(slug='article-15')
-        self.article16 = Article.objects.get(slug='article-16')
-        self.article17 = Article.objects.get(slug='article-17')
-        self.article18 = Article.objects.get(slug='article-18')
-        self.article19 = Article.objects.get(slug='article-19')
-        self.article20 = Article.objects.get(slug='article-20')
-        self.article21 = Article.objects.get(slug='article-21')
+
+    def tearDown(self):
+        settings.LANGUAGES = self.old_LANGUAGES
+        settings.LANGUAGE_CODE = self.old_LANGUAGE_CODE
+        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+
+        self.client = Client()
 
     def test_default_num_per_page(self):
         """

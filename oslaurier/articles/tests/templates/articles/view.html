@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title|title }}{% endblock %}
+
+{% block content %}
+<h1>{{ article.title|title }}</h1>
+<div id="article-author-date">
+    {{ authors }}<br />
+    {{ article.date_created|date:"F j, Y" }}
+    {% ifnotequal article.date_created article.date_updated %}
+        <br />Updated {{ article.date_updated|date:"F j, Y" }}
+    {% endifnotequal %}
+</div>
+<div id="article-description">
+    {{ article.description }}
+</div>
+{{ article.content|safe }}
+{% endblock %}
