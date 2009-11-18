@@ -6,7 +6,7 @@ class ArticleAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_updated'
     fieldsets = (
         (None, {
-            'fields': ('title', 'authors', 'description', 'content')
+            'fields': ('title', 'authors', 'description', 'markdown_content')
         }),
         (None, {
             'fields': ('draft', 'disable_comments', 'hidden')
