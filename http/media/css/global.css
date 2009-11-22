@@ -17,8 +17,9 @@ body {
 #container {
     background-color: #FFFFFF;
     min-height: 100%;
-    margin-left: 6%;
-    margin-right: 6%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 950px;
 }
 
 #content {
@@ -48,9 +49,10 @@ body {
     color: #CCCCCC;
     height: 1.5em;
     margin-top: -2.0em;
-    margin-left: 6%;
-    margin-right: 6%;
+    margin-left: auto;
+    margin-right: auto;
     padding-top: 0.5em;
+    width: 950px;
 }
 
 #footer p {
