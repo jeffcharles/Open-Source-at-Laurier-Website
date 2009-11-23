@@ -4,10 +4,17 @@
 DEBUG = False
 
 ADMINS = (
-    ('Jeffrey Charles', 'webmaster@oslaurier.com'),
+    ('Jeffrey Charles', 'webmaster@wluopensource.org'),
 )
 
 MANAGERS = ADMINS
+
+DATABASE_ENGINE = ''           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = ''             # Or path to database file if using sqlite3.
+DATABASE_USER = ''             # Not used with sqlite3.
+DATABASE_PASSWORD = ''         # Not used with sqlite3.
+DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -33,19 +40,22 @@ MEDIA_ROOT = ''
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = 'http://www.wluopensource.org/media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/admin_media/'
+ADMIN_MEDIA_PREFIX = 'http://www.wluopensource.org/media/admin/'
+
+# Make this unique, and don't share it with anybody.
+SECRET_KEY = ''
 
 # Custom settings I have added
-DEFAULT_FROM_EMAIL = 'django@oslaurier.org'
+DEFAULT_FROM_EMAIL = 'automailer@wluopensource.org'
 FILE_UPLOAD_PERMISSIONS = 0666
 SEND_BROKEN_LINK_EMAILS = False
-SERVER_EMAIL = 'django@oslaurier.org'
-SESSION_COOKIE_NAME = 'oslaurier_session'
+SERVER_EMAIL = 'django@wluopensource.org'
+SESSION_COOKIE_NAME = 'wluopensource_session'
 TEMPLATE_DEBUG = False
 
 # List of callables that know how to import templates from various sources.
