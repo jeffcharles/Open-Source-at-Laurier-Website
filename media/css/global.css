@@ -11,12 +11,15 @@ body {
 }
 
 #clear-footer {
-    height: -2.0em;
+    height: 2.0em;
 }
 
 #container {
     background-color: #FFFFFF;
+    height: auto !important;
+    height: 100%;
     min-height: 100%;
+    margin-bottom: -2.0em;
     margin-left: auto;
     margin-right: auto;
     width: 950px;
@@ -49,7 +52,6 @@ body {
     background-color: #333333;
     color: #CCCCCC;
     height: 1.5em;
-    margin-top: -2.0em;
     margin-left: auto;
     margin-right: auto;
     padding-top: 0.5em;
@@ -110,3 +112,4 @@ p {
 #top-navbar {
     background-color: #FF6600;
 }
+
