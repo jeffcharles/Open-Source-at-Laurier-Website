@@ -96,6 +96,10 @@ html {
     float: right;
 }
 
+ol {
+    list-style-position: inside;
+}
+
 p {
     margin: 15px 0px 15px 0px;
 }
@@ -111,5 +115,9 @@ p {
 
 #top-navbar {
     background-color: #FF6600;
+}
+
+ul {
+    list-style-position: inside;
 }
 
