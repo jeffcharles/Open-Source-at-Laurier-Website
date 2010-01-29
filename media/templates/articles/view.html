@@ -2,6 +2,8 @@
 
 {% block title %} | {{ article.title|title }}{% endblock %}
 
+{% block description %}{{ article.description }}{% endblock %}
+
 {% block css %}
 <link href="{{ MEDIA_URL }}css/article-view.css" rel="stylesheet" type="text/css" />
 {% endblock %}
