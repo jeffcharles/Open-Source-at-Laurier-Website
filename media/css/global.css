@@ -73,21 +73,21 @@ h1 {
     margin: 10px 0px 15px 0px;
 }
 
-navbar a {
+nav a {
     color: #FFFFFF;
     text-decoration: none;
 }
 
-navbar a:hover {
+nav a:hover {
     text-decoration: underline;
 }
 
-navbar ul {
+nav ul {
     list-style-type: none;
     padding: 3px 0px 3px 0px;
 }
 
-navbar li {
+nav li {
     display: inline;
     padding: 0px 20px 0px 20px;
 }
@@ -105,7 +105,7 @@ ol {
     list-style-position: inside;
 }
 
-navbar {
+nav {
     display: block;
 }
 

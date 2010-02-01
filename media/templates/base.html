@@ -17,14 +17,14 @@
         <div id="container">
             <header>
                 <img src="{{ MEDIA_URL }}images/OSL-logo.jpg" alt="OSL" width="214" height="100" />
-                <navbar id="primary-navbar">
+                <nav id="primary-navbar">
                     <ul>
                         <li><a href="{% url home %}" title="OSL Home Page">Home</a></li>
                         <li><a href="{% url articles.views.index %}" title="OSL Articles">Articles</a></li>
                         <li><a href="{% url development %}" title="OSL Software Projects">Development</a></li>
                         <li><a href="{% url about %}" title="About OSL">About Us</a></li>
                     </ul>
-                </navbar>
+                </nav>
             </header>
             <div id="content">
                 {% block content %}{% endblock %}
@@ -33,12 +33,12 @@
         </div>
         <footer>
             <section>&copy;2009 OSL</section>
-            <navbar id="secondary-navbar">
+            <nav id="secondary-navbar">
                 <ul>
                     <li><a href="{% url terms %}" title="Terms of Use of the OSL Site">Terms and Conditions</a></li>
                     <li><a href="{% url privacy %}" title="OSL Privacy Policy">Privacy</a></li>
                 </ul>
-            </navbar>
+            </nav>
         </footer>
         <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
