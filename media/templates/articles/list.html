@@ -22,13 +22,13 @@
     {% if articles.has_other_pages %}
         <div class="pagination">
             {% if articles.has_previous %}
-                <a href="?num_per_page={{ num_per_page }}&amp;page={{ articles.previous_page_number }}">&lt;&lt; Previous</a>
+                <a href="?num_per_page={{ num_per_page }}&amp;page={{ articles.previous_page_number }}" rel="prev">&lt;&lt; Previous</a>
             {% endif %}
 
             Page {{ articles.number }} of {{ articles.paginator.num_pages }}
 
             {% if articles.has_next %}
-                <a href="?num_per_page={{ num_per_page }}&amp;page={{ articles.next_page_number }}">Next &gt;&gt;</a>
+                <a href="?num_per_page={{ num_per_page }}&amp;page={{ articles.next_page_number }}" rel="next">Next &gt;&gt;</a>
             {% endif %}
         </div>
     {% endif %}

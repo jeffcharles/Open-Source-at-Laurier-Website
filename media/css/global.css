@@ -48,18 +48,23 @@ body {
     margin-top: 10px;
 }
 
-#footer {
+header {
+    display: block;
+}
+
+footer {
     background-color: #333333;
     color: #CCCCCC;
+    display: block;
     height: 1.5em;
     margin-left: auto;
     margin-right: auto;
-    padding-top: 0.5em;
-    width: 950px;
+    padding: 0.5em 10px 0em 10px;
+    width: 930px;
 }
 
-#footer p {
-    margin: 0px 0px 0px 0px;
+footer section {
+    display: inline;
 }
 
 h1 {
@@ -68,21 +73,21 @@ h1 {
     margin: 10px 0px 15px 0px;
 }
 
-.horizontal-navbar a {
+navbar a {
     color: #FFFFFF;
     text-decoration: none;
 }
 
-.horizontal-navbar a:hover {
+navbar a:hover {
     text-decoration: underline;
 }
 
-.horizontal-navbar ul {
+navbar ul {
     list-style-type: none;
     padding: 3px 0px 3px 0px;
 }
 
-.horizontal-navbar li {
+navbar li {
     display: inline;
     padding: 0px 20px 0px 20px;
 }
@@ -100,24 +105,32 @@ ol {
     list-style-position: inside;
 }
 
+navbar {
+    display: block;
+}
+
 p {
     margin: 15px 0px 15px 0px;
 }
 
 #primary-navbar {
-    float: left;
+    background-color: #FF6600;
     font-size: 1.2em;
 }
 
 #secondary-navbar {
+    display: inline;
     font-size: 1.0em;
 }
 
-#top-navbar {
-    background-color: #FF6600;
+#secondary-navbar ul {
+    display: inline;
+}
+
+section {
+    display: block;
 }
 
 ul {
     list-style-position: inside;
 }
-

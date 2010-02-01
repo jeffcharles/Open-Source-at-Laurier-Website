@@ -1,44 +1,45 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html lang="en">
     <head>
+        <meta charset="utf-8" />
         <title>OSL{% block title %}{% endblock %}</title>
         <meta name="author" content="OSL (Open Source at Laurier)" />
         <meta name="description" content="{% block description %}{% endblock %}" />
         <meta name="keywords" content="open,source,software,support,advocacy,development" />
-        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
         <meta name="google-site-verification" content="E132HGoJrQKRdNhgb6lxkp6e0Lc94hg3fwQBldnuHP0" />
-        <link href="{{ MEDIA_URL }}css/global.css" rel="stylesheet" type="text/css" />
+        <!--[if IE]>
+            <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link href="{{ MEDIA_URL }}css/global.css" rel="stylesheet" />
         {% block css %}{% endblock %}
     </head>
     <body>
         <div id="container">
-            <div id="header">
+            <header>
                 <img src="{{ MEDIA_URL }}images/OSL-logo.jpg" alt="OSL" width="214" height="100" />
-            </div>
-            <div id="top-navbar" class="horizontal-navbar">
-                <ul id="primary-navbar">
-                    <li><a href="{% url home %}" title="OSL Home Page">Home</a></li>
-                    <li><a href="{% url articles.views.index %}" title="OSL Articles">Articles</a></li>
-                    <li><a href="{% url development %}" title="OSL Software Projects">Development</a></li>
-                    <li><a href="{% url about %}" title="About OSL">About Us</a></li>
-                </ul>
-                <div style="clear: both"></div>
-            </div>
+                <navbar id="primary-navbar">
+                    <ul>
+                        <li><a href="{% url home %}" title="OSL Home Page">Home</a></li>
+                        <li><a href="{% url articles.views.index %}" title="OSL Articles">Articles</a></li>
+                        <li><a href="{% url development %}" title="OSL Software Projects">Development</a></li>
+                        <li><a href="{% url about %}" title="About OSL">About Us</a></li>
+                    </ul>
+                </navbar>
+            </header>
             <div id="content">
                 {% block content %}{% endblock %}
             </div>
             <div id="clear-footer"></div>
         </div>
-        <div id="footer">
-            <p style="float: left; margin-left: 20px; margin-right: 20px;">&copy;2009 OSL</p>
-            <div class="navbar">
-                <ul id="secondary-navbar" class="horizontal-navbar">
+        <footer>
+            <section>&copy;2009 OSL</section>
+            <navbar id="secondary-navbar">
+                <ul>
                     <li><a href="{% url terms %}" title="Terms of Use of the OSL Site">Terms and Conditions</a></li>
                     <li><a href="{% url privacy %}" title="OSL Privacy Policy">Privacy</a></li>
                 </ul>
-            </div>
-        </div>
+            </navbar>
+        </footer>
         <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
