@@ -113,6 +113,11 @@ p {
     font-size: 1.0em;
 }
 
+table thead {
+    font-weight: bold;
+    text-align: center;
+}
+
 #top-navbar {
     background-color: #FF6600;
 }
