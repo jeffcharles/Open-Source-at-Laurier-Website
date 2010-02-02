@@ -5,20 +5,26 @@
 {% block description %}{{ article.description }}{% endblock %}
 
 {% block css %}
-<link href="{{ MEDIA_URL }}css/article-view.css" rel="stylesheet" type="text/css" />
+<link href="{{ MEDIA_URL }}css/article-view.css" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
-<h1>{{ article.title|title }}</h1>
-<div id="article-author-date">
-    {{ authors }}<br />
-    {{ article.date_created|date:"F j, Y" }}
-    {% ifnotequal article.date_created article.date_updated %}
-        <br />Updated {{ article.date_updated|date:"F j, Y" }}
-    {% endifnotequal %}
-</div>
-<div id="article-description">
-    {{ article.description }}
-</div>
-{{ article.content|safe }}
+<article>
+    <header>
+        <hgroup>
+            <h1>{{ article.title|title }}</h1>
+            <div id="article-author-date">
+                {{ authors }}<br />
+                <time datetime="{{ article.date_created|date:"Y-m-d" }}" pubdate>{{ article.date_created|date:"F j, Y" }}</time>
+                {% ifnotequal article.date_created article.date_updated %}
+                    <br />Updated <time datetime="{{ article.date_updated|date:"Y-m-d" }}">{{ article.date_updated|date:"F j, Y" }}</time>
+                {% endifnotequal %}
+            </div>
+            <h2>
+                {{ article.description }}
+            </h2>
+        </hgroup>
+    </header>
+    {{ article.content|safe }}
+</article>
 {% endblock %}
