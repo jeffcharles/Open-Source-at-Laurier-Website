@@ -38,6 +38,11 @@ body {
     padding-bottom: 2.0em;
 }
 
+#content img {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
 #content ol {
     margin-bottom: 10px;
     margin-top: 10px;
