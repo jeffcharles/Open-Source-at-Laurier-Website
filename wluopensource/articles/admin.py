@@ -1,9 +1,19 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
+
+import settings
 from articles.models import Article, ArticleForm
 
 class ArticleAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_updated'
+    third_fieldset = (None, {
+            'fields': ('slug',)
+        })
+    if "tagging" in settings.INSTALLED_APPS:
+        third_fieldset = (None, {
+            'fields': ('slug', 'tags')
+        })    
+        
     fieldsets = (
         (None, {
             'fields': ('title', 'authors', 'description', 'markdown_content')
@@ -11,9 +21,7 @@ class ArticleAdmin(admin.ModelAdmin):
         (None, {
             'fields': ('draft', 'disable_comments', 'hidden')
         }),
-        (None, {
-            'fields': ('slug',)
-        })
+        third_fieldset
     )
     form = ArticleForm
     list_display = ('title', 'description', 'draft', 'disable_comments', 'hidden', 'slug',)

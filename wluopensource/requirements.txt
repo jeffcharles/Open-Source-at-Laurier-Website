@@ -2,3 +2,4 @@ Django==1.1.1
 Markdown
 psycopg2>=2.0.0
 wsgiref>=0.1.2
+django-tagging==0.3.1

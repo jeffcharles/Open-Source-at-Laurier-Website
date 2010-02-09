@@ -5,6 +5,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.forms import ModelForm
 
+import settings
+if "tagging" in settings.INSTALLED_APPS:
+    from tagging.fields import TagField
+
 class Article(models.Model):
     title = models.CharField(max_length=100, unique=True)
     authors = models.ManyToManyField(User)
@@ -17,6 +21,8 @@ class Article(models.Model):
     disable_comments = models.BooleanField('disable comments?', default=False)
     hidden = models.BooleanField('hide?', default=False)
     slug = models.SlugField(max_length=50)
+    if "tagging" in settings.INSTALLED_APPS:
+        tags = TagField()
 
     def __unicode__(self):
         return self.title
