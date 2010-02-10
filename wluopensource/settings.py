@@ -58,6 +58,14 @@ SERVER_EMAIL = 'django@wluopensource.org'
 SESSION_COOKIE_NAME = 'wluopensource_session'
 TEMPLATE_DEBUG = False
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.core.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "announcements.context_processors.site_wide_announcements",
+)
+
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
@@ -94,6 +102,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'articles',
+    'announcements',
+    'mailer',
+    'notification',
     'tagging'
 )
 

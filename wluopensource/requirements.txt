@@ -3,3 +3,7 @@ Markdown
 psycopg2>=2.0.0
 wsgiref>=0.1.2
 django-tagging==0.3.1
+django-announcements==0.1.0
+django-mailer==0.1.0
+django-notification==0.1.5
+
