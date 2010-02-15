@@ -8,6 +8,9 @@ class Flatpage(models.Model):
     markdown_content = models.TextField('content')
     content = models.TextField(editable=False)
     
+    class Meta:
+        ordering = ['page_name']
+    
     def __unicode__(self):
         return self.page_name
         
