@@ -6,7 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'osl_flatpages.views.get', {'page': 'Home'}, name="home"),
-    url(r'^about/$', direct_to_template, {'template': 'about.html'},
+    url(r'^about/$', 'osl_flatpages.views.get', {'page': 'About'}, 
         name="about"),
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
