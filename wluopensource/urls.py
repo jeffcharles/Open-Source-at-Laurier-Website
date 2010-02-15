@@ -5,7 +5,7 @@ from django.views.generic.simple import direct_to_template
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', direct_to_template, {'template': 'home.html'}, name="home"),
+    url(r'^$', 'osl_flatpages.views.get', {'page': 'Home'}, name="home"),
     url(r'^about/$', direct_to_template, {'template': 'about.html'},
         name="about"),
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
