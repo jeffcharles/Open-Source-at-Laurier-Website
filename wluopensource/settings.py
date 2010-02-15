@@ -57,6 +57,9 @@ SEND_BROKEN_LINK_EMAILS = False
 SERVER_EMAIL = 'django@wluopensource.org'
 SESSION_COOKIE_NAME = 'wluopensource_session'
 TEMPLATE_DEBUG = False
+# For tagging
+MAX_TAG_LENGTH = 25
+FORCE_LOWERCASE_TAGS = True
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.auth",
