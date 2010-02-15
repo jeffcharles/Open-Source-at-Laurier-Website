@@ -18,6 +18,6 @@ urlpatterns = patterns('',
         name="development"),
     url(r'^privacy/$', direct_to_template, {'template': 'privacy.html'},
         name="privacy"),
-    url(r'^terms/$', direct_to_template, {'template': 'terms.html'},
+    url(r'^terms/$', 'osl_flatpages.views.get', {'page': 'Terms'}, 
         name="terms"),
 )
