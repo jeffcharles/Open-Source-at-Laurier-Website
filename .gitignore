@@ -1,3 +1,5 @@
 *.pyc
 local_settings.py
 cron_scripts/local_variables.sh
+media/pub/*
+
