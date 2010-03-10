@@ -38,6 +38,11 @@ body {
     padding-bottom: 2.0em;
 }
 
+#content img {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
 #content ol {
     margin-bottom: 10px;
     margin-top: 10px;
@@ -71,6 +76,10 @@ h1 {
     border-bottom: thin dotted black;
     color: black;
     margin: 10px 0px 15px 0px;
+}
+
+img {
+    display: block;
 }
 
 nav a {
