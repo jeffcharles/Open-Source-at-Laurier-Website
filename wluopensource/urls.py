@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.conf.urls.defaults import *
 from django.contrib import admin
 from django.views.generic.simple import direct_to_template
@@ -19,3 +20,9 @@ urlpatterns = patterns('',
     url(r'^terms/$', 'osl_flatpages.views.get', {'page': 'Terms'}, 
         name="terms"),
 )
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root': settings.MEDIA_ROOT})
+    )
