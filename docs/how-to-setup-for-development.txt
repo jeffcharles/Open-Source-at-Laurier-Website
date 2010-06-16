@@ -1,0 +1,97 @@
+# How to set up a development environment for OSL main website source code #
+
+## Development ##
+
+We recommend developing the source code with a Unix-based operating system. The reason for this is that we recommend using a piece of software called virtualenvwrapper which only supports Unix-based operating systems at the present time.
+
+### Install required third party software ###
+
+The following third party software is recommended for your development machine:
+
+* Python 2.5 or later
+* PostgreSQL (database) (optional, can also use SQLite)
+* Git (source code management)
+* easy_install (Python package manager)
+* virtualenv (Python virtual environment manager)
+* virtualenvwrapper (virtualenv helper scripts, Note: only Unix-based operating systems supported)
+* pip (Virtual environment aware Python package manager)
+
+1. Open a terminal
+2. Type the following: sudo apt-get install python python-dev python-setuptools libpq-dev postgresql git-core
+3. Answer “Y” to any of the prompts that follow
+4. Ensure everything has been downloaded and installed correctly
+5. Now type the following: sudo easy_install virtualenv virtualenvwrapper pip
+6. Ensure everything has been downloaded and installed correctly
+7. Create a folder inside your home directory called .virtualenvs by typing: mkdir .virtualenvs
+8. Add the following two lines to your .bashrc file by opening it through your file manager:
+
+    export WORKON_HOME=$HOME/.virtualenvs
+	source /usr/local/bin/virtualenvwrapper.sh
+	
+9. Source the virtualenv_wrappers by typing: `source .bashrc`
+
+### Setup PostgreSQL ###
+
+1. Change to the postgres user (i.e., `sudo su postgres`)
+2. Open the PostgreSQL prompt (i.e., `psql`)
+3. Add a user (e.g., `CREATE USER wluopensource WITH PASSWORD 'green';`)
+4. Add a database (e.g., `CREATE DATABASE wluopensource OWNER wluopensource;`)
+5. Exit the PostgreSQL prompt
+6. Have PostgreSQL use password-based authentication locally instead of Ident-based authentication:
+    1. Open `/etc/postgresql/8.4/main/pg_hba.conf` (e.g., `gksudo gedit /etc/postgresql/8.4/main/pg_hba.conf`)
+    2. Change `local all all ident` to `local all all md5`
+7. Restart the PostgreSQL server (e.g., `sudo /etc/init.d/postgresql-8.4 restart`)
+
+### Download the website source code ###
+
+1. Change to a directory where you want to store the source code (the following step will download a directory called `osl-main-website` inside the present working directory)
+2. Download the project repository using git by typing: `git clone git://gitorious.org/osl-main-website/osl-main-website.git`
+3.Configure git to display your name and email for your commits by typing:
+ 
+    git config user.name “your username”
+    git config user.email “your email address”
+
+### Setup up a local settings file ###
+
+1. Now you need to create a local settings file, so use the file manager to go to the project folder and enter the `wluopensource` folder
+2. Create a file called `local_settings.py` and enter your database settings, secret key as well as any other settings you would like to override (such as the media templates and admin media templates locations)
+
+Here is a sample `local_settings.py` file:
+
+~~~.python
+import os
+
+DEBUG = True
+TEMPLATE_DEBUG = True
+
+DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'wluopensource'             # Or path to database file if using sqlite3.
+DATABASE_USER = 'wluopensource'             # Not used with sqlite3.
+DATABASE_PASSWORD = 'green'         # Not used with sqlite3.
+DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+
+MEDIA_ROOT = os.path.join(os.path.dirname(__file__), os.path.pardir, 'media')
+
+MEDIA_URL = '/site_media/'
+
+ADMIN_MEDIA_PREFIX = '/admin_media/'
+
+SECRET_KEY = 'qggt_qnf$k_k)6o@makif34ka8(xhhew&oziw3vr6_u^546*+6'
+
+TEMPLATE_DIRS = (
+    os.path.join(MEDIA_ROOT, 'templates')
+)
+~~~
+
+### Install third party Python packages required by the website source code ###
+
+1.Create a virtual environment for the website source code by typing: `mkvirtualenv –no-site-packages osl_main-website`
+2.Go to the project application directory (e.g., `osl-main-website/wluopensource`)
+3.Download, compile, and install the required python packages by typing: `pip install -r requirements.txt`
+
+### Steps to take when you want to work on the website source code ###
+
+Whenever you want to work on the source code, ensure that the appropriate servers are running (typically just PostgreSQL) and that the correct virtual environment is active (type: `workon osl_main-website` to activate the virtual environment).
+
+See Django documentation for further instructions (e.g., initially setting up the database) as our process is the same.
