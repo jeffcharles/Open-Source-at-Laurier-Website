@@ -1,0 +1,13 @@
+List of Contributors
+====================
+
+Software Development
+--------------------
+
+* Jeffrey Charles <<jeffrey.charles@wluopensource.org>>
+
+Graphics Design
+---------------
+
+* Blake Vollbrecht <<blake.vollbrecht@wluopensource.org>>
+
