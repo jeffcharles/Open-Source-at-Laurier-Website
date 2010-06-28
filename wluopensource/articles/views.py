@@ -25,27 +25,6 @@ def __get_articles(request, article_list, number_per_page):
         articles = None
     return articles
 
-def __get_authors(article):
-    """
-    Returns a string containing all of the articles authors
-    """
-    number_of_authors = len(article.authors.all())
-    if number_of_authors == 1:
-        authors = article.authors.all()[0].get_full_name()
-    elif number_of_authors == 2:
-        authors = " and ".join([author.get_full_name()
-            for author in article.authors.all()])
-    elif number_of_authors > 2:
-        authors = ", and ".join(
-            [", ".join([author.get_full_name()
-            for author in article.authors.all()[1:]]),
-            article.authors.all()[0].get_full_name()])
-    else:
-        return HttpResponseServerError("<h1>A server error has occurred</h1> \
-            <p>Please contact the webmaster with the url you attempted to \
-            access.</p>")
-    return authors
-
 def __get_order_by_title(request):
     """
     Returns whether to order the articles by title or by most recent
@@ -123,7 +102,6 @@ def view(request, slug_filter):
         return HttpResponseForbidden("<h1>You are not authorized to view this \
             page</h1>")
 
-    authors = __get_authors(article)
     return render_to_response('articles/view.html',
-        {'article': article, 'authors': authors},
+        {'article': article},
         context_instance=RequestContext(request))

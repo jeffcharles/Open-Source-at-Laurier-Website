@@ -197,7 +197,7 @@ class ArticleTestCase(TestCase):
         outputted correctly
         """
         response = self.client.get('/articles/view/multi-author-article/')
-        self.assertEqual(response.context['authors'],
+        self.assertEqual(response.context['article'].author_string,
             u'Siraj Mithoowani, Blake Vollbrecht, and Jeffrey Charles')
 
     def test_view_single_author_formatting(self):
@@ -205,7 +205,7 @@ class ArticleTestCase(TestCase):
         Test that article with single author has author name outputted correctly
         """
         response = self.client.get('/articles/view/hello-world/')
-        self.assertEqual(response.context['authors'], u'Jeffrey Charles')
+        self.assertEqual(response.context['article'].author_string, u'Jeffrey Charles')
 
     def test_view_template(self):
         """
@@ -226,7 +226,7 @@ class ArticleTestCase(TestCase):
         Test that article with two authors has author names outputted correctly
         """
         response = self.client.get('/articles/view/two-author-article/')
-        self.assertEqual(response.context['authors'],
+        self.assertEqual(response.context['article'].author_string,
             u'Jeffrey Charles and Siraj Mithoowani')
 
     def test_view_valid(self):

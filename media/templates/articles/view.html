@@ -14,7 +14,7 @@
         <hgroup>
             <h1>{{ article.title|title }}</h1>
             <div id="article-author-date">
-                {{ authors }}<br />
+                {{ article.author_string }}<br />
                 <time datetime="{{ article.date_created|date:"Y-m-d" }}" pubdate>{{ article.date_created|date:"F j, Y" }}</time>
                 {% ifnotequal article.date_created article.date_updated %}
                     <br />Updated <time datetime="{{ article.date_updated|date:"Y-m-d" }}">{{ article.date_updated|date:"F j, Y" }}</time>
