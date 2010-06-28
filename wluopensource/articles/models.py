@@ -40,15 +40,15 @@ class Article(models.Model):
         """
         number_of_authors = len(self.authors.all())
         if number_of_authors == 1:
-            authors = self.authors.all()[0].get_full_name()
+            authors = self.authors.order_by('last_name')[0].get_full_name()
         elif number_of_authors == 2:
             authors = " and ".join([author.get_full_name()
-                for author in self.authors.all()])
+                for author in self.authors.order_by('last_name')])
         elif number_of_authors > 2:
             authors = ", and ".join(
                 [", ".join([author.get_full_name()
-                for author in self.authors.all()[1:]]),
-                self.authors.all()[0].get_full_name()])
+                for author in self.authors.order_by('last_name')[1:]]),
+                self.authors.order_by('last_name')[0].get_full_name()])
         else:
             return HttpResponseServerError("<h1>A server error has occurred</h1> \
                 <p>Please contact the webmaster with the url you attempted to \
