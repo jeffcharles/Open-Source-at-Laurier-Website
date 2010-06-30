@@ -46,9 +46,9 @@ class Article(models.Model):
                 for author in self.authors.order_by('last_name')])
         elif number_of_authors > 2:
             authors = ", and ".join(
-                [", ".join([author.get_full_name()
-                for author in self.authors.order_by('last_name')[1:]]),
-                self.authors.order_by('last_name')[0].get_full_name()])
+                [", ".join([author.get_full_name() for author in 
+                self.authors.order_by('last_name')[:number_of_authors-1]]),
+                self.authors.order_by('last_name')[number_of_authors-1].get_full_name()])
         else:
             return HttpResponseServerError("<h1>A server error has occurred</h1> \
                 <p>Please contact the webmaster with the url you attempted to \
