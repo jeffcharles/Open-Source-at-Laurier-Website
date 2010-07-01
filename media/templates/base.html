@@ -17,13 +17,13 @@
     <body>
         <div id="container">
             <header>
-                <a href="{% url home %}" title="Open Source at Laurier Home Page"><img src="{{ MEDIA_URL }}images/OSL-banner.png" alt="Open Source at Laurier (OSL)" width="950" height="100" border="0" /></a>
+                <a href="{% url home %}" title="Home Page"><img src="{{ MEDIA_URL }}images/OSL-banner.png" alt="Open Source at Laurier (OSL)" width="950" height="100" border="0" /></a>
                 <nav id="primary-navbar">
                     <ul>
-                        <li><a href="{% url home %}" title="OSL Home Page">Home</a></li>
-                        <li><a href="{% url articles.views.index %}" title="OSL Articles">Articles</a></li>
-                        <li><a href="{% url development %}" title="OSL Software Projects">Development</a></li>
-                        <li><a href="{% url about %}" title="About OSL">About Us</a></li>
+                        <li><a href="{% url home %}" title="Home Page">Home</a></li>
+                        <li><a href="{% url articles.views.index %}" title="Articles">Articles</a></li>
+                        <li><a href="{% url development %}" title="Software Projects">Development</a></li>
+                        <li><a href="{% url about %}" title="About Us">About Us</a></li>
                         <li><a href="{% url laurier_wireless_connect %}" title="Laurier Wireless Connect">Laurier Wireless Connect</a></li>
                     </ul>
                 </nav>
@@ -49,8 +49,8 @@
             <section>&copy;2009-2010 OSL</section>
             <nav id="secondary-navbar">
                 <ul>
-                    <li><a href="{% url terms %}" title="Terms of Use of the OSL Site">Terms and Conditions</a></li>
-                    <li><a href="{% url privacy %}" title="OSL Privacy Policy">Privacy</a></li>
+                    <li><a href="{% url terms %}" title="Terms and Conditions">Terms and Conditions</a></li>
+                    <li><a href="{% url privacy %}" title="Privacy Policy">Privacy</a></li>
                 </ul>
             </nav>
         </footer>
