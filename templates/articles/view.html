@@ -14,7 +14,22 @@
         <hgroup>
             <h1>{{ article.title|title }}</h1>
             <div id="article-author-date">
-                {{ article.author_string }}<br />
+            {% if article.authors.all|length <= 2 %}
+                <a href="mailto:{{ article.authors.all.0.email }}">{{ article.authors.all.0.get_full_name }}</a>
+            {% endif %}
+            {% if article.authors.all|length == 2 %}
+                and <a href="mailto:{{ article.authors.all.1.email }}">{{ article.authors.all.1.get_full_name }}</a>
+            {% endif %}
+            {% if article.authors.all|length > 2 %}
+            {% for author in article.authors.all %}
+                {% if forloop.last %}
+                and <a href="mailto:{{ author.email }}">{{ author.get_full_name }}</a>
+                {% else %}
+                <a href="mailto:{{ author.email }}">{{ author.get_full_name }}</a>, 
+                {% endif %}
+            {% endfor %}
+            {% endif %}
+                <br />
                 <time datetime="{{ article.date_created|date:"Y-m-d" }}" pubdate>{{ article.date_created|date:"F j, Y" }}</time>
                 {% ifnotequal article.date_created article.date_updated %}
                     <br />Updated <time datetime="{{ article.date_updated|date:"Y-m-d" }}">{{ article.date_updated|date:"F j, Y" }}</time>
