@@ -33,28 +33,6 @@ class Article(models.Model):
     def save(self, force_insert=False, force_update=False):
         self.content = markdown.markdown(self.markdown_content)
         super(Article, self).save(force_insert, force_update)
-        
-    def _get_authors(self):
-        """
-        Returns a string containing all of the articles' authors
-        """
-        number_of_authors = len(self.authors.all())
-        if number_of_authors == 1:
-            authors = self.authors.order_by('last_name')[0].get_full_name()
-        elif number_of_authors == 2:
-            authors = " and ".join([author.get_full_name()
-                for author in self.authors.order_by('last_name')])
-        elif number_of_authors > 2:
-            authors = ", and ".join(
-                [", ".join([author.get_full_name() for author in 
-                self.authors.order_by('last_name')[:number_of_authors-1]]),
-                self.authors.order_by('last_name')[number_of_authors-1].get_full_name()])
-        else:
-            return HttpResponseServerError("<h1>A server error has occurred</h1> \
-                <p>Please contact the webmaster with the url you attempted to \
-                access.</p>")
-        return authors
-    author_string = property(_get_authors)
 
 class ArticleForm(ModelForm):
     class Meta:
