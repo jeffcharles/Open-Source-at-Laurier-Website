@@ -59,8 +59,6 @@ The following third party software is recommended for your development machine:
 Here is a sample `local_settings.py` file:
 
 ~~~.python
-import os
-
 DEBUG = True
 TEMPLATE_DEBUG = True
 
@@ -74,8 +72,6 @@ DATABASES = {
         'PORT': '',         # Set to empty string for default. Not used with sqlite3.
     }
 }
-
-ADMIN_MEDIA_PREFIX = '/admin_media/'
 
 SECRET_KEY = 'qggt_qnf$k_k)6o@makif34ka8(xhhew&oziw3vr6_u^546*+6'
 ~~~
