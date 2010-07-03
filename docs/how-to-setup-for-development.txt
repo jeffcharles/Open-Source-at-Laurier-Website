@@ -36,11 +36,12 @@ The following third party software is recommended for your development machine:
 2. Open the PostgreSQL prompt (i.e., `psql`)
 3. Add a user (e.g., `CREATE USER wluopensource WITH PASSWORD 'green';`)
 4. Add a database (e.g., `CREATE DATABASE wluopensource OWNER wluopensource;`)
-5. Exit the PostgreSQL prompt
-6. Have PostgreSQL use password-based authentication locally instead of Ident-based authentication:
+5. Allow the user you created in step 5 to create databases so Django can create the necessary test databases during automated testing (e.g., `ALTER USER wluopensource CREATEDB;`)
+6. Exit the PostgreSQL prompt
+7. Have PostgreSQL use password-based authentication locally instead of Ident-based authentication:
     1. Open `/etc/postgresql/8.4/main/pg_hba.conf` (e.g., `gksudo gedit /etc/postgresql/8.4/main/pg_hba.conf`)
     2. Change `local all all ident` to `local all all md5`
-7. Restart the PostgreSQL server (e.g., `sudo /etc/init.d/postgresql-8.4 restart`)
+8. Restart the PostgreSQL server (e.g., `sudo /etc/init.d/postgresql-8.4 restart`)
 
 ### Download the website source code ###
 
