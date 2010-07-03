@@ -191,22 +191,6 @@ class ArticleTestCase(TestCase):
         response = self.client.get('/articles/view/multi-author-article/')
         self.failUnlessEqual(response.status_code, 200)
 
-    def test_view_multi_authors_formatting(self):
-        """
-        Test that articles with multiple authors have the authors' names
-        outputted correctly
-        """
-        response = self.client.get('/articles/view/multi-author-article/')
-        self.assertEqual(response.context['article'].author_string,
-            u'Jeffrey Charles, Siraj Mithoowani, and Blake Vollbrecht')
-
-    def test_view_single_author_formatting(self):
-        """
-        Test that article with single author has author name outputted correctly
-        """
-        response = self.client.get('/articles/view/hello-world/')
-        self.assertEqual(response.context['article'].author_string, u'Jeffrey Charles')
-
     def test_view_template(self):
         """
         Test that article view loads the correct template
@@ -220,14 +204,6 @@ class ArticleTestCase(TestCase):
         """
         response = self.client.get('/articles/view/two-author-article/')
         self.failUnlessEqual(response.status_code, 200)
-
-    def test_view_two_authors_formatting(self):
-        """
-        Test that article with two authors has author names outputted correctly
-        """
-        response = self.client.get('/articles/view/two-author-article/')
-        self.assertEqual(response.context['article'].author_string,
-            u'Jeffrey Charles and Siraj Mithoowani')
 
     def test_view_valid(self):
         """
