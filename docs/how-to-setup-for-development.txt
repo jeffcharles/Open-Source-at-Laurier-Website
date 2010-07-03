@@ -75,17 +75,11 @@ DATABASES = {
     }
 }
 
-MEDIA_ROOT = os.path.join(os.path.dirname(__file__), os.path.pardir, 'media')
-
 MEDIA_URL = '/site_media/'
 
 ADMIN_MEDIA_PREFIX = '/admin_media/'
 
 SECRET_KEY = 'qggt_qnf$k_k)6o@makif34ka8(xhhew&oziw3vr6_u^546*+6'
-
-TEMPLATE_DIRS = (
-    os.path.join(MEDIA_ROOT, 'templates')
-)
 ~~~
 
 ### Install third party Python packages required by the website source code ###
