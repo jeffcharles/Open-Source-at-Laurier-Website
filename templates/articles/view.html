@@ -16,16 +16,15 @@
             <div id="article-author-date">
             {% if article.authors.all|length <= 2 %}
                 <a href="mailto:{{ article.authors.all.0.email }}">{{ article.authors.all.0.get_full_name }}</a>
-            {% endif %}
-            {% if article.authors.all|length == 2 %}
+                {% if article.authors.all|length == 2 %}
                 and <a href="mailto:{{ article.authors.all.1.email }}">{{ article.authors.all.1.get_full_name }}</a>
-            {% endif %}
-            {% if article.authors.all|length > 2 %}
+                {% endif %}
+            {% else %}
             {% for author in article.authors.all %}
-                {% if forloop.last %}
-                and <a href="mailto:{{ author.email }}">{{ author.get_full_name }}</a>
-                {% else %}
+                {% if not forloop.last %}
                 <a href="mailto:{{ author.email }}">{{ author.get_full_name }}</a>, 
+                {% else %}
+                and <a href="mailto:{{ author.email }}">{{ author.get_full_name }}</a>
                 {% endif %}
             {% endfor %}
             {% endif %}
