@@ -19,6 +19,10 @@ urlpatterns = patterns('',
         {'page': 'Laurier Wireless Connect'}, name="laurier_wireless_connect"),
     url(r'^privacy/$', 'osl_flatpages.views.get', {'page': 'Privacy'},
         name="privacy"),
+        
+    # used to get 'view on site' hyperlinks working in admin interface
+    url(r'^r/', include('django.conf.urls.shortcut')),
+    
     url(r'^terms/$', 'osl_flatpages.views.get', {'page': 'Terms'}, 
         name="terms"),
 )
