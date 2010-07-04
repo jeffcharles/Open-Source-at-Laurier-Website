@@ -27,8 +27,9 @@ class Article(models.Model):
     def __unicode__(self):
         return self.title
 
+    @models.permalink
     def get_absolute_url(self):
-        return "/articles/view/%s/" % self.slug
+        return ('articles.views.view', (), {'slug_filter': self.slug})
 
     def save(self, force_insert=False, force_update=False):
         self.content = markdown.markdown(self.markdown_content)
