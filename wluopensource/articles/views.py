@@ -73,7 +73,7 @@ def index(request, month=None, username=None, year=None):
         order = '-date_created'
 
     article_list = \
-        Article.objects.exclude(draft=True).exclude(hidden=True).order_by(order)
+        Article.objects.filter(status=Article.LIVE_STATUS).order_by(order)
 
     if month is not None and year is not None:
         article_list = (article_list.filter(date_created__year=year)
@@ -97,8 +97,8 @@ def view(request, slug_filter):
     """
     article = get_object_or_404(Article, slug=slug_filter)
 
-    # if article is hidden or a draft, return 403 error
-    if article.hidden or article.draft:
+    # if article is not live, return 403 error
+    if article.status != Article.LIVE_STATUS:
         return HttpResponseForbidden("<h1>You are not authorized to view this \
             page</h1>")
 

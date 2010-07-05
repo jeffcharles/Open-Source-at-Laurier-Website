@@ -10,6 +10,15 @@ if "tagging" in settings.INSTALLED_APPS:
     from tagging.fields import TagField
 
 class Article(models.Model):
+    LIVE_STATUS = 0
+    DRAFT_STATUS = 1
+    HIDDEN_STATUS = 2
+    STATUS_CHOICES = (
+        (LIVE_STATUS, 'Live'),
+        (DRAFT_STATUS, 'Draft'),
+        (HIDDEN_STATUS, 'Hidden'),
+    )
+
     title = models.CharField(max_length=100, unique=True)
     authors = models.ManyToManyField(User)
     date_created = models.DateField('date created', auto_now_add=True)
@@ -17,9 +26,9 @@ class Article(models.Model):
     description = models.CharField(max_length=200)
     markdown_content = models.TextField('content')
     content = models.TextField(editable=False)
-    draft = models.BooleanField('draft?', default=False)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=LIVE_STATUS,
+        db_index=True)
     disable_comments = models.BooleanField('disable comments?', default=False)
-    hidden = models.BooleanField('hide?', default=False)
     slug = models.SlugField(max_length=50)
     if "tagging" in settings.INSTALLED_APPS:
         tags = TagField()
