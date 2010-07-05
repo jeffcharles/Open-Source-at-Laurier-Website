@@ -97,8 +97,8 @@ def view(request, slug_filter):
     """
     article = get_object_or_404(Article, slug=slug_filter)
 
-    # if article is not live, return 403 error
-    if article.status != Article.LIVE_STATUS:
+    # if article is hidden return 403 error
+    if article.status == Article.HIDDEN_STATUS:
         return HttpResponseForbidden("<h1>You are not authorized to view this \
             page</h1>")
 
