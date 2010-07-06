@@ -50,7 +50,7 @@ class ArticleTestCase(TestCase):
 
     def test_index_default_list(self):
         """
-        Test that index is only displaying non-draft, non-hidden articles
+        Test that index is only displaying live articles
         """
         response = self.client.get('/articles/')
         hello_world = Article.objects.get(slug='hello-world')
