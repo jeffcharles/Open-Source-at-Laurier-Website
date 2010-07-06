@@ -165,10 +165,10 @@ class ArticleTestCase(TestCase):
 
     def test_view_draft(self):
         """
-        Test that draft article view returns a 403 response
+        Test that draft article view returns a 200 response
         """
         response = self.client.get('/articles/view/draft-article/')
-        self.failUnlessEqual(response.status_code, 403)
+        self.failUnlessEqual(response.status_code, 200)
 
     def test_view_hidden(self):
         """
