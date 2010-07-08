@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-import markdown
+from datetime import datetime
 
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+from django.db.models.signals import post_init
 from django.forms import ModelForm
+
+import markdown
 
 import settings
 if "tagging" in settings.INSTALLED_APPS:
@@ -18,6 +21,8 @@ class Article(models.Model):
         (DRAFT_STATUS, 'Draft'),
         (HIDDEN_STATUS, 'Hidden'),
     )
+    
+    __orig_status = None
 
     title = models.CharField(max_length=100, unique=True)
     authors = models.ManyToManyField(User)
@@ -33,15 +38,93 @@ class Article(models.Model):
     if "tagging" in settings.INSTALLED_APPS:
         tags = TagField()
 
+    def __init__(self, *args, **kwargs):
+        super(Article, self).__init__(*args, **kwargs)
+        self.__orig_status = self.status
+
     def __unicode__(self):
         return self.title
+
+    def __adjust_date_created(self):
+        """
+        Reset date created if article is changing from draft to something else
+        
+        Only called from save method.
+        
+        Going from draft to draft should not change anything:
+        >>> from datetime import timedelta
+        >>> a = Article()
+        >>> a.title = "Adjust date created"
+        >>> a.status = Article.DRAFT_STATUS
+        >>> a.save()
+        >>> a.date_created -= timedelta(days=1)
+        >>> a.save()
+        >>> orig_date = a.date_created.date()
+        >>> a = None
+        >>> a = Article.objects.get(title="Adjust date created")
+        >>> a.status = Article.DRAFT_STATUS
+        >>> a.save()
+        >>> a.date_created == orig_date
+        True
+        
+        Going from draft to live should change the date created:
+        >>> a = Article()
+        >>> a.title = "Adjust date created 2"
+        >>> a.status = Article.DRAFT_STATUS
+        >>> a.save()
+        >>> a.date_created -= timedelta(days=1)
+        >>> a.save()
+        >>> orig_date = a.date_created.date()
+        >>> a = None
+        >>> a = Article.objects.get(title="Adjust date created 2")
+        >>> a.status = Article.LIVE_STATUS
+        >>> a.save()
+        >>> a.date_created.date() > orig_date
+        True
+        
+        Going from live to draft should not change the date created:
+        >>> a = Article()
+        >>> a.title = "Adjust date created 3"
+        >>> a.status = Article.LIVE_STATUS
+        >>> a.save()
+        >>> a.date_created -= timedelta(days=1)
+        >>> a.save()
+        >>> orig_date = a.date_created.date()
+        >>> a = None
+        >>> a = Article.objects.get(title="Adjust date created")
+        >>> a.status = Article.DRAFT_STATUS
+        >>> a.save()
+        >>> a.date_created == orig_date
+        True
+        """
+        if self.__orig_status == self.DRAFT_STATUS and \
+                self.status != self.DRAFT_STATUS:
+            self.date_created = datetime.now()
+
+    def __convert_markdown_content_to_html(self):
+        """
+        Transform markdown content into html content
+        
+        >>> a = Article()
+        >>> a.title = "Markdown content to html"
+        >>> a.markdown_content = "# Something! #"
+        >>> a.save()
+        >>> a.content
+        u'<h1>Something!</h1>'
+        """
+        self.content = markdown.markdown(self.markdown_content)
 
     @models.permalink
     def get_absolute_url(self):
         return ('articles.views.view', (), {'slug_filter': self.slug})
 
     def save(self, force_insert=False, force_update=False):
-        self.content = markdown.markdown(self.markdown_content)
+        """
+        Transform Markdown content into HTML content and update date created
+        if article is going from draft to live status
+        """
+        self.__convert_markdown_content_to_html()
+        self.__adjust_date_created()
         super(Article, self).save(force_insert, force_update)
 
 class ArticleForm(ModelForm):
