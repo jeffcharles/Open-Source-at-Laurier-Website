@@ -3,7 +3,15 @@ from django.conf import settings
 from django.conf.urls.defaults import *
 from django.contrib import admin
 from django.views.generic.simple import direct_to_template
+
+from articles.sitemap import ArticlesSitemap
+from osl_flatpages.sitemap import FlatpagesSitemap
+
 admin.autodiscover()
+
+sitemaps = {
+    'articles': ArticlesSitemap,
+}
 
 urlpatterns = patterns('',
     url(r'^$', 'osl_flatpages.views.get', {'page': 'Home'}, name="home"),
@@ -23,6 +31,8 @@ urlpatterns = patterns('',
     # used to get 'view on site' hyperlinks working in admin interface
     url(r'^r/', include('django.conf.urls.shortcut')),
     
+    url('^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
+        {'sitemaps': sitemaps}),
     url(r'^terms/$', 'osl_flatpages.views.get', {'page': 'Terms'}, 
         name="terms"),
 )

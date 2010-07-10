@@ -106,6 +106,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django.contrib.redirects',
     'django.contrib.sessions',
+    'django.contrib.sitemaps',
     'django.contrib.sites',
     'articles',
     'announcements',
