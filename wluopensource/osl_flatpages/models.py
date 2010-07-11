@@ -43,7 +43,8 @@ class Flatpage(models.Model):
     description = models.CharField(blank=True, max_length=255)
     markdown_content = models.TextField('content')
     content = models.TextField(editable=False)
-    changefreq = models.CharField(max_length=7, choices=CHANGEFREQ_CHOICES)
+    changefreq = models.CharField(max_length=7, choices=CHANGEFREQ_CHOICES,
+        verbose_name="Change Frequency")
     
     class Meta:
         ordering = ['page_name']
