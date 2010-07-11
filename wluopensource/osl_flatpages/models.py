@@ -19,7 +19,10 @@ class Flatpage(models.Model):
     
     def get_absolute_url(self):
         """
-        Search for page name in urlconf, raise an exception if not found
+        Use urlconf to determine url name from page name and then use url name
+        to get absolute url. 
+        
+        Returns none if there is no url name associated with the page name.
         """
         from django.core.urlresolvers import reverse
         from urls import urlpatterns
