@@ -69,8 +69,6 @@ class Flatpage(models.Model):
                 hasattr(urlpattern, "name")):
                 
                 return reverse(urlpattern.name)
-                
-        return None
         
     def save(self, force_insert=False, force_update=False):
         self.content = markdown.markdown(self.markdown_content)
