@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: http://www.wluopensource.org/media/sitemap.xml
+Sitemap: http://www.wluopensource.org/sitemap.xml
