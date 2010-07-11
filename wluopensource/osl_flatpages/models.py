@@ -28,11 +28,22 @@ class Flatpage(models.Model):
     >>> about_fp.get_absolute_url()
     '/about/'    
     """
+    CHANGEFREQ_CHOICES = (
+        ('always', 'Always'),
+        ('hourly', 'Hourly'),
+        ('daily', 'Daily'),
+        ('weekly', 'Weekly'),
+        ('monthly', 'Monthly'),
+        ('yearly', 'Yearly'),
+        ('never', 'Never'),
+    )
+    
     page_name = models.CharField(max_length=100, primary_key=True, unique=True)
     title = models.CharField(blank=True, max_length=100)
     description = models.CharField(blank=True, max_length=255)
     markdown_content = models.TextField('content')
     content = models.TextField(editable=False)
+    changefreq = models.CharField(max_length=7, choices=CHANGEFREQ_CHOICES)
     
     class Meta:
         ordering = ['page_name']
