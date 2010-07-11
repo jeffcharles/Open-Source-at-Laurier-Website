@@ -1,11 +1,11 @@
-from datetime import datetime, time
-
 from django.contrib.sitemaps import Sitemap
 
 from osl_flatpages.models import Flatpage
 
 class FlatpagesSitemap(Sitemap):
-    changefreq = "never"
+    
+    def changefreq(self, obj):
+        return obj.changefreq
     
     def items(self):
         return Flatpage.objects.all()
