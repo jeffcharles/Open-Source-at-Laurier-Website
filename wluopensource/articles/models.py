@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from django.contrib.auth.models import User
+from django.contrib.sitemaps import ping_google, SitemapNotFound
 from django.db import models
 from django.db.models.signals import post_init
 from django.forms import ModelForm
@@ -113,6 +114,19 @@ class Article(models.Model):
         u'<h1>Something!</h1>'
         """
         self.content = markdown.markdown(self.markdown_content)
+    
+    def __ping_google(self):
+        """
+        Pings Google to let them know sitemap has been updated
+        """
+        try:
+            ping_google()
+        except SitemapNotFound:
+            raise
+        except Exception:
+            # Could get variety of HTTP-related exceptions, pinging Google is
+            # not critical so just swallow exception
+            pass
 
     @models.permalink
     def get_absolute_url(self):
@@ -125,7 +139,13 @@ class Article(models.Model):
         """
         self.__convert_markdown_content_to_html()
         self.__adjust_date_created()
+        if not self.id:
+            insert = True
+        else:
+            insert = False
         super(Article, self).save(force_insert, force_update)
+        if insert:
+            self.__ping_google()
 
 class ArticleForm(ModelForm):
     class Meta:
