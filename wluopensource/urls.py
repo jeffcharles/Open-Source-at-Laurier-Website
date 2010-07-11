@@ -11,6 +11,7 @@ admin.autodiscover()
 
 sitemaps = {
     'articles': ArticlesSitemap,
+    'flatpages': FlatpagesSitemap,
 }
 
 urlpatterns = patterns('',
