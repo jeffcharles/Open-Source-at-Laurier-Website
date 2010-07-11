@@ -115,18 +115,24 @@ class Article(models.Model):
         """
         self.content = markdown.markdown(self.markdown_content)
     
-    def __ping_google(self):
+    def __ping_google(self, is_new):
         """
         Pings Google to let them know sitemap has been updated
         """
-        try:
-            ping_google()
-        except SitemapNotFound:
-            raise
-        except Exception:
-            # Could get variety of HTTP-related exceptions, pinging Google is
-            # not critical so just swallow exception
-            pass
+        new_live_article = (is_new and self.status == self.LIVE_STATUS)
+        old_article_now_live = \
+            (not is_new and self.status == self.LIVE_STATUS and 
+            self.__orig_status != self.LIVE_STATUS)
+        
+        if (new_live_article or old_article_now_live):
+            try:
+                ping_google()
+            except SitemapNotFound:
+                raise
+            except Exception:
+                # Could get variety of HTTP-related exceptions, pinging Google is
+                # not critical so just swallow exception
+                pass
 
     @models.permalink
     def get_absolute_url(self):
@@ -135,17 +141,20 @@ class Article(models.Model):
     def save(self, force_insert=False, force_update=False):
         """
         Transform Markdown content into HTML content and update date created
-        if article is going from draft to live status
+        if article is going from draft to live status. Also ping Google if
+        new live article added or old article is now live.
         """
         self.__convert_markdown_content_to_html()
         self.__adjust_date_created()
+        
         if not self.id:
             insert = True
         else:
             insert = False
+        
         super(Article, self).save(force_insert, force_update)
-        if insert:
-            self.__ping_google()
+        
+        self.__ping_google(insert)
 
 class ArticleForm(ModelForm):
     class Meta:
