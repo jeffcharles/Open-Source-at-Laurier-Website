@@ -4,8 +4,8 @@ from django.conf.urls.defaults import *
 from articles.feeds import LatestArticlesRssFeed, LatestArticlesAtomFeed
 
 urlpatterns = patterns('articles.feeds',
-    (r'^rss/$', LatestArticlesRssFeed()),
-    (r'^atom/$', LatestArticlesAtomFeed())
+    url(r'^rss/$', LatestArticlesRssFeed(), name="articles_rss"),
+    url(r'^atom/$', LatestArticlesAtomFeed(), name="articles_atom")
 )
 
 urlpatterns += patterns('articles.views',
