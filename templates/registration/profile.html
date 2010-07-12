@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Account Profile{% endblock %}
+
+{% block description %}Your account profile settings{% endblock %}
+
+{% block content %}
+<h1>Your account profile settings</h1>
+
+<p>
+    Username: {{ user.username }}<br />
+    Password: <a href="{% url django.contrib.auth.views.password_change %}" title="Change password">Change password</a>
+</p>
+<p>
+    First name: {{ user.first_name }}<br />
+    Last name: {{ user.last_name }}<br />
+    Email address: <a href="mailto:{{ user.email }}">{{ user.email }}</a><br />
+</p>
+{% endblock %}

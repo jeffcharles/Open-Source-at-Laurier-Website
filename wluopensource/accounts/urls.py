@@ -9,4 +9,5 @@ urlpatterns = patterns('',
     (r'^password_reset_done/$', 'django.contrib.auth.views.password_reset_done'),
     (r'^password_reset_confirm/$', 'django.contrib.auth.views.password_reset_confirm'),
     (r'^password_reset_complete/$', 'django.contrib.auth.views.password_reset_complete'),
+    (r'^profile/$', 'accounts.views.profile'),
 )
