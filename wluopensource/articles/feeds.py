@@ -6,8 +6,7 @@ from articles.models import Article
 class LatestArticlesRssFeed(Feed):
     title = "Open Source at Laurier articles"
     link = "/articles/"
-    description = "Various articles revolving around open source software and \
-Open Source at Laurier"
+    description = "Various articles about open source software and Open Source at Laurier"
     
     def items(self):
         return Article.objects.filter(status=Article.LIVE_STATUS).order_by('-date_created')[:5]
