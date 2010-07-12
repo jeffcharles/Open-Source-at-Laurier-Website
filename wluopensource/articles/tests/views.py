@@ -212,6 +212,39 @@ class ArticleTestCase(TestCase):
         response = self.client.get('/articles/view/hello-world/')
         self.failUnlessEqual(response.status_code, 200)
 
+class ArticleFeedsTestCase(TestCase):
+    fixtures = ['test_fixture.json']
+    urls = 'articles.tests.urls'
+
+    def setUp(self):
+        self.old_LANGUAGES = settings.LANGUAGES
+        self.old_LANGUAGE_CODE = settings.LANGUAGE_CODE
+        settings.LANGUAGES = (('en', 'English'),)
+        settings.LANGUAGE_CODE = 'en'
+        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = (
+            os.path.join(
+                os.path.dirname(__file__),
+                'templates'
+            )
+        ,)
+
+        self.client = Client()
+
+    def tearDown(self):
+        settings.LANGUAGES = self.old_LANGUAGES
+        settings.LANGUAGE_CODE = self.old_LANGUAGE_CODE
+        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+        
+    def test_atom_status_code(self):
+        response = self.client.get('/articles/atom/')
+        self.assertEqual(response.status_code, 200)
+    
+    def test_rss_status_code(self):
+        response = self.client.get('/articles/rss/')
+        self.assertEqual(response.status_code, 200)
+    
+
 class ArticlePaginationTestCase(TestCase):
     fixtures = ['pagination.json']
     urls = 'articles.tests.urls'

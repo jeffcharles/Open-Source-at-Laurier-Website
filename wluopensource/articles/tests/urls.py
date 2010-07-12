@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('articles.views',
+from articles.feeds import LatestArticlesRssFeed, LatestArticlesAtomFeed
+
+urlpatterns = patterns('articles.feeds',
+    (r'^rss/$', LatestArticlesRssFeed()),
+    (r'^atom/$', LatestArticlesAtomFeed())
+)
+
+urlpatterns += patterns('articles.views',
     (r'^articles/$', 'index'),
     (r'^articles/view/$', 'blank'),
     (r'^articles/(?P<year>\d{4})/$', 'index'),
