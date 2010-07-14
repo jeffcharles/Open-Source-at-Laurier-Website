@@ -110,11 +110,6 @@ html {
     height: 100%;
 }
 
-#log-in-navbar {
-    font-size: 1.2em;
-    float: right;
-}
-
 ol {
     list-style-position: inside;
 }
