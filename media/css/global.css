@@ -158,13 +158,14 @@ ul {
 
 #user-bar {
     background-color: #333333;
+    color: #CCCCCC;
     padding: 0.5em 0em;
     text-align: right;
 }
 
 #user-bar li {
-    border-right: 1px thin solid #FFFFFF;
     display: inline;
+    padding: 10px;
 }
 
 #user-bar nav {
