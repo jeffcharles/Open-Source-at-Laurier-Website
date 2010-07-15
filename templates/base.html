@@ -29,6 +29,25 @@
                         <li><a href="{% url laurier_wireless_connect %}" title="Laurier Wireless Connect">Laurier Wireless Connect</a></li>
                     </ul>
                 </nav>
+                <div id="user-bar">
+                {% if user.is_authenticated %}
+                    <ul>
+                        <li>Signed in as {{ user.username }}</li>
+                        <li>
+                            <nav id="user-navbar">
+                                <ul>
+                                    <li><a href="{% url accounts.views.profile %}" title="View Profile">View Profile</a></li>
+                                    <li><a href="{% url django.contrib.auth.views.logout %}" title="Sign Out">Sign Out</a></li>
+                                </ul>
+                            </nav>
+                        </li>
+                    </ul>
+                {% else %}
+                    <nav id="user-signin">
+                        <a href="{% url django.contrib.auth.views.login %}" title="Sign in">Sign In</a>
+                    </nav>
+                {% endif %}
+                </div>
             </header>
             <div id="content">
             {% if site_wide_announcements %}

@@ -155,3 +155,24 @@ section {
 ul {
     list-style-position: inside;
 }
+
+#user-bar {
+    background-color: #333333;
+    padding: 0.5em 0em;
+    text-align: right;
+}
+
+#user-bar li {
+    border-right: 1px thin solid #FFFFFF;
+    display: inline;
+}
+
+#user-bar nav {
+    display: inline;
+}
+
+#user-bar ul {
+    display: inline;
+    list-style-type: none;
+    padding: 3px 0px;
+}
