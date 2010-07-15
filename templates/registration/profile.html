@@ -16,4 +16,5 @@
     Last name: {{ user.last_name }}<br />
     Email address: <a href="mailto:{{ user.email }}">{{ user.email }}</a><br />
 </p>
+<p><a href="{% url accounts.views.profile_change %}" title="Update Profile">Update Your Profile</a></p>
 {% endblock %}
