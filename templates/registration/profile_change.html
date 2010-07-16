@@ -7,6 +7,10 @@
 {% block content %}
 <h1>Update account profile</h1>
 
+{% if form.errors %}
+<p class="error">Please correct the errors below.</p>
+{% endif %}
+
 <form method="post" action="">
 <table border="0" cellpadding="0" cellspacing="0">
     {{ form }}

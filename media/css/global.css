@@ -154,6 +154,10 @@ p {
     margin: 15px 0px 15px 0px;
 }
 
+p.error {
+    color: #FF0000;
+}
+
 #primary-navbar {
     background-color: #FF6600;
     font-size: 1.2em;
