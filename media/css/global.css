@@ -77,6 +77,16 @@ footer section {
     display: inline;
 }
 
+form td, th {
+    padding-bottom: 10px;
+}
+
+form th {
+    font-weight: normal;
+    padding-right: 10px;
+    text-align: right;
+}
+
 h1 {
     border-bottom: thin dotted black;
     color: black;
@@ -152,8 +162,17 @@ section {
     padding: 5px 10px 5px 10px;
 }
 
+th {
+    vertical-align: bottom;
+}
+
 ul {
     list-style-position: inside;
+}
+
+ul.errorlist {
+    font-size: 0.8em;
+    list-style-type: none;
 }
 
 #user-bar {
