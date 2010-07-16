@@ -58,6 +58,16 @@ body {
     margin-top: 10px;
 }
 
+#content ul.errorlist {
+    font-size: 0.8em;
+    list-style-type: none;
+    margin: 0px;
+}
+
+#content ul.errorlist li {
+    margin-bottom: 2px;
+}
+
 header {
     display: block;
 }
@@ -78,13 +88,25 @@ footer section {
 }
 
 form td, th {
-    padding-bottom: 10px;
+    padding: 10px;
 }
 
 form th {
     font-weight: normal;
     padding-right: 10px;
     text-align: right;
+    vertical-align: bottom;
+}
+
+form tr.error {
+    background-color: #DE9988;
+}
+
+form tr.error td, tr.error th {
+    border-bottom: 3px solid #CC0000;
+    border-top: 3px solid #CC0000;
+    padding-bottom: 7px;
+    padding-top: 7px;
 }
 
 h1 {
@@ -162,17 +184,8 @@ section {
     padding: 5px 10px 5px 10px;
 }
 
-th {
-    vertical-align: bottom;
-}
-
 ul {
     list-style-position: inside;
-}
-
-ul.errorlist {
-    font-size: 0.8em;
-    list-style-type: none;
 }
 
 #user-bar {
