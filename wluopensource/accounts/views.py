@@ -1,9 +1,22 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
 
 from accounts.forms import UserInfoChangeForm
+
+def create_account(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(profile)
+    else:
+        form = UserCreationForm()
+    return render_to_response('registration/create_account.html', {
+        'form': form,
+    }, context_instance=RequestContext(request))
 
 @login_required
 def profile(request):
@@ -24,4 +37,3 @@ def profile_change(request):
         'form': form,
     }, context_instance=RequestContext(request))
         
-
