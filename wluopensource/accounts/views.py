@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -10,7 +11,11 @@ def create_account(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
+            cd = form.cleaned_data
+            user = User.objects.create_user(cd['username'], u'', cd['password1'])
+            user.save()
+            user = authenticate(username=cd['username'], password=cd['password1'])
+            login(request, user)
             return redirect(profile)
     else:
         form = UserCreationForm()
