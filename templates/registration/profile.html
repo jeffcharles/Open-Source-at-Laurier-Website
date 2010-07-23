@@ -12,9 +12,9 @@
     Password: <a href="{% url django.contrib.auth.views.password_change %}" title="Change password">Change password</a>
 </p>
 <p>
-    First name: {{ user.first_name }}<br />
-    Last name: {{ user.last_name }}<br />
-    Email address: <a href="mailto:{{ user.email }}">{{ user.email }}</a><br />
+    First name: {% if user.first_name %}{{ user.first_name }}{% else %}&lt;Not provided&gt;{% endif %}<br />
+    Last name: {% if user.last_name %}{{ user.last_name }}{% else %}&lt;Not provided&gt;{% endif %}<br />
+    Email address: {% if user.email %}<a href="mailto:{{ user.email }}">{{ user.email }}</a>{% else %}&lt;Not provided&gt;{% endif %}<br />
 </p>
 <p><a href="{% url accounts.views.profile_change %}" title="Update Profile">Update Your Profile</a></p>
 {% endblock %}
