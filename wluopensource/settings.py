@@ -55,6 +55,16 @@ ADMIN_MEDIA_PREFIX = '/media/admin/'
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
 
+# Facebook and Twitter keys
+FACEBOOK_API_KEY = ''
+FACEBOOK_SECRET_KEY = ''
+
+TWITTER_CONSUMER_KEY = ''
+TWITTER_CONSUMER_SECRET_KEY = ''
+TWITTER_REQUEST_TOKEN_URL = ''
+TWITTER_ACCESS_TOKEN_URL = ''
+TWITTER_AUTHORIZATION_URL = ''
+
 # Custom settings I have added
 DEFAULT_FROM_EMAIL = 'automailer@wluopensource.org'
 FILE_UPLOAD_PERMISSIONS = 0666
@@ -90,6 +100,14 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.redirects.middleware.RedirectFallbackMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
+    'socialregistration.middleware.FacebookMiddleware'
+)
+
+AUTHENTICATION_BACKENDS = (
+    'socialregistration.auth.FacebookAuth',
+    'socialregistration.auth.TwitterAuth',
+    'socialregistration.auth.OpenIDAuth',
+    'django.contrib.auth.backends.ModelBackend'
 )
 
 ROOT_URLCONF = 'urls'
@@ -113,6 +131,7 @@ INSTALLED_APPS = (
     'mailer',
     'notification',
     'osl_flatpages',
+    'socialregistration',
     'tagging'
 )
 
