@@ -9,7 +9,7 @@ django-tagging==0.3.1
 django-announcements==0.1.0
 django-mailer==0.1.0
 django-notification==0.1.5
-django-socialregistration==0.4
 
 -e git+http://github.com/facebook/python-sdk.git#egg=facebook
+-e git+http://github.com/flashingpumpkin/django-socialregistration.git#egg=socialregistration
 
