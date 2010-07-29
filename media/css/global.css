@@ -163,6 +163,29 @@ p.error {
     font-size: 1.2em;
 }
 
+#registration-page #google-openid-button {
+    background: #FFFFFF url('/media/images/registration_logos/google_logo.png') no-repeat center;
+    border: 3px solid #999999;
+    cursor: pointer;
+    height: 120px;
+    padding: 5px;
+    width: 300px;
+}
+
+#registration-page #register-div {
+    border-left: 3px dashed #333333;
+    float: right;
+    width: 500px;
+}
+
+#registration-page #register-div > * {
+    margin-left: 20px;
+}
+
+#registration-page #third-party-div > * {
+    margin: 20px 0px 20px 0px;
+}
+
 #secondary-navbar {
     display: inline;
     font-size: 1.0em;
