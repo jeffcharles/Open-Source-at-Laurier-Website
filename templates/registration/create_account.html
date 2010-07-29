@@ -15,7 +15,7 @@
         <p class="error">Please correct the errors below.</p>
         {% endif %}
 
-        <form method="post" action="">
+        <form method="post" action="">{% csrf_token %}
         <table border="0" cellpadding="0" cellspacing="0">
             {% for field in form %}
                 {% if not field.errors %}
