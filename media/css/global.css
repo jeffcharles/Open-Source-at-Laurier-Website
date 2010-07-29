@@ -178,13 +178,17 @@ p.error {
 }
 
 #registration-page #register-div {
-    border-left: 3px dashed #333333;
     float: right;
     width: 540px;
 }
 
 #registration-page #register-div > * {
     margin-left: 20px;
+}
+
+#registration-page #third-party-div {
+    border-right: 3px dashed #333333;
+    width: 350px;
 }
 
 #registration-page #third-party-div > * {
