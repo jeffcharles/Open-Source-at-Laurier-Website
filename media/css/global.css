@@ -3,6 +3,36 @@
     padding: 0;
 }
 
+#auth-page #google-openid-button {
+    background: #FFFFFF url('/media/images/registration_logos/google_logo.png') no-repeat center;
+    border: 2px solid #999999;
+    cursor: pointer;
+    height: 85px;
+    width: 225px;
+}
+
+#auth-page #google-openid-button:hover {
+    border: 2px solid #FFE4C4;
+}
+
+#auth-page #register-div {
+    float: right;
+    width: 540px;
+}
+
+#auth-page #register-div > * {
+    margin-left: 20px;
+}
+
+#auth-page #third-party-div {
+    border-right: 3px dashed #333333;
+    width: 350px;
+}
+
+#auth-page #third-party-div > * {
+    margin: 20px 0px 20px 0px;
+}
+
 body {
     background-color: #999999;
     color: #FFFFFF;
@@ -167,36 +197,6 @@ p.error {
 #primary-navbar {
     background-color: #FF6600;
     font-size: 1.2em;
-}
-
-#registration-page #google-openid-button {
-    background: #FFFFFF url('/media/images/registration_logos/google_logo.png') no-repeat center;
-    border: 2px solid #999999;
-    cursor: pointer;
-    height: 85px;
-    width: 225px;
-}
-
-#registration-page #google-openid-button:hover {
-    border: 2px solid #FFE4C4;
-}
-
-#registration-page #register-div {
-    float: right;
-    width: 540px;
-}
-
-#registration-page #register-div > * {
-    margin-left: 20px;
-}
-
-#registration-page #third-party-div {
-    border-right: 3px dashed #333333;
-    width: 350px;
-}
-
-#registration-page #third-party-div > * {
-    margin: 20px 0px 20px 0px;
 }
 
 #secondary-navbar {
