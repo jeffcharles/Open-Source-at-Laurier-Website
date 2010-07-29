@@ -89,13 +89,13 @@ footer section {
 
 form td, th {
     padding: 10px;
+    vertical-align: bottom;
 }
 
 form th {
     font-weight: normal;
     padding-right: 10px;
     text-align: right;
-    vertical-align: bottom;
 }
 
 form tr.error {
