@@ -23,4 +23,15 @@
     <tr><th><input type="submit" value="Create Account" /></th><td></td>
 </table>
 </form>
+
+{% load facebook_tags %}
+{% facebook_button %}
+{% facebook_js %}
+
+{% load twitter_tags %}
+{% twitter_button %}
+
+{% load openid_tags %}
+{% openid_form %}
+
 {% endblock %}
