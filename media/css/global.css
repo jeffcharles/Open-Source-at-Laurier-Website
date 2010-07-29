@@ -150,6 +150,12 @@ nav {
     display: block;
 }
 
+input.openid {
+    background-image: url('/media/images/openid_logo/openid-16x16.gif');
+    background-repeat: no-repeat;
+    padding-left: 16px;
+}
+
 p {
     margin: 15px 0px 15px 0px;
 }
