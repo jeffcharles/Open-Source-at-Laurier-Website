@@ -165,11 +165,10 @@ p.error {
 
 #registration-page #google-openid-button {
     background: #FFFFFF url('/media/images/registration_logos/google_logo.png') no-repeat center;
-    border: 3px solid #999999;
+    border: 2px solid #999999;
     cursor: pointer;
-    height: 120px;
-    padding: 5px;
-    width: 300px;
+    height: 85px;
+    width: 225px;
 }
 
 #registration-page #register-div {
