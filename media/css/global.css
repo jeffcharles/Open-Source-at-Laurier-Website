@@ -177,6 +177,10 @@ p.error {
     width: 225px;
 }
 
+#registration-page #google-openid-button:hover {
+    border: 2px solid #FFE4C4;
+}
+
 #registration-page #register-div {
     float: right;
     width: 540px;
