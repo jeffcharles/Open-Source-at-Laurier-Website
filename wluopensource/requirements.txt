@@ -3,7 +3,6 @@ Markdown
 oauth2==1.2
 psycopg2>=2.0.0
 python-openid==2.2
-facebook-python-sdk==0.1
 wsgiref>=0.1.2
 django-tagging==0.3.1
 django-announcements==0.1.0
