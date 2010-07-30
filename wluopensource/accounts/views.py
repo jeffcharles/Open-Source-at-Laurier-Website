@@ -1,24 +1,23 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
 
-from accounts.forms import UserInfoChangeForm
+from accounts.forms import OslUserCreationForm, UserInfoChangeForm
 
 def create_account(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = OslUserCreationForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            user = User.objects.create_user(cd['username'], u'', cd['password1'])
+            user = User.objects.create_user(cd['username'], cd['email'], cd['password1'])
             user.save()
             user = authenticate(username=cd['username'], password=cd['password1'])
             login(request, user)
             return redirect(profile)
     else:
-        form = UserCreationForm()
+        form = OslUserCreationForm()
     return render_to_response('registration/create_account.html', {
         'form': form,
     }, context_instance=RequestContext(request))
