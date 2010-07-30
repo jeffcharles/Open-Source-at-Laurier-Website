@@ -18,11 +18,7 @@
         <form method="post" action="">{% csrf_token %}
         <table border="0" cellpadding="0" cellspacing="0">
             {% for field in form %}
-                {% if not field.errors %}
-                    <tr><th>{{ field.label_tag }}:</th><td>{{ field }}</td><td>{{ field.help_text }}</td></tr>
-                {% else %}
-                    <tr class="error"><th>{{ field.label_tag }}:</th><td>{{ field.errors }}{{ field }}</td><td>{{ field.help_text }}</td></tr>
-                {% endif %}
+                <tr class="{{ field.css_classes }}"><th>{{ field.label_tag }}:</th><td>{{ field.errors }}{{ field }}</td><td>{{ field.help_text }}</td></tr>
             {% endfor %}
             <tr><th><input type="submit" value="Create Account" /></th><td></td>
         </table>
