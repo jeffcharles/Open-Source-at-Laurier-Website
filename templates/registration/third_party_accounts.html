@@ -1,0 +1,14 @@
+<form action="{% url openid_redirect %}" method="GET">
+    <input type="hidden" name="openid_provider" value="http://www.google.com/accounts/o8/id" />
+    <input id="google-openid-button" type="submit" value="" />
+</form>
+
+{% load facebook_tags %}
+{% facebook_button %}
+{% facebook_js %}
+
+{% load twitter_tags %}
+{% twitter_button %}
+
+{% load openid_tags %}
+{% openid_form %}
