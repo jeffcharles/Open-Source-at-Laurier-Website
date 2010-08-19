@@ -121,6 +121,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.auth',
+    'django.contrib.comments',
     'django.contrib.contenttypes',
     'django.contrib.humanize',
     'django.contrib.redirects',
@@ -131,6 +132,7 @@ INSTALLED_APPS = (
     'announcements',
     'mailer',
     'notification',
+    'osl_comments',
     'osl_flatpages',
     'socialregistration',
     'tagging'
