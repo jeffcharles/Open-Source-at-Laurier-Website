@@ -1,5 +1,10 @@
-from django.contrib.comments.templatetags import CommentListNode
+from django import template
+from django.conf import settings
+from django.contrib import comments
+from django.contrib.comments.templatetags.comments import CommentListNode
+from django.utils.encoding import smart_unicode
 
+register = template.Library()
 
 class OslCommentListNode(CommentListNode):
     """Insert a list of comments into the context."""
@@ -22,65 +27,104 @@ class OslCommentListNode(CommentListNode):
         if not object_pk:
             return self.comment_model.objects.none()
         
-        if self.sorted_by = 'oldest':
-            order_by = 'submit_date ASC'
-        elif self.sorted_by = 'newest':
-            order_by = 'submit_date DESC'
+        if self.sorted_by == 'oldest':
+            first_order_by = 'thread_submit_date ASC'
+            second_order_by = 'submit_date ASC'
+        elif self.sorted_by == 'newest':
+            first_order_by = 'thread_submit_date DESC'
+            second_order_by = 'submit_date DESC'
         else:
-            order_by = 'submit_date DESC'
+            first_order_by = 'thread_submit_date DESC'
+            second_order_by = 'submit_date DESC'
         
-        sql = """
+        removed_comments_condition = 'id IS NOT NULL'    
+        if getattr(settings, 'COMMENTS_HIDE_REMOVED', True):
+            removed_comments_condition = 'is_removed = False'
+        
+        get_threaded_comments_sql = """
             SELECT
-                dc.user_name,
-                dc.user_url,
-                dc.comment,
-                dc.submit_date,
-                oc.edit_timestamp
-                dc2.user_name,
-                dc2.user_url,
-                dc2.comment,
-                dc2.submit_date,
-                oc2.edit_timestamp
-            FROM
-                django_comments AS dc
-            JOIN
-                osl_comments_oslcomments AS oc 
-                ON dc.id = oc.comment_ptr_id 
-            LEFT OUTER JOIN
-                osl_comments_oslcomments AS oc2 
-                ON oc.comment_ptr_id = oc2.parent_comment_pk 
-            JOIN
-                django_comments AS dc2 
-                ON oc2.comment_ptr_id = dc2.id
-            WHERE
-                dc.content_type_id = %(content_type)r AND
-                dc.object_pk = %(object_pk)r AND
-                dc.site_id = %(site_id)r AND
-                ((dc.is_public = True AND dc2.id = NULL) OR dc2.is_public = True) AND
-                dc.inline_to_object = False
+                id,
+                parent,
+                user_name,
+                user_url,
+                comment,
+                thread_submit_date,
+                submit_date,
+                edit_timestamp
+            FROM (
+                SELECT
+                    dc.id,
+                    True AS parent,
+                    dc.id AS thread_id,
+                    dc.user_name,
+                    dc.user_url,
+                    dc.comment,
+                    dc.submit_date AS thread_submit_date,
+                    dc.submit_date,
+                    oc.edit_timestamp
+                FROM
+                    django_comments AS dc
+                JOIN
+                    osl_comments_oslcomment AS oc 
+                    ON dc.id = oc.comment_ptr_id 
+                WHERE
+                    dc.content_type_id = %(content_type)d AND
+                    dc.object_pk = %(object_pk)s AND
+                    dc.site_id = %(site_id)d AND
+                    dc.is_public = TRUE AND
+                    dc.%(removed_comments_condition)s AND
+                    oc.inline_to_object = False AND
+                    oc.parent_comment_id IS NULL
+                UNION
+                SELECT
+                    dc2.id,
+                    False AS parent,
+                    oc2.parent_comment_id AS thread_id,
+                    dc2.user_name,
+                    dc2.user_url,
+                    dc2.comment,
+                    dc3.submit_date AS thread_submit_date,
+                    dc2.submit_date,
+                    oc2.edit_timestamp
+                FROM
+                    django_comments AS dc2
+                JOIN
+                    osl_comments_oslcomment AS oc2
+                    ON dc2.id = oc2.comment_ptr_id
+                JOIN
+                    django_comments AS dc3
+                    ON dc3.id = oc2.parent_comment_id
+                WHERE
+                    dc2.content_type_id = %(content_type)d AND
+                    dc2.object_pk = %(object_pk)s AND
+                    dc2.site_id = %(site_id)d AND
+                    dc2.is_public = True AND
+                    dc2.%(removed_comments_condition)s AND
+                    dc3.%(removed_comments_condition)s AND
+                    oc2.inline_to_object = False AND
+                    oc2.parent_comment_id IS NOT NULL
+                ) AS t
             ORDER BY
-                dc.%(first_thread_order_by)r,
-                dc.id ASC
-                dc2.%(second_thread_order_by)r
+                %(first_thread_order_by)s,
+                thread_id ASC,
+                parent DESC,
+                %(second_thread_order_by)s
             LIMIT
-                %(limit)r
+                %(limit)d
             OFFSET
-                %(offset)r
+                %(offset)d
         """ % {
-            'content_type': ctype,
-            'object_pk': smart_unicode(object_pk),
+            'content_type': ctype.id,
+            'object_pk': "'%s'" % object_pk,
             'site_id': settings.SITE_ID,
-            'first_thread_order_by': order_by,
-            'second_thread_order_by': order_by,
+            'removed_comments_condition': removed_comments_condition,
+            'first_thread_order_by': first_order_by,
+            'second_thread_order_by': second_order_by,
             'limit': self.limit, 
             'offset': self.offset
         }
         
-        qs = self.comment_model.objects.raw(sql)
-
-        field_names = [f.name for f in self.comment_model._meta.fields]
-        if getattr(settings, 'COMMENTS_HIDE_REMOVED', True) and 'is_removed' in field_names:
-            qs = qs.filter(is_removed=False)
+        qs = self.comment_model.objects.raw(get_threaded_comments_sql)
 
         return qs
     
@@ -101,8 +145,8 @@ class OslCommentListNode(CommentListNode):
             return cls(
                 object_expr = parser.compile_filter(tokens[2]),
                 as_varname = tokens[4],
-                limit = tokens[6],
-                offset = tokens[8]
+                limit = int(tokens[6]),
+                offset = int(tokens[8])
             )
 
         # {% get_comment_list for app.model pk as varname limit int offset int %}
@@ -114,11 +158,11 @@ class OslCommentListNode(CommentListNode):
             if tokens[8] != 'offset':
                 raise template.TemplateSyntaxError("Eighth argument in %r must be 'offset'" % tokens[0])
             return cls(
-                ctype = OslBaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
+                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
                 object_pk_expr = parser.compile_filter(tokens[3]),
                 as_varname = tokens[5],
-                limit = tokens[7],
-                offset = tokens[9]
+                limit = int(tokens[7]),
+                offset = int(tokens[9])
             )
             
         # {% get_comment_list for obj as varname sorted by column limit int offset int %}
@@ -134,11 +178,11 @@ class OslCommentListNode(CommentListNode):
             if tokens[10] != 'offset':
                 raise template.TemplateSyntaxError("Tenth argument in %r must be 'offset'" % tokens[0])
             return cls(
-                object_expr = parser.complile_filter(tokens[2]),
+                object_expr = parser.compile_filter(tokens[2]),
                 as_varname = tokens[4],
                 sorted_by = tokens[7],
-                limit = tokens[9],
-                offset = tokens[11]
+                limit = int(tokens[9]),
+                offset = int(tokens[11])
             )
             
         # {% get_comment_list for app.model pk as varname sorted by column limit int offset int %}
@@ -154,12 +198,12 @@ class OslCommentListNode(CommentListNode):
             if tokens[11] != 'offset':
                 raise template.TemplateSyntaxError("Eleventh argument in %r must be 'offset'" % tokens[0])
             return cls(
-                ctype = OslBaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
+                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
                 object_pk_expr = parser.compile_filter(tokens[3]),
                 as_varname = tokens[5],
                 sorted_by = tokens[8],
-                limit = tokens[10],
-                offset = tokens[11]
+                limit = int(tokens[10]),
+                offset = int(tokens[11])
             )
 
         else:
@@ -175,18 +219,18 @@ def get_threaded_comment_list(parser, token):
 
     Syntax::
 
-        {% get_comment_list for [object] as [varname]  %}
-        {% get_comment_list for [app].[model] [object_id] as [varname]  %}
-        {% get_comment_list for [object] as [varname] sorted by [column] %}
-        {% get_comment_list for [app].[model] [object_id] as [varname] sorted by [column] %}
+        {% get_threaded_comment_list for [object] as [varname]  %}
+        {% get_threaded_comment_list for [app].[model] [object_id] as [varname]  %}
+        {% get_threaded_comment_list for [object] as [varname] sorted by [column] %}
+        {% get_threaded_comment_list for [app].[model] [object_id] as [varname] sorted by [column] %}
 
     Example usage::
 
-        {% get_comment_list for event as comment_list %}
+        {% get_threaded_comment_list for event as comment_list %}
         {% for comment in comment_list %}
             ...
         {% endfor %}
 
     """
-    return CommentListNode.handle_token(parser, token)
+    return OslCommentListNode.handle_token(parser, token)
 

@@ -41,4 +41,18 @@
     </header>
     {{ article.content|safe }}
 </article>
+
+{% load osl_comments %}
+
+{% get_threaded_comment_list for article as comments sorted by newest limit 100 offset 0 %}
+{% if not comments %}
+<p>There do not appear to be any comments for this article.</p>
+{% else %}
+<ul>
+    {% for comment in comments %}
+    <li>{{ comment.comment }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
 {% endblock %}

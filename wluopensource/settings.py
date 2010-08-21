@@ -138,6 +138,8 @@ INSTALLED_APPS = (
     'tagging'
 )
 
+COMMENTS_APP = 'osl_comments'
+
 try:
     from local_settings import *
 except:
