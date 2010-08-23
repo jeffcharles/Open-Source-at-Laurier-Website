@@ -52,7 +52,7 @@
 {% else %}
 <ul>
     {% for comment in comments %}
-    <li>{{ comment.comment }}</li>
+    <li{% if not comment.parent %} style="margin-left: 2.0em"{% endif %}>{{ comment.comment }}</li>
     {% endfor %}
 </ul>
 {% endif %}
