@@ -1,0 +1,24 @@
+{% load comments osl_comments_lib %}
+<form action="{% comment_form_target %}" method="post">{% csrf_token %}
+    <table>
+    {% if next %}
+        <input type="hidden" name="next" value="{{ next }}" />
+    {% endif %}
+    {% for field in form %}
+    {% if field.is_hidden %}
+        {{ field }}
+    {% else %}
+        <tr
+            {% if field.errors %} class="error"{% endif %}
+            {% ifequal field.name "honeypot" %} style="display:none;"{% endifequal %}>
+            <td>{{ field.label_tag }}:</td>
+            <td>{{ field }}</td>
+            <td>{% if field.errors %}{{ field.errors }}{% endif %}</td>
+        </tr>
+    {% endif %}
+    {% endfor %}
+        <tr class="submit">
+            <td></td><td><input type="submit" name="post" class="submit-post" value="Post" /></td><td></td>
+        </tr>
+    </table>
+</form>

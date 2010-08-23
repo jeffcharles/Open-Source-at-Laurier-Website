@@ -42,7 +42,9 @@
     {{ article.content|safe }}
 </article>
 
-{% load osl_comments %}
+{% load osl_comments_lib %}
+
+{% render_anon_comment_form for article %}
 
 {% get_threaded_comment_list for article as comments sorted by newest limit 100 offset 0 %}
 {% if not comments %}
