@@ -44,6 +44,31 @@ body {
     height: 2.0em;
 }
 
+.comment-body {
+    font-size: 115%;
+    margin: 5px 0px 5px 10px;
+}
+
+.comment-child {
+    padding-left: 3.0em;
+}
+
+.comment-links a {
+    color: #666666;
+}
+
+#comment-list {
+    font-size: 80%;
+}
+
+#comments h1 {
+    font-size: 26px;
+}
+
+#comments ul {
+    list-style-type: none;
+}
+
 #container {
     background-color: #FFFFFF;
     height: auto !important;
@@ -68,6 +93,12 @@ body {
     padding-bottom: 2.0em;
 }
 
+#content #comments li {
+    border-bottom: 1px dotted #333333;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
 #content img {
     margin-bottom: 5px;
     margin-top: 5px;
@@ -86,6 +117,13 @@ body {
 #content ul {
     margin-bottom: 10px;
     margin-top: 10px;
+}
+
+#content ul.comment-links {
+    list-style-position: outside;
+    list-style-type: none;
+    margin-bottom: 0px;
+    margin-top: 0px;
 }
 
 #content ul.errorlist {
@@ -226,6 +264,11 @@ section {
 
 ul {
     list-style-position: inside;
+}
+
+ul.comment-links li {
+    display: inline;
+    margin-right: 10px;
 }
 
 #user-bar {

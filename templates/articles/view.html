@@ -41,24 +41,41 @@
     </header>
     {{ article.content|safe }}
 </article>
+<section id="comments">
+    <h1>Comments</h1>
+    {% if flash.comment_response %}
+        <p>{{ flash.comment_response }}</p>
+    {% endif %}
 
-{% if flash.comment_response %}
-    <p>{{ flash.comment_response }}</p>
-{% endif %}
+    {% load osl_comments_lib %}
 
-{% load osl_comments_lib %}
+    {% render_anon_comment_form for article %}
 
-{% render_anon_comment_form for article %}
-
-{% get_threaded_comment_list for article as comments sorted by newest limit 100 offset 0 %}
-{% if not comments %}
-<p>There do not appear to be any comments for this article.</p>
-{% else %}
-<ul>
-    {% for comment in comments %}
-    <li{% if not comment.parent %} style="margin-left: 2.0em"{% endif %}>{{ comment.comment }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
+    {% get_threaded_comment_list for article as comments sorted by newest limit 100 offset 0 %}
+    {% if not comments %}
+    <p>There do not appear to be any comments for this article.</p>
+    {% else %}
+    <ul id="comment-list">
+        {% for comment in comments %}
+        <li{% if not comment.parent %} class="comment-child"{% endif %}>
+            <div class="comment-header">
+                {% if comment.url %}
+                    <a href="{{ comment.url }}">{{ comment.name }}</a>
+                {% else %}
+                    {{ comment.name }}
+                {% endif %}
+                said {{ comment.submit_date|timesince }} ago:
+            </div>
+            <blockquote class="comment-body">
+                {{ comment.comment }}
+            </blockquote>
+            <ul class="comment-links">
+                <li><a href="#">Reply</a></li>
+                <li><a href="#">Report this comment</a></li>
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</section>
 {% endblock %}
