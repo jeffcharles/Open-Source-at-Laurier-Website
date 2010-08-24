@@ -42,6 +42,10 @@
     {{ article.content|safe }}
 </article>
 
+{% if flash.comment_response %}
+    <p>{{ flash.comment_response }}</p>
+{% endif %}
+
 {% load osl_comments_lib %}
 
 {% render_anon_comment_form for article %}
