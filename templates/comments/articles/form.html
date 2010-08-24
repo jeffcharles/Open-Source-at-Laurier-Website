@@ -3,6 +3,8 @@
     <table>
     {% if next %}
         <input type="hidden" name="next" value="{{ next }}" />
+    {% else %}
+        <input type="hidden" name="next" value="{{ request.path }}" />
     {% endif %}
     {% for field in form %}
     {% if field.is_hidden %}
@@ -18,7 +20,10 @@
     {% endif %}
     {% endfor %}
         <tr class="submit">
-            <td></td><td><input type="submit" name="post" class="submit-post" value="Post" /></td><td></td>
+            <td></td><td>
+                <input type="submit" name="post" class="submit-post" value="Post" />
+                <input type="submit" name="preview" class="submit-preview" value="Preview" />
+            </td><td></td>
         </tr>
     </table>
 </form>

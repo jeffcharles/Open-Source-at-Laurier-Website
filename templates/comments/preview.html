@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Preview your comment{% endblock %}
+
+{% block content %}
+{% load comments %}
+<form action="{% comment_form_target %}" method="post">{% csrf_token %}
+    {% if next %}
+        <input type="hidden" name="next" value="{{ next }}" />
+    {% endif %}
+    {% if form.errors %}
+        <h1>{% with form.errors|length as counter %}Please correct the error{{ counter|pluralize }} below{% endwith %}</h1>
+    {% else %}
+        <h1>Preview your comment</h1>
+        <blockquote>{{ comment|linebreaks }}</blockquote>
+        <p> and <input type="submit" name="submit" class="submit-post" value="Post your comment" id="submit" /> or make changes:</p>
+    {% endif %}
+    <table cellpadding="0" cellspacing="0">
+        {% for field in form %}
+            {% if field.is_hidden %}
+                {{ field }}
+            {% else %}
+                <tr
+                    {% if field.errors %} class="error"{% endif %}
+                    {% ifequal field.name "honeypot" %} style="display:none;"{% endifequal %}>
+                    
+                    <td>{{ field.label_tag }}:</td>
+                    <td>{{ field }}</td>
+                    <td>
+                        {% if field.errors %}
+                            {{ field.errors }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        <tr class="submit">
+            <td></td><td>
+                <input type="submit" name="submit" class="submit-post" value="Post" />
+                <input type="submit" name="preview" class="submit-preview" value="Preview" />
+            </td><td></td>
+        </tr>
+    </table>
+</form>
+{% endblock %}
