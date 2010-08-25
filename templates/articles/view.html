@@ -76,8 +76,8 @@
                 <li><a href="#">Report this comment</a></li>
             </ul>
         </li>
-        {% if request.GET.reply_to == comment.id %}
-            {% render_anon_comment_form for article replying to comment.id %}
+        {% if request.GET.reply_to == comment.id|slugify %}
+            <li class="comment-child">{% render_anon_comment_form for article replying to comment.id %}</li>
         {% endif %}
         {% endfor %}
     </ul>
