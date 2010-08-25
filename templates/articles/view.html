@@ -72,11 +72,13 @@
                 {{ comment.comment }}
             </blockquote>
             <ul class="comment-links">
-                <li><a href="{% output_reply_url for comment with request.path %}">Reply</a></li>
+                {% if comment.parent %}
+                    <li><a href="{% output_reply_url for comment with request.path %}">Reply</a></li>
+                {% endif %}
                 <li><a href="#">Report this comment</a></li>
             </ul>
         </li>
-        {% if request.GET.reply_to == comment.id|slugify %}
+        {% if request.GET.reply_to == comment.id|slugify and comment.parent %}
             <li class="comment-child">{% render_anon_comment_form for article replying to comment.id %}</li>
         {% endif %}
         {% endfor %}
