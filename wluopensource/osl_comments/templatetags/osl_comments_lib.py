@@ -26,10 +26,14 @@ class AnonOslCommentFormNode(CommentFormNode):
     
     def get_form(self, context):
         ctype, object_pk = self.get_target_ctype_pk(context)
+        if self.parent_comment_id is not None:
+            parent_comment_id = self.parent_comment_id.resolve(context)
+        else:
+            parent_comment_id = None
         if object_pk:
             return AnonOslCommentForm(
                 target_object = ctype.get_object_for_this_type(pk=object_pk),
-                parent_comment_id = self.parent_comment_id
+                parent_comment_id = parent_comment_id
             )
         else:
             return None
@@ -69,7 +73,7 @@ class AnonOslCommentFormNode(CommentFormNode):
                 raise template.TemplateSyntaxError("Sixth argument in %r tag must be 'as'" % tokens[0])
             return cls(
                 object_expr = parser.compile_filter(tokens[2]),
-                parent_comment_id = tokens[5],
+                parent_comment_id = parser.compile_filter(tokens[5]),
                 as_varname = tokens[7]
             )
             
@@ -84,7 +88,7 @@ class AnonOslCommentFormNode(CommentFormNode):
             return cls(
                 ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
                 object_pk_expr = parser.compile_filter(tokens[3]),
-                parent_comment_id = tokens[6],
+                parent_comment_id = parser.compile_filter(tokens[6]),
                 as_varname = tokens[8]
             )
         
@@ -326,7 +330,7 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode):
                 raise template.TemplateSyntaxError("Fourth argument in %r tag must be 'to'" % tokens[0])
             return cls(
                 object_expr = parser.compile_filter(tokens[2]),
-                parent_comment_id = tokens[5]
+                parent_comment_id = parser.compile_filter(tokens[5])
             )
             
         # {% render_anon_comment_form for app.model pk replying to parent_comment_id %}
@@ -338,7 +342,7 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode):
             return cls(
                 ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
                 object_pk_expr = parser.compile_filter(tokens[3]),
-                parent_comment_id = tokens[6]
+                parent_comment_id = parser.compile_filter(tokens[6])
             )
         
         else:
