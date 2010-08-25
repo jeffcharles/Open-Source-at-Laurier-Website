@@ -359,6 +359,25 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode):
         else:
             return ''
         
+class ReplyUrlNode(template.Node):
+    
+    def __init__(self, comment_object, url):
+        if comment_object is None:
+            raise template.TemplateSyntaxError(
+                "Reply objects must be given a valid comment."
+            )
+        self.comment_object = comment_object
+        self.url = url
+    
+    def render(self, context):
+        url = self.url.resolve(context)
+        comment = self.comment_object.resolve(context)
+        if '?' in url:
+            separator = '&'
+        else:
+            separator = '?'
+        return ''.join([url, separator, 'reply_to=', str(comment.id)])
+        
 @register.tag
 def get_anon_comment_form(parser, token):
     """
@@ -397,6 +416,25 @@ def get_threaded_comment_list(parser, token):
 
     """
     return OslCommentListNode.handle_token(parser, token)
+
+@register.tag
+def output_reply_url(parser, token):
+    """
+    Output a URL to trigger a reply to this comment
+    
+    Syntax::
+    
+        {% output_reply_url for [comment_object] with [url] %}
+    """
+    try:
+        tag_name, ignore, comment_object, ignore2, url = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError("%r tag requires four arguments" % tokens.contents.split[0])
+    if ignore != 'for':
+        raise template.TemplateSyntaxError("First argument in %r must be 'for'" % tokens.contents.split[0])
+    if ignore2 != 'with':
+        raise template.TemplateSyntaxError("Three argument in %r must be 'with'" % tokens.contents.split[0]) 
+    return ReplyUrlNode(parser.compile_filter(comment_object), parser.compile_filter(url))
 
 @register.tag
 def render_anon_comment_form(parser, token):

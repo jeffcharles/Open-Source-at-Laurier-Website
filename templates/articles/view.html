@@ -49,7 +49,9 @@
 
     {% load osl_comments_lib %}
 
-    {% render_anon_comment_form for article %}
+    {% if not request.GET.reply_to %}
+        {% render_anon_comment_form for article %}
+    {% endif %}
 
     {% get_threaded_comment_list for article as comments sorted by newest limit 100 offset 0 %}
     {% if not comments %}
@@ -70,10 +72,13 @@
                 {{ comment.comment }}
             </blockquote>
             <ul class="comment-links">
-                <li><a href="#">Reply</a></li>
+                <li><a href="{% output_reply_url for comment with request.path %}">Reply</a></li>
                 <li><a href="#">Report this comment</a></li>
             </ul>
         </li>
+        {% if request.GET.reply_to == comment.id %}
+            {% render_anon_comment_form for article replying to comment.id %}
+        {% endif %}
         {% endfor %}
     </ul>
     {% endif %}
