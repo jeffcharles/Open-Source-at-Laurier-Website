@@ -15,7 +15,7 @@
     First name: {% if user.first_name %}{{ user.first_name }}{% else %}&lt;Not provided&gt;{% endif %}<br />
     Last name: {% if user.last_name %}{{ user.last_name }}{% else %}&lt;Not provided&gt;{% endif %}<br />
     Email address: {% if user.email %}<a href="mailto:{{ user.email }}">{{ user.email }}</a>{% else %}&lt;Not provided&gt;{% endif %}<br />
-    Website: {% if user.get_profile.url %}{{ user.get_profile.url }}{% else %}&lt;Not provided&gt;{% endif %}<br />
+    Website: {% if user.get_profile.url %}<a href="{{ user.get_profile.url }}">{{ user.get_profile.url }}</a>{% else %}&lt;Not provided&gt;{% endif %}<br />
 </p>
 <p><a href="{% url accounts.views.profile_change %}" title="Update Profile">Update Your Profile</a></p>
 {% endblock %}
