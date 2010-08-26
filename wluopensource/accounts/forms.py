@@ -3,6 +3,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.forms import ModelForm
 
+from accounts.models import UserProfile
+
 class OslUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=False)
     
@@ -19,4 +21,11 @@ class UserInfoChangeForm(ModelForm):
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'email')
+        
+class UserProfileChangeForm(ModelForm):
+    error_css_class = 'error'
+    
+    class Meta:
+        model = UserProfile
+        fields = ('url',)
     

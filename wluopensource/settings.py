@@ -130,6 +130,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sitemaps',
     'django.contrib.sites',
+    'accounts',
     'articles',
     'announcements',
     'mailer',
@@ -140,6 +141,7 @@ INSTALLED_APPS = (
     'tagging'
 )
 
+AUTH_PROFILE_MODULE = 'accounts.UserProfile'
 COMMENTS_APP = 'osl_comments'
 
 try:

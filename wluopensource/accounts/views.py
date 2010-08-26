@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
 
-from accounts.forms import OslUserCreationForm, UserInfoChangeForm
+from accounts.forms import OslUserCreationForm, UserInfoChangeForm, UserProfileChangeForm
 
 def create_account(request):
     if request.method == 'POST':
@@ -30,14 +30,19 @@ def profile(request):
 @login_required        
 def profile_change(request):
     current_user = User.objects.get(pk=request.user.pk)
+    current_profile = current_user.get_profile()
     if request.method == 'POST':
-        form = UserInfoChangeForm(request.POST, instance=current_user)
-        if form.is_valid():
-            form.save()
+        info_form = UserInfoChangeForm(request.POST, instance=current_user)
+        profile_form = UserProfileChangeForm(request.POST, instance=current_profile)
+        if info_form.is_valid() and profile_form.is_valid():
+            info_form.save()
+            profile_form.save()
             return redirect(profile)
     else:
-        form = UserInfoChangeForm(instance=current_user)
+        info_form = UserInfoChangeForm(instance=current_user)
+        profile_form = UserProfileChangeForm(instance=current_profile)
     return render_to_response('registration/profile_change.html', {
-        'form': form,
+        'info_form': info_form,
+        'profile_form': profile_form
     }, context_instance=RequestContext(request))
         
