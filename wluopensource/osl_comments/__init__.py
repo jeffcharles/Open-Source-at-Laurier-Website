@@ -6,6 +6,9 @@ from osl_comments.models import OslComment
 def get_model():
     return OslComment
     
+def get_edit_form_target():
+    return urlresolvers.reverse('osl_comments.views.edit_comment')
+    
 def get_form():
     return AnonOslCommentForm
     

@@ -44,3 +44,10 @@ class AnonOslCommentForm(CommentForm, AuthOslCommentForm):
     def get_comment_model(self):
         return AuthOslCommentForm.get_comment_model(self)
 
+class OslEditCommentForm(forms.Form):
+    comment = CommentForm.base_fields['comment']
+    comment_id = forms.IntegerField(widget=forms.HiddenInput)
+    
+    def get_comment_model(self):
+        return AuthOslCommentForm.get_comment_model(self)
+

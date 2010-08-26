@@ -49,7 +49,7 @@
 
     {% load osl_comments_lib %}
 
-    {% if not request.GET.reply_to %}
+    {% if not request.GET.reply_to and not request.GET.edit_comment %}
         {% render_anon_comment_form for article %}
     {% endif %}
 
@@ -68,18 +68,22 @@
                 {% endif %}
                 said {{ comment.submit_date|timesince }} ago:
             </div>
-            <blockquote class="comment-body">
-                {{ comment.comment }}
-            </blockquote>
-            <ul class="comment-links">
-                {% if comment.parent %}
-                    <li><a href="{% output_reply_url for comment with request.path %}">Reply</a></li>
-                {% endif %}
-                {% if comment.user == request.user %}
-                    <li><a href="#">Edit</a></li>
-                {% endif %}
-                <li><a href="#">Report this comment</a></li>
-            </ul>
+            {% if request.GET.edit_comment == comment.id|slugify %}
+                {% render_edit_comment_form for comment %}
+            {% else %}
+                <blockquote class="comment-body">
+                    {{ comment.comment }}
+                </blockquote>
+                <ul class="comment-links">
+                    {% if comment.parent %}
+                        <li><a href="{% output_reply_url for comment with request.path %}">Reply</a></li>
+                    {% endif %}
+                    {% if comment.user == request.user %}
+                        <li><a href="?edit_comment={{ comment.id }}">Edit</a></li>
+                    {% endif %}
+                    <li><a href="#">Report this comment</a></li>
+                </ul>
+            {% endif %}
         </li>
         {% if request.GET.reply_to == comment.id|slugify and comment.parent %}
             <li class="comment-child">{% render_anon_comment_form for article replying to comment.id %}</li>

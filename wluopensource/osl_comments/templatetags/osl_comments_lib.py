@@ -5,7 +5,8 @@ from django.contrib.comments.templatetags.comments import CommentFormNode, Comme
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_unicode
 
-from osl_comments.forms import AnonOslCommentForm, AuthOslCommentForm
+import osl_comments
+from osl_comments.forms import AnonOslCommentForm, AuthOslCommentForm, OslEditCommentForm
 
 register = template.Library()
 
@@ -307,6 +308,52 @@ class OslCommentListNode(CommentListNode):
         else:
             raise template.TemplateSyntaxError("%r tag requires 8, 9, 11, or 12 arguments" % tokens[0])
             
+class OslEditCommentFormNode(CommentFormNode):
+    
+    def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, 
+        as_varname=None, comment=None):
+        
+        if comment is None:
+            raise template.TemplateSyntaxError(
+                "Edit comment form node must be given a comment object."
+            )
+        self.comment_model = comments.get_model()
+        self.as_varname = as_varname
+        self.ctype = ctype
+        self.object_pk_expr = object_pk_expr
+        self.object_expr = object_expr
+        self.comment = comment
+        
+    def get_form(self, context):
+        comment = self.comment.resolve(context)
+        if context['request'].user.is_authenticated():
+            return OslEditCommentForm(
+                initial = {
+                    'comment_id': comment.id,
+                    'comment': comment.comment
+                }
+            )
+        else:
+            return None
+            
+    @classmethod
+    def handle_token(cls, parser, token):
+        tokens = token.contents.split()
+        if tokens[1] != 'for':
+            raise template.TemplateSyntaxError("First argument in %r tag must be 'for'" % tokens[0])
+            
+        # {% get_edit_comment_form for comment as varname %}
+        if len(tokens) == 5:
+            if tokens[3] != 'as':
+                raise template.TemplateSyntaxError("Third argument in %r tag must be 'as'" % tokens[0])
+            return cls(
+                comment = parser.compile_filter(tokens[2]),
+                as_varname = tokens[4]
+            )
+        else:
+            raise template.TemplateSyntaxError("%r tag takes 4 arguments" % tokens[0])
+                
+
 class RenderAnonOslCommentFormNode(AnonOslCommentFormNode):
 
     @classmethod
@@ -369,6 +416,36 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode):
         else:
             return ''
         
+class RenderOslEditCommentNode(OslEditCommentFormNode):
+    
+    @classmethod
+    def handle_token(cls, parser, token):
+        tokens = token.contents.split()
+        if tokens[1] != 'for':
+            raise template.TemplateSyntaxError("First argument in %r tag must be 'for'" % tokens[0])
+            
+        # {% render_anon_comment_form for obj %}
+        if len(tokens) == 3:
+            return cls(
+                comment = parser.compile_filter(tokens[2])
+            )
+            
+    def render(self, context):
+        comment = self.comment.resolve(context)
+        ctype = comment.content_type
+        if context['request'].user.is_authenticated():
+            template_search_list = [
+                "comments/%s/%s/edit_form.html" % (ctype.app_label, ctype.model),
+                "comments/%s/edit_form.html" % ctype.app_label,
+                "comments/edit_form.html"
+            ]
+            context.push()
+            formstr = render_to_string(template_search_list, {"form" : self.get_form(context)}, context)
+            context.pop()
+            return formstr
+        else:
+            return ''
+        
 class ReplyUrlNode(template.Node):
     
     def __init__(self, comment_object, url):
@@ -387,6 +464,17 @@ class ReplyUrlNode(template.Node):
         else:
             separator = '?'
         return ''.join([url, separator, 'reply_to=', str(comment.id)])
+
+@register.simple_tag
+def edit_comment_form_target():
+    """
+    Get the target URL for the comment form.
+
+    Example::
+
+        <form action="{% edit_comment_form_target %}" method="post">
+    """
+    return osl_comments.get_edit_form_target()
         
 @register.tag
 def get_anon_comment_form(parser, token):
@@ -401,6 +489,17 @@ def get_anon_comment_form(parser, token):
         {% get_anon_comment_form for [app].[model] [object_id] replying to [parent_comment_id] as [varname] %}
     """
     return AnonOslCommentFormNode.handle_token(parser, token)
+        
+@register.tag
+def get_edit_comment_form(parser, token):
+    """
+    Gets a form where the user can edit their own comment
+    
+    Syntax::
+    
+        {% get_edit_comment_form for [comment] as [varname] %}
+    """
+    return OslEditCommentFormNode.handle_token(parser, token)
         
 @register.tag
 def get_threaded_comment_list(parser, token):
@@ -458,4 +557,15 @@ def render_anon_comment_form(parser, token):
         {% render_anon_comment_form for [app].[model] [object_id] %}
     """
     return RenderAnonOslCommentFormNode.handle_token(parser, token)
+    
+@register.tag
+def render_edit_comment_form(parser, token):
+    """
+    Render the edit comment form through the `comments/form.html` template.
+    
+    Syntax::
+    
+        {% render_edit_comment_form for [comment] %}
+    """
+    return RenderOslEditCommentNode.handle_token(parser, token)
 

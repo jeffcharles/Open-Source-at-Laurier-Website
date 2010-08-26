@@ -11,6 +11,7 @@ urlpatterns = patterns('django.contrib.comments.views',
 )
 
 urlpatterns += patterns('',
+    (r'^edit/$', 'osl_comments.views.edit_comment'),
     url(r'^post/$',          'osl_comments.views.post_comment',       name='comments-post-comment'),
     url(r'^cr/(\d+)/(.+)/$', 'django.views.defaults.shortcut', name='comments-url-redirect'),
 )
