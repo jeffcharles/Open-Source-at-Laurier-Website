@@ -75,6 +75,9 @@
                 {% if comment.parent %}
                     <li><a href="{% output_reply_url for comment with request.path %}">Reply</a></li>
                 {% endif %}
+                {% if comment.user == request.user %}
+                    <li><a href="#">Edit</a></li>
+                {% endif %}
                 <li><a href="#">Report this comment</a></li>
             </ul>
         </li>
