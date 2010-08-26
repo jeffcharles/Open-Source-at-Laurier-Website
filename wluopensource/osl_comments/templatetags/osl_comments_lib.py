@@ -5,7 +5,7 @@ from django.contrib.comments.templatetags.comments import CommentFormNode, Comme
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_unicode
 
-from osl_comments.forms import AnonOslCommentForm
+from osl_comments.forms import AnonOslCommentForm, AuthOslCommentForm
 
 register = template.Library()
 
@@ -31,10 +31,16 @@ class AnonOslCommentFormNode(CommentFormNode):
         else:
             parent_comment_id = None
         if object_pk:
-            return AnonOslCommentForm(
-                target_object = ctype.get_object_for_this_type(pk=object_pk),
-                parent_comment_id = parent_comment_id
-            )
+            if context['request'].user.is_authenticated():
+                return AuthOslCommentForm(
+                    target_object = ctype.get_object_for_this_type(pk=object_pk),
+                    parent_comment_id = parent_comment_id
+                )
+            else:
+                return AnonOslCommentForm(
+                    target_object = ctype.get_object_for_this_type(pk=object_pk),
+                    parent_comment_id = parent_comment_id
+                )
         else:
             return None
             
