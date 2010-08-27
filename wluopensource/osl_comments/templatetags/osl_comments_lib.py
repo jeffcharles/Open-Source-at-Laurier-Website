@@ -100,15 +100,13 @@ class AnonOslCommentFormNode(CommentFormNode):
 class OslCommentListNode(CommentListNode):
     """Insert a list of comments into the context."""
     
-    def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, as_varname=None, comment=None, sorted_by=None, limit=None, offset=None):
-        if ctype is None and object_expr is None:
-            raise template.TemplateSyntaxError("Comment nodes must be given either a literal object or a ctype and object pk.")
-        self.comment_model = comments.get_model()
-        self.as_varname = as_varname
-        self.ctype = ctype
-        self.object_pk_expr = object_pk_expr
-        self.object_expr = object_expr
-        self.comment = comment
+    def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, 
+        as_varname=None, comment=None, sorted_by=None, limit=None, offset=None):
+    
+        super(OslCommentListNode, self).__init__(ctype=ctype, 
+            object_pk_expr=object_pk_expr, object_expr=object_expr, 
+            as_varname=as_varname, comment=comment)
+            
         self.sorted_by = sorted_by
         self.limit = limit
         self.offset = offset
