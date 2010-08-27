@@ -15,14 +15,9 @@ class AnonOslCommentFormNode(CommentFormNode):
     def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, 
         as_varname=None, comment=None, parent_comment_id=None):
         
-        if ctype is None and object_expr is None:
-            raise template.TemplateSyntaxError("Comment nodes must be given either a literal object or a ctype and object pk.")
-        self.comment_model = comments.get_model()
-        self.as_varname = as_varname
-        self.ctype = ctype
-        self.object_pk_expr = object_pk_expr
-        self.object_expr = object_expr
-        self.comment = comment
+        super(AnonOslCommentFormNode, self).__init__(ctype=ctype, 
+            object_pk_expr=object_pk_expr, object_expr=object_expr, 
+            as_varname=as_varname, comment=comment)
         self.parent_comment_id = parent_comment_id
     
     def get_form(self, context):
