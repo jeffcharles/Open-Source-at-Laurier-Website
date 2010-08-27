@@ -7,6 +7,11 @@ class OslComment(Comment):
     inline_to_object = models.BooleanField()
     edit_timestamp = models.DateTimeField(auto_now=True)
 
+def comment_success_flash_handler(sender, **kwargs):
+    if 'request' in kwargs:
+        kwargs['request'].flash['comment_response'] = 'Your comment has been added!'
+comment_was_posted.connect(comment_success_flash_handler)
+
 def comment_user_url_injection_handler(sender, **kwargs):
     if 'request' in kwargs and kwargs['request'].user.is_authenticated() and \
         'comment' in kwargs:

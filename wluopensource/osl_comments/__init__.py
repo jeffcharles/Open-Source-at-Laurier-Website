@@ -12,6 +12,3 @@ def get_edit_form_target():
 def get_form():
     return AnonOslCommentForm
     
-def get_form_target():
-    return urlresolvers.reverse('osl_comments.views.post_comment')
-    

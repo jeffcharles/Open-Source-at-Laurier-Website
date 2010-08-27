@@ -68,12 +68,6 @@ def edit_comment(request, next=None):
     
     return next_redirect(data, next, comment_edited, c=comment._get_pk_val())
 
-@csrf_protect
-@require_POST
-def post_comment(request, next=None, using=None):
-    request.flash['comment_response'] = 'Your comment has been added!'
-    return comments.post_comment(request, next, using)
-    
 comment_edited = confirmation_view(
     template = "comments/edit_confirmed.html",
     doc = """Display a "comment was edited" success page."""
