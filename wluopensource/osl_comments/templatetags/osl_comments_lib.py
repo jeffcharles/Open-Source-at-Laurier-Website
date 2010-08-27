@@ -27,15 +27,15 @@ class AnonOslCommentFormNode(CommentFormNode):
         else:
             parent_comment_id = None
         if object_pk:
+            target_object = ctype.get_object_for_this_type(pk=object_pk)
+            initial = {'parent_comment_id': parent_comment_id}
             if context['request'].user.is_authenticated():
                 return AuthOslCommentForm(
-                    target_object = ctype.get_object_for_this_type(pk=object_pk),
-                    parent_comment_id = parent_comment_id
+                    target_object = target_object, initial = initial
                 )
             else:
                 return AnonOslCommentForm(
-                    target_object = ctype.get_object_for_this_type(pk=object_pk),
-                    parent_comment_id = parent_comment_id
+                    target_object = target_object, initial = initial
                 )
         else:
             return None
