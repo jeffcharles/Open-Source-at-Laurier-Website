@@ -303,8 +303,7 @@ class OslCommentListNode(CommentListNode):
             
 class OslEditCommentFormNode(CommentFormNode):
     
-    def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, 
-        as_varname=None, comment=None):
+    def __init__(self, as_varname=None, comment=None):
         
         if comment is None:
             raise template.TemplateSyntaxError(
@@ -312,9 +311,6 @@ class OslEditCommentFormNode(CommentFormNode):
             )
         self.comment_model = comments.get_model()
         self.as_varname = as_varname
-        self.ctype = ctype
-        self.object_pk_expr = object_pk_expr
-        self.object_expr = object_expr
         self.comment = comment
         
     def get_form(self, context):
