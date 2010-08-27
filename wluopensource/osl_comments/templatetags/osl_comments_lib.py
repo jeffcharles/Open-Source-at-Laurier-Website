@@ -1,7 +1,7 @@
 from django import template
 from django.conf import settings
 from django.contrib import comments
-from django.contrib.comments.templatetags.comments import CommentFormNode, CommentListNode
+from django.contrib.comments.templatetags.comments import CommentFormNode, CommentListNode, RenderCommentFormNode
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_unicode
 
@@ -347,7 +347,8 @@ class OslEditCommentFormNode(CommentFormNode):
             raise template.TemplateSyntaxError("%r tag takes 4 arguments" % tokens[0])
                 
 
-class RenderAnonOslCommentFormNode(AnonOslCommentFormNode):
+class RenderAnonOslCommentFormNode(AnonOslCommentFormNode, 
+    RenderCommentFormNode):
 
     @classmethod
     def handle_token(cls, parser, token):
@@ -393,21 +394,6 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode):
         
         else:
             raise template.TemplateSyntaxError("%r tag requires 2, 3, 5, or 6 arguments" % tokens[0])
-    
-    def render(self, context):
-        ctype, object_pk = self.get_target_ctype_pk(context)
-        if object_pk:
-            template_search_list = [
-                "comments/%s/%s/form.html" % (ctype.app_label, ctype.model),
-                "comments/%s/form.html" % ctype.app_label,
-                "comments/form.html"
-            ]
-            context.push()
-            formstr = render_to_string(template_search_list, {"form" : self.get_form(context)}, context)
-            context.pop()
-            return formstr
-        else:
-            return ''
         
 class RenderOslEditCommentNode(OslEditCommentFormNode):
     
