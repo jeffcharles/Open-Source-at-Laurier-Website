@@ -67,6 +67,9 @@
                     {{ comment.name }}
                 {% endif %}
                 said {{ comment.submit_date|timesince }} ago:
+                {% if comment.edit_timestamp != comment.submit_date %}
+                    *edited
+                {% endif %}
             </div>
             {% if request.GET.edit_comment == comment.id|slugify %}
                 {% render_edit_comment_form for comment %}

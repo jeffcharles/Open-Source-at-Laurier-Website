@@ -1,11 +1,17 @@
 from django.contrib.comments.models import Comment
-from django.contrib.comments.signals import comment_was_posted
+from django.contrib.comments.signals import comment_was_posted, comment_will_be_posted
 from django.db import models
 
 class OslComment(Comment):
     parent_comment = models.ForeignKey(Comment, blank=True, null=True, related_name='parent_comment')
     inline_to_object = models.BooleanField()
-    edit_timestamp = models.DateTimeField(auto_now=True)
+    edit_timestamp = models.DateTimeField()
+
+def comment_edit_timestamp_injection_handler(sender, **kwargs):
+    if 'comment' in kwargs:
+        comment = kwargs['comment']
+        comment.edit_timestamp = comment.submit_date
+comment_will_be_posted.connect(comment_edit_timestamp_injection_handler)
 
 def comment_success_flash_handler(sender, **kwargs):
     if 'request' in kwargs:

@@ -1,4 +1,5 @@
-from django.contrib.comments.models import Comment
+from datetime import datetime
+
 from django.contrib.comments.views import comments
 from django.contrib.comments.views.comments import CommentPostBadRequest
 from django.contrib.comments.views.utils import confirmation_view, next_redirect
@@ -7,6 +8,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 
 from osl_comments.forms import OslEditCommentForm
+from osl_comments.models import OslComment
 
 @require_POST
 def edit_comment(request, next=None):
@@ -19,7 +21,7 @@ def edit_comment(request, next=None):
     if comment_id is None:
         return CommentPostBadRequest("Missing comment id field.")
     try:
-        comment = Comment.objects.get(pk=comment_id)
+        comment = OslComment.objects.get(pk=comment_id)
     except ObjectDoesNotExist:
         return CommentPostBadRequest(
             "No comment matching with PK %r exists." % comment_id
@@ -64,6 +66,7 @@ def edit_comment(request, next=None):
         
     # update comment content
     comment.comment = data.get('comment')
+    comment.edit_timestamp = datetime.now()
     comment.save()
     
     return next_redirect(data, next, comment_edited, c=comment._get_pk_val())

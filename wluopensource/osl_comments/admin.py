@@ -12,7 +12,7 @@ class OslCommentsAdmin(CommentsAdmin):
            {'fields': ('user', 'user_name', 'user_email', 'user_url', 'parent_comment', 'comment')}
         ),
         ('Metadata',
-           {'fields': ('submit_date', 'ip_address', 'is_public', 'is_removed')}
+           {'fields': ('submit_date', 'edit_timestamp', 'ip_address', 'is_public', 'is_removed')}
         ),
      )
 admin.site.register(OslComment, OslCommentsAdmin)
