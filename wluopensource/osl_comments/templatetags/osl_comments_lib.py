@@ -133,8 +133,7 @@ class CommentPaginationPageNode(BaseCommentNode):
         comment_paginator = Paginator(comment_list, 
             get_comments_per_page_for_content_type(ctype))
         context[self.as_varname] = comment_paginator.page(
-            context['request'].GET.get('comment_page', 1)
-        )
+            get_comment_page(context))
         return ''
 
 class OslCommentListNode(CommentListNode):
@@ -253,8 +252,7 @@ class OslCommentListNode(CommentListNode):
             'first_thread_order_by': first_order_by,
             'second_thread_order_by': second_order_by,
             'limit': num_comments_per_page, 
-            'offset': ((int(context['request'].GET.get('comment_page', 1)) - 1) * 
-                num_comments_per_page)
+            'offset': (get_comment_page(context) - 1) * num_comments_per_page
         }
         
         qs = self.comment_model.objects.raw(get_threaded_comments_sql)
@@ -519,6 +517,16 @@ def get_comment_paginator_page(parser, token):
             as_varname = tokens[5]
         )
     raise template.TemplateSyntaxError("%r tag requires 4 or 5 arguments" % tokens[0])
+        
+def get_comment_page(context):
+    """Returns the current comment page."""
+    try:
+        page_num = int(context['request'].GET.get('comment_page', 1))
+    except ValueError:
+        page_num = 1
+    if page_num < 1:
+        page_num = 1
+    return page_num
         
 @register.tag
 def get_edit_comment_form(parser, token):
