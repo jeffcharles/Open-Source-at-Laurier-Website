@@ -1,5 +1,6 @@
 from django.contrib.comments.models import Comment
 from django.contrib.comments.signals import comment_was_posted, comment_will_be_posted
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 class OslComment(Comment):
@@ -26,4 +27,8 @@ def comment_user_url_injection_handler(sender, **kwargs):
         comment.url = comment.user.get_profile().url
         comment.save()
 comment_was_posted.connect(comment_user_url_injection_handler)
+
+class CommentsPerPageForContentType(models.Model):
+    content_type = models.OneToOneField(ContentType)
+    number_per_page = models.IntegerField()
 

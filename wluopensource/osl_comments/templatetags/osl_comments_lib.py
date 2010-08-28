@@ -1,12 +1,14 @@
 from django import template
 from django.conf import settings
 from django.contrib import comments
-from django.contrib.comments.templatetags.comments import CommentFormNode, CommentListNode, RenderCommentFormNode
+from django.contrib.comments.templatetags.comments import BaseCommentNode, CommentFormNode, CommentListNode, RenderCommentFormNode
+from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_unicode
 
 import osl_comments
 from osl_comments.forms import AnonOslCommentForm, AuthOslCommentForm, OslEditCommentForm
+from osl_comments.models import CommentsPerPageForContentType, OslComment
 
 register = template.Library()
 
@@ -97,19 +99,55 @@ class AnonOslCommentFormNode(CommentFormNode):
         else:
             raise template.TemplateSyntaxError("%r tag requires 4, 5, 7, or 8 arguments" % tokens[0])
 
+class CommentPaginationPageNode(BaseCommentNode):
+    """Insert a comment pagination object into the context."""
+    
+    def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, 
+        as_varname=None):
+        
+        if ctype is None and object_expr is None:
+            raise template.TemplateSyntaxError(
+                "Comment nodes must be given either a literal object or a \
+                ctype and object pk."
+            )
+        self.ctype = ctype
+        self.object_pk_expr = object_pk_expr
+        self.object_expr = object_expr
+        self.as_varname = as_varname
+        
+    def render(self, context):
+        ctype, object_pk = self.get_target_ctype_pk(context)
+        if object_pk is None:
+            comment_list = []
+        
+        comment_list = OslComment.objects.filter(
+            content_type = ctype,
+            object_pk = smart_unicode(object_pk),
+            site__pk = settings.SITE_ID,
+            is_public = True
+        )
+
+        if getattr(settings, 'COMMENTS_HIDE_REMOVED', True):
+            comment_list = comment_list.filter(is_removed=False)
+        
+        comment_paginator = Paginator(comment_list, 
+            get_comments_per_page_for_content_type(ctype))
+        context[self.as_varname] = comment_paginator.page(
+            context['request'].GET.get('comment_page', 1)
+        )
+        return ''
+
 class OslCommentListNode(CommentListNode):
     """Insert a list of comments into the context."""
     
     def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, 
-        as_varname=None, comment=None, sorted_by=None, limit=None, offset=None):
+        as_varname=None, comment=None, sorted_by=None):
     
         super(OslCommentListNode, self).__init__(ctype=ctype, 
             object_pk_expr=object_pk_expr, object_expr=object_expr, 
             as_varname=as_varname, comment=comment)
             
         self.sorted_by = sorted_by
-        self.limit = limit
-        self.offset = offset
     
     def get_query_set(self, context):
         ctype, object_pk = self.get_target_ctype_pk(context)
@@ -129,6 +167,8 @@ class OslCommentListNode(CommentListNode):
         removed_comments_condition = 'id IS NOT NULL'    
         if getattr(settings, 'COMMENTS_HIDE_REMOVED', True):
             removed_comments_condition = 'is_removed = False'
+            
+        num_comments_per_page = get_comments_per_page_for_content_type(ctype)
         
         get_threaded_comments_sql = """
             SELECT
@@ -212,8 +252,9 @@ class OslCommentListNode(CommentListNode):
             'removed_comments_condition': removed_comments_condition,
             'first_thread_order_by': first_order_by,
             'second_thread_order_by': second_order_by,
-            'limit': self.limit, 
-            'offset': self.offset
+            'limit': num_comments_per_page, 
+            'offset': ((int(context['request'].GET.get('comment_page', 1)) - 1) * 
+                num_comments_per_page)
         }
         
         qs = self.comment_model.objects.raw(get_threaded_comments_sql)
@@ -226,80 +267,56 @@ class OslCommentListNode(CommentListNode):
         if tokens[1] != 'for':
             raise template.TemplateSyntaxError("Second argument in %r tag must be 'for'" % tokens[0])
 
-        # {% get_comment_list for obj as varname limit int offset int %}
-        if len(tokens) == 9:
+        # {% get_comment_list for obj as varname %}
+        if len(tokens) == 5:
             if tokens[3] != 'as':
                 raise template.TemplateSyntaxError("Third argument in %r must be 'as'" % tokens[0])
-            if tokens[5] != 'limit':
-                raise template.TemplateSyntaxError("Fifth argument in %r must be 'limit'" % tokens[0])
-            if tokens[7] != 'offset':
-                raise template.TemplateSyntaxError("Seventh argument in %r must be 'offset'" % tokens[0])
             return cls(
                 object_expr = parser.compile_filter(tokens[2]),
                 as_varname = tokens[4],
-                limit = int(tokens[6]),
-                offset = int(tokens[8])
             )
 
-        # {% get_comment_list for app.model pk as varname limit int offset int %}
-        elif len(tokens) == 10:
+        # {% get_comment_list for app.model pk as varname %}
+        elif len(tokens) == 6:
             if tokens[4] != 'as':
                 raise template.TemplateSyntaxError("Fourth argument in %r must be 'as'" % tokens[0])
-            if tokens[6] != 'limit':
-                raise template.TemplateSyntaxError("Sixth argument in %r must be 'limit'" % tokens[0])
-            if tokens[8] != 'offset':
-                raise template.TemplateSyntaxError("Eighth argument in %r must be 'offset'" % tokens[0])
             return cls(
                 ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
                 object_pk_expr = parser.compile_filter(tokens[3]),
                 as_varname = tokens[5],
-                limit = int(tokens[7]),
-                offset = int(tokens[9])
             )
             
-        # {% get_comment_list for obj as varname sorted by column limit int offset int %}
-        elif len(tokens) == 12:
+        # {% get_comment_list for obj as varname sorted by column %}
+        elif len(tokens) == 8:
             if tokens[3] != 'as':
                 raise template.TemplateSyntaxError("Third argument in %r must be 'as'" % tokens[0])
             if tokens[5] != 'sorted':
                 raise template.TemplateSyntaxError("Fifth argument in %r must be 'sorted'" % tokens[0])
             if tokens[6] != 'by':
                 raise template.TemplateSyntaxError("Sixth argument in %r must be 'by'" % tokens[0])
-            if tokens[8] != 'limit':
-                raise template.TemplateSyntaxError("Eighth argument in %r must be 'limit'" % tokens[0])
-            if tokens[10] != 'offset':
-                raise template.TemplateSyntaxError("Tenth argument in %r must be 'offset'" % tokens[0])
             return cls(
                 object_expr = parser.compile_filter(tokens[2]),
                 as_varname = tokens[4],
                 sorted_by = tokens[7],
-                limit = int(tokens[9]),
-                offset = int(tokens[11])
             )
             
-        # {% get_comment_list for app.model pk as varname sorted by column limit int offset int %}
-        elif len(tokens) == 13:
+        # {% get_comment_list for app.model pk as varname sorted by column %}
+        elif len(tokens) == 9:
             if tokens[4] != 'as':
                 raise template.TemplateSyntaxError("Fourth argument in %r must be 'as'" % tokens[0])
             if tokens[6] != 'sorted':
                 raise template.TemplateSyntaxError("Sixth argument in %r must be 'sorted'" % tokens[0])
             if tokens[7] != 'by':
                 raise template.TemplateSyntaxError("Seventh argument in %r must be 'by'" % tokens[0])
-            if tokens[9] != 'limit':
-                raise template.TemplateSyntaxError("Ninth argument in %r must be 'limit'" % tokens[0])
-            if tokens[11] != 'offset':
-                raise template.TemplateSyntaxError("Eleventh argument in %r must be 'offset'" % tokens[0])
             return cls(
                 ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
                 object_pk_expr = parser.compile_filter(tokens[3]),
                 as_varname = tokens[5],
                 sorted_by = tokens[8],
-                limit = int(tokens[10]),
-                offset = int(tokens[11])
             )
 
         else:
-            raise template.TemplateSyntaxError("%r tag requires 8, 9, 11, or 12 arguments" % tokens[0])
+            raise template.TemplateSyntaxError("%r tag requires 4, 5, 7, or 8 arguments" % tokens[0])
             
 class OslEditCommentFormNode(CommentFormNode):
     
@@ -440,6 +457,13 @@ class ReplyUrlNode(template.Node):
             separator = '?'
         return ''.join([url, separator, 'reply_to=', str(comment.id)])
 
+def get_comments_per_page_for_content_type(content_type):
+    """Returns the number of comments on a page for the given content type."""
+    try:
+        return CommentsPerPageForContentType.objects.get(content_type=content_type).number_per_page
+    except CommentsPerPageForContentType.DoesNotExist:
+        return getattr(settings, 'DEFAULT_COMMENTS_PER_PAGE', 100)
+
 @register.simple_tag
 def edit_comment_form_target():
     """
@@ -464,6 +488,37 @@ def get_anon_comment_form(parser, token):
         {% get_anon_comment_form for [app].[model] [object_id] replying to [parent_comment_id] as [varname] %}
     """
     return AnonOslCommentFormNode.handle_token(parser, token)
+        
+@register.tag
+def get_comment_paginator_page(parser, token):
+    """
+    Gets a paginator for navigating through comment lists
+    
+    Syntax::
+        
+        {% get_comment_paginator_page for [object] as [varname] %}
+        {% get_comment_paginator_page for [app].[model] [pk] as [varname] %}
+    """
+    
+    tokens = token.contents.split()
+    if tokens[1] != 'for':
+        raise template.TemplateSyntaxError("First argument in %r tag must be 'for'" % tokens[0])
+    if len(tokens) == 5:
+        if tokens[3] != 'as':
+            raise template.TemplateSyntaxError("Third argument in %r tag must be 'as'" % tokens[0])
+        return CommentPaginationPageNode(
+            object_expr = parser.compile_filter(tokens[2]),
+            as_varname = tokens[4]
+        )
+    if len(tokens) == 6:
+        if tokens[4] != 'as':
+            raise template.TemplateSyntaxError("Fifth argument in %r tag must be 'as'" % tokens[0])
+        return CommentPaginationPageNode(
+            ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
+            object_pk_expr = parser.compile_filter(tokens[3]),
+            as_varname = tokens[5]
+        )
+    raise template.TemplateSyntaxError("%r tag requires 4 or 5 arguments" % tokens[0])
         
 @register.tag
 def get_edit_comment_form(parser, token):
@@ -499,7 +554,7 @@ def get_threaded_comment_list(parser, token):
         {% endfor %}
 
     """
-    return OslCommentListNode.handle_token(parser, token)
+    return OslCommentListNode.handle_token(parser, token) 
 
 @register.tag
 def output_reply_url(parser, token):

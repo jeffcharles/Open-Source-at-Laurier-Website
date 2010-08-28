@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.contrib.comments.admin import CommentsAdmin
 
-from osl_comments.models import OslComment
+from osl_comments.models import CommentsPerPageForContentType, OslComment
+
+class CommentsPerPageForContentTypeAdmin(admin.ModelAdmin):
+    pass
+admin.site.register(CommentsPerPageForContentType, 
+    CommentsPerPageForContentTypeAdmin)
 
 class OslCommentsAdmin(CommentsAdmin):
     fieldsets = (

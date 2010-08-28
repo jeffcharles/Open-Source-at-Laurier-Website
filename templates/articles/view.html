@@ -53,7 +53,7 @@
         {% render_anon_comment_form for article %}
     {% endif %}
 
-    {% get_threaded_comment_list for article as comments sorted by newest limit 100 offset 0 %}
+    {% get_threaded_comment_list for article as comments sorted by newest %}
     {% if not comments %}
     <p>There do not appear to be any comments for this article.</p>
     {% else %}
@@ -93,6 +93,13 @@
         {% endif %}
         {% endfor %}
     </ul>
+    {% get_comment_paginator_page for article as comment_page %}
+    {% if comment_page.has_previous %}
+        <a href="?comment_page={{ comment_page.previous_page_number }}">Previous</a>
+    {% endif %}
+    {% if comment_page.has_next %}
+        <a href="?comment_page={{ comment_page.next_page_number }}">Next</a>
+    {% endif %}
     {% endif %}
 </section>
 {% endblock %}
