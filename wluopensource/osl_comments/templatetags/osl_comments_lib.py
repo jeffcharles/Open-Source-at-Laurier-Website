@@ -438,22 +438,18 @@ class RenderOslEditCommentNode(OslEditCommentFormNode):
         
 class ReplyUrlNode(template.Node):
     
-    def __init__(self, comment_object, url):
+    def __init__(self, comment_object):
         if comment_object is None:
             raise template.TemplateSyntaxError(
                 "Reply objects must be given a valid comment."
             )
         self.comment_object = comment_object
-        self.url = url
     
     def render(self, context):
-        url = self.url.resolve(context)
         comment = self.comment_object.resolve(context)
-        if '?' in url:
-            separator = '&'
-        else:
-            separator = '?'
-        return ''.join([url, separator, 'reply_to=', str(comment.id)])
+        query_string = context['request'].GET.copy()
+        query_string.update({'reply_to': comment.id})
+        return ''.join(['?', query_string.urlencode()])
 
 def get_comments_per_page_for_content_type(content_type):
     """Returns the number of comments on a page for the given content type."""
@@ -571,17 +567,15 @@ def output_reply_url(parser, token):
     
     Syntax::
     
-        {% output_reply_url for [comment_object] with [url] %}
+        {% output_reply_url for [comment_object] %}
     """
     try:
-        tag_name, ignore, comment_object, ignore2, url = token.split_contents()
+        tag_name, ignore, comment_object = token.split_contents()
     except ValueError:
-        raise template.TemplateSyntaxError("%r tag requires four arguments" % tokens.contents.split[0])
+        raise template.TemplateSyntaxError("%r tag requires two arguments" % tokens.contents.split[0])
     if ignore != 'for':
         raise template.TemplateSyntaxError("First argument in %r must be 'for'" % tokens.contents.split[0])
-    if ignore2 != 'with':
-        raise template.TemplateSyntaxError("Three argument in %r must be 'with'" % tokens.contents.split[0]) 
-    return ReplyUrlNode(parser.compile_filter(comment_object), parser.compile_filter(url))
+    return ReplyUrlNode(parser.compile_filter(comment_object))
 
 @register.tag
 def render_anon_comment_form(parser, token):

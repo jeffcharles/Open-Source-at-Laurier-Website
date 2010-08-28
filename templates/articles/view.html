@@ -79,7 +79,7 @@
                 </blockquote>
                 <ul class="comment-links">
                     {% if comment.parent %}
-                        <li><a href="{% output_reply_url for comment with request.path %}">Reply</a></li>
+                        <li><a href="{% output_reply_url for comment %}">Reply</a></li>
                     {% endif %}
                     {% if comment.user == request.user %}
                         <li><a href="?edit_comment={{ comment.id }}">Edit</a></li>
