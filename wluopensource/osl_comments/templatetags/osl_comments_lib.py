@@ -561,13 +561,13 @@ def get_threaded_comment_list(parser, token):
     return OslCommentListNode.handle_token(parser, token) 
 
 @register.tag
-def output_reply_url(parser, token):
+def output_comment_reply_url(parser, token):
     """
     Output a URL to trigger a reply to this comment
     
     Syntax::
     
-        {% output_reply_url for [comment_object] %}
+        {% output_comment_reply_url for [comment_object] %}
     """
     try:
         tag_name, ignore, comment_object = token.split_contents()
