@@ -82,7 +82,7 @@
                         <li><a href="{% output_comment_reply_url for comment %}">Reply</a></li>
                     {% endif %}
                     {% if comment.user == request.user %}
-                        <li><a href="?edit_comment={{ comment.id }}">Edit</a></li>
+                        <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
                     {% endif %}
                     <li><a href="#">Report this comment</a></li>
                 </ul>

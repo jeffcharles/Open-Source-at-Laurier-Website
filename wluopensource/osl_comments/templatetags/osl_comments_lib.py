@@ -12,6 +12,23 @@ from osl_comments.models import CommentsPerPageForContentType, OslComment
 
 register = template.Library()
 
+class AbstractUrlNode(template.Node):
+    query_string_key = None
+    type_of_object = None
+    
+    def __init__(self, comment_object):
+        if comment_object is None:
+            raise template.TemplateSyntaxError(
+                "%s objects must be given a valid comment." % self.type_of_object
+            )
+        self.comment_object = comment_object
+    
+    def render(self, context):
+        comment = self.comment_object.resolve(context)
+        query_string = context['request'].GET.copy()
+        query_string.update({('%s' % self.query_string_key): comment.id})
+        return ''.join(['?', query_string.urlencode()])
+
 class AnonOslCommentFormNode(CommentFormNode):
     
     def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, 
@@ -135,6 +152,10 @@ class CommentPaginationPageNode(BaseCommentNode):
         context[self.as_varname] = comment_paginator.page(
             get_comment_page(context))
         return ''
+
+class EditUrlNode(AbstractUrlNode):
+    query_string_key = 'edit_comment'
+    type_of_object = 'Edit'
 
 class OslCommentListNode(CommentListNode):
     """Insert a list of comments into the context."""
@@ -436,20 +457,9 @@ class RenderOslEditCommentNode(OslEditCommentFormNode):
         else:
             return ''
         
-class ReplyUrlNode(template.Node):
-    
-    def __init__(self, comment_object):
-        if comment_object is None:
-            raise template.TemplateSyntaxError(
-                "Reply objects must be given a valid comment."
-            )
-        self.comment_object = comment_object
-    
-    def render(self, context):
-        comment = self.comment_object.resolve(context)
-        query_string = context['request'].GET.copy()
-        query_string.update({'reply_to': comment.id})
-        return ''.join(['?', query_string.urlencode()])
+class ReplyUrlNode(AbstractUrlNode):
+    query_string_key = 'reply_to'
+    type_of_object = 'Reply'
 
 def get_comments_per_page_for_content_type(content_type):
     """Returns the number of comments on a page for the given content type."""
@@ -559,6 +569,23 @@ def get_threaded_comment_list(parser, token):
 
     """
     return OslCommentListNode.handle_token(parser, token) 
+
+@register.tag
+def output_comment_edit_url(parser, token):
+    """
+    Output a URL to trigger an edit to this comment
+    
+    Syntax::
+    
+        {% output_comment_edit_url for [comment_object] %}
+    """
+    try:
+        tag_name, ignore, comment_object = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError("%r tag requires two arguments" % tokens.contents.split[0])
+    if ignore != 'for':
+        raise template.TemplateSyntaxError("First argument in %r must be 'for'" % tokens.contents.split[0])
+    return EditUrlNode(parser.compile_filter(comment_object))
 
 @register.tag
 def output_comment_reply_url(parser, token):
