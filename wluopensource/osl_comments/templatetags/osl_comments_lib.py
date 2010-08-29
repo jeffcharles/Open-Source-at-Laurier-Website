@@ -12,6 +12,9 @@ from osl_comments.models import CommentsPerPageForContentType, OslComment
 
 register = template.Library()
 
+EDIT_QUERY_STRING_KEY = 'edit_comment'
+REPLY_QUERY_STRING_KEY = 'reply_to_comment'
+
 class AbstractIsFormPresentNode(template.Node):
     form_query_string_key = None
     
@@ -77,10 +80,10 @@ class AbstractUrlNode(template.Node):
     def render(self, context):
         comment = self.comment_object.resolve(context)
         query_string = context['request'].GET.copy()
-        if 'edit_comment' in query_string:
-            del query_string['edit_comment']
-        if 'reply_to' in query_string:
-            del query_string['reply_to']
+        if EDIT_QUERY_STRING_KEY in query_string:
+            del query_string[EDIT_QUERY_STRING_KEY]
+        if REPLY_QUERY_STRING_KEY in query_string:
+            del query_string[REPLY_QUERY_STRING_KEY]
         query_string[self.query_string_key] = comment.id
         return ''.join(['?', query_string.urlencode()])
 
@@ -209,16 +212,16 @@ class CommentPaginationPageNode(BaseCommentNode):
         return ''
 
 class EditUrlNode(AbstractUrlNode):
-    query_string_key = 'edit_comment'
+    query_string_key = EDIT_QUERY_STRING_KEY
     type_of_object = 'Edit'
     
 class IsEditFormPresentNode(AbstractIsFormPresentNode):
     """Insert whether an edit form is displayed somewhere into the context."""
-    form_query_string_key = 'edit_comment'
+    form_query_string_key = EDIT_QUERY_STRING_KEY
     
 class IsReplyFormPresentNode(AbstractIsFormPresentNode):
     """Insert whether a reply form is displayed somewhere into the context."""
-    form_query_string_key = 'reply_to'
+    form_query_string_key = REPLY_QUERY_STRING_KEY
 
 class OslCommentListNode(CommentListNode):
     """Insert a list of comments into the context."""
@@ -521,7 +524,7 @@ class RenderOslEditCommentNode(OslEditCommentFormNode):
             return ''
         
 class ReplyUrlNode(AbstractUrlNode):
-    query_string_key = 'reply_to'
+    query_string_key = REPLY_QUERY_STRING_KEY
     type_of_object = 'Reply'
     
 class ShouldDisplayEditFormNode(AbstractShouldDisplayFormNode):
@@ -529,14 +532,14 @@ class ShouldDisplayEditFormNode(AbstractShouldDisplayFormNode):
     Insert whether an edit form should be displayed for the specified content 
     into the context.
     """
-    query_string_key = 'edit_comment'
+    query_string_key = EDIT_QUERY_STRING_KEY
     
 class ShouldDisplayReplyFormNode(AbstractShouldDisplayFormNode):
     """
     Insert whether a reply form should be displayed for the specified content 
     into the context.
     """
-    query_string_key = 'reply_to'
+    query_string_key = REPLY_QUERY_STRING_KEY
     
     def render(self, context):
         super(ShouldDisplayReplyFormNode, self).render(context)
