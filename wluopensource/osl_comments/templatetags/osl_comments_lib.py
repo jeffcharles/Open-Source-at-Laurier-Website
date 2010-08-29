@@ -34,7 +34,7 @@ class AbstractIsFormPresentNode(template.Node):
     
     def render(self, context):
         context[self.as_varname] = \
-            context['request'].GET.get('%s' % self.form_query_string_key, False)
+            context['request'].GET.get(self.form_query_string_key, False)
         return ''
         
 class AbstractShouldDisplayFormNode(template.Node):
