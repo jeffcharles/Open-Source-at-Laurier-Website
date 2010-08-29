@@ -33,6 +33,35 @@ class AbstractIsFormPresentNode(template.Node):
         context[self.as_varname] = \
             context['request'].GET.get('%s' % self.form_query_string_key, False)
         return ''
+        
+class AbstractShouldDisplayFormNode(template.Node):
+    query_string_key = None
+
+    def __init__(self, comment, as_varname):
+        self.comment = comment
+        self.as_varname = as_varname
+    
+    @classmethod
+    def handle_token(cls, parser, token):
+        tokens = token.contents.split()
+        
+        # {% should_display_form for [comment] as [varname] %}
+        if len(tokens) != 5:
+            raise template.TemplateSyntaxError("%r tag requires 4 arguments" % tokens[0])
+        if tokens[1] != 'for':
+            raise template.TemplateSyntaxError("First argument in %r tag must be 'for'" % tokens[0])
+        if tokens[3] != 'as':
+            raise template.TemplateSyntaxError("Third argument in %r tag must be 'as'" % tokens[0])
+        return cls(
+            comment = parser.compile_filter(tokens[2]),
+            as_varname = tokens[4]
+        )
+    
+    def render(self, context):
+        comment = self.comment.resolve(context)
+        context[self.as_varname] = \
+            context['request'].GET.get(self.query_string_key) == str(comment.id)
+        return ''
 
 class AbstractUrlNode(template.Node):
     query_string_key = None
@@ -494,6 +523,27 @@ class RenderOslEditCommentNode(OslEditCommentFormNode):
 class ReplyUrlNode(AbstractUrlNode):
     query_string_key = 'reply_to'
     type_of_object = 'Reply'
+    
+class ShouldDisplayEditFormNode(AbstractShouldDisplayFormNode):
+    """
+    Insert whether an edit form should be displayed for the specified content 
+    into the context.
+    """
+    query_string_key = 'edit_comment'
+    
+class ShouldDisplayReplyFormNode(AbstractShouldDisplayFormNode):
+    """
+    Insert whether a reply form should be displayed for the specified content 
+    into the context.
+    """
+    query_string_key = 'reply_to'
+    
+    def render(self, context):
+        super(ShouldDisplayReplyFormNode, self).render(context)
+        comment = self.comment.resolve(context)
+        if context[self.as_varname] and not comment.parent:
+            context[self.as_varname] = False
+        return ''
 
 def get_comments_per_page_for_content_type(content_type):
     """Returns the number of comments on a page for the given content type."""
@@ -683,4 +733,26 @@ def render_edit_comment_form(parser, token):
         {% render_edit_comment_form for [comment] %}
     """
     return RenderOslEditCommentNode.handle_token(parser, token)
+
+@register.tag
+def should_display_edit_form(parser, token):
+    """
+    Gets whether an edit form should be displayed for the given comment.
+    
+    Syntax::
+    
+        {% should_display_edit_form for [comment] as [varname]
+    """
+    return ShouldDisplayEditFormNode.handle_token(parser, token)
+
+@register.tag
+def should_display_reply_form(parser, token):
+    """
+    Gets whether a reply form should be displayed for the given comment.
+    
+    Syntax::
+    
+        {% should_display_reply_form for [comment] as [varname] %}
+    """
+    return ShouldDisplayReplyFormNode.handle_token(parser, token)
 
