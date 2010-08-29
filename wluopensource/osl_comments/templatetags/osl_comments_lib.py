@@ -12,6 +12,28 @@ from osl_comments.models import CommentsPerPageForContentType, OslComment
 
 register = template.Library()
 
+class AbstractIsFormPresentNode(template.Node):
+    form_query_string_key = None
+    
+    def __init__(self, as_varname):
+        self.as_varname = as_varname
+    
+    @classmethod
+    def handle_token(cls, parser, token):
+        tokens = token.contents.split()
+        
+        # {% is_form_present as [varname] %}
+        if len(tokens) != 3:
+            raise template.TemplateSyntaxError("%r tag requires 2 arguments" % tokens[0])
+        if tokens[1] != 'as':
+            raise template.TemplateSyntaxError("First argument in %r tag must be 'as'" % tokens[0])
+        return cls(as_varname = tokens[2])
+    
+    def render(self, context):
+        context[self.as_varname] = \
+            context['request'].GET.get('%s' % self.form_query_string_key, False)
+        return ''
+
 class AbstractUrlNode(template.Node):
     query_string_key = None
     type_of_object = None
@@ -156,6 +178,14 @@ class CommentPaginationPageNode(BaseCommentNode):
 class EditUrlNode(AbstractUrlNode):
     query_string_key = 'edit_comment'
     type_of_object = 'Edit'
+    
+class IsEditFormPresentNode(AbstractIsFormPresentNode):
+    """Insert whether an edit form is displayed somewhere into the context."""
+    form_query_string_key = 'edit_comment'
+    
+class IsReplyFormPresentNode(AbstractIsFormPresentNode):
+    """Insert whether a reply form is displayed somewhere into the context."""
+    form_query_string_key = 'reply_to'
 
 class OslCommentListNode(CommentListNode):
     """Insert a list of comments into the context."""
@@ -569,6 +599,28 @@ def get_threaded_comment_list(parser, token):
 
     """
     return OslCommentListNode.handle_token(parser, token) 
+
+@register.tag
+def is_edit_form_present(parser, token):
+    """
+    Gets whether or not an edit form is present.
+    
+    Syntax::
+    
+        {% is_edit_form_present as [varname] %}
+    """
+    return IsEditFormPresentNode.handle_token(parser, token)
+    
+@register.tag
+def is_reply_form_present(parser, token):
+    """
+    Gets whether or not a reply form is present.
+    
+    Syntax::
+    
+        {% is_reply_form_present as [varname] %}
+    """
+    return IsReplyFormPresentNode.handle_token(parser, token)
 
 @register.tag
 def output_comment_edit_url(parser, token):
