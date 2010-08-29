@@ -93,7 +93,7 @@
         </li>
         {% should_display_reply_form for comment as display_reply_form %}
         {% if display_reply_form %}
-            <li class="comment-child">{% render_anon_comment_form for article replying to comment.id %}</li>
+            <li class="comment-child">{% render_anon_comment_form for article replying to comment %}</li>
         {% endif %}
         {% endfor %}
     </ul>

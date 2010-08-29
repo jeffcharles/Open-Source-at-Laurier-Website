@@ -90,17 +90,17 @@ class AbstractUrlNode(template.Node):
 class AnonOslCommentFormNode(CommentFormNode):
     
     def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, 
-        as_varname=None, comment=None, parent_comment_id=None):
+        as_varname=None, comment=None, parent_comment=None):
         
         super(AnonOslCommentFormNode, self).__init__(ctype=ctype, 
             object_pk_expr=object_pk_expr, object_expr=object_expr, 
             as_varname=as_varname, comment=comment)
-        self.parent_comment_id = parent_comment_id
+        self.parent_comment = parent_comment
     
     def get_form(self, context):
         ctype, object_pk = self.get_target_ctype_pk(context)
-        if self.parent_comment_id is not None:
-            parent_comment_id = self.parent_comment_id.resolve(context)
+        if self.parent_comment is not None:
+            parent_comment_id = self.parent_comment.resolve(context).id
         else:
             parent_comment_id = None
         if object_pk:
@@ -142,7 +142,7 @@ class AnonOslCommentFormNode(CommentFormNode):
                 as_varname = tokens[5]
             )
         
-        # {% get_anon_comment_form for obj replying to parent_comment_id as varname %}
+        # {% get_anon_comment_form for obj replying to parent_comment as varname %}
         if len(tokens) == 8:
             if tokens[3] != 'replying':
                 raise template.TemplateSyntaxError("Third argument in %r tag must be 'replying'" % tokens[0])
@@ -152,11 +152,11 @@ class AnonOslCommentFormNode(CommentFormNode):
                 raise template.TemplateSyntaxError("Sixth argument in %r tag must be 'as'" % tokens[0])
             return cls(
                 object_expr = parser.compile_filter(tokens[2]),
-                parent_comment_id = parser.compile_filter(tokens[5]),
+                parent_comment = parser.compile_filter(tokens[5]),
                 as_varname = tokens[7]
             )
             
-        # {% get_anon_comment_form for app.model pk replying to parent_comment_id as varname %}
+        # {% get_anon_comment_form for app.model pk replying to parent_comment as varname %}
         if len(tokens) == 9:
             if tokens[4] != 'replying':
                 raise template.TemplateSyntaxError("Fourth argument in %r tag must be 'replying'" % tokens[0])
@@ -167,12 +167,11 @@ class AnonOslCommentFormNode(CommentFormNode):
             return cls(
                 ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
                 object_pk_expr = parser.compile_filter(tokens[3]),
-                parent_comment_id = parser.compile_filter(tokens[6]),
+                parent_comment = parser.compile_filter(tokens[6]),
                 as_varname = tokens[8]
             )
         
-        else:
-            raise template.TemplateSyntaxError("%r tag requires 4, 5, 7, or 8 arguments" % tokens[0])
+        raise template.TemplateSyntaxError("%r tag requires 4, 5, 7, or 8 arguments" % tokens[0])
 
 class CommentPaginationPageNode(BaseCommentNode):
     """Insert a comment pagination object into the context."""
@@ -467,7 +466,7 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode,
                 object_pk_expr = parser.compile_filter(tokens[3])
             )
         
-        # {% render_anon_comment_form for obj replying to parent_comment_id %}
+        # {% render_anon_comment_form for obj replying to parent_comment %}
         if len(tokens) == 6:
             if tokens[3] != 'replying':
                 raise template.TemplateSyntaxError("Third argument in %r tag must be 'replying'" % tokens[0])
@@ -475,10 +474,10 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode,
                 raise template.TemplateSyntaxError("Fourth argument in %r tag must be 'to'" % tokens[0])
             return cls(
                 object_expr = parser.compile_filter(tokens[2]),
-                parent_comment_id = parser.compile_filter(tokens[5])
+                parent_comment = parser.compile_filter(tokens[5])
             )
             
-        # {% render_anon_comment_form for app.model pk replying to parent_comment_id %}
+        # {% render_anon_comment_form for app.model pk replying to parent_comment %}
         if len(tokens) == 7:
             if tokens[4] != 'replying':
                 raise template.TemplateSyntaxError("Fourth argument in %r tag must be 'replying'" % tokens[0])
@@ -487,11 +486,10 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode,
             return cls(
                 ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
                 object_pk_expr = parser.compile_filter(tokens[3]),
-                parent_comment_id = parser.compile_filter(tokens[6])
+                parent_comment = parser.compile_filter(tokens[6])
             )
-        
-        else:
-            raise template.TemplateSyntaxError("%r tag requires 2, 3, 5, or 6 arguments" % tokens[0])
+
+        raise template.TemplateSyntaxError("%r tag requires 2, 3, 5, or 6 arguments" % tokens[0])
         
 class RenderOslEditCommentNode(OslEditCommentFormNode):
     
@@ -575,8 +573,8 @@ def get_anon_comment_form(parser, token):
         
         {% get_anon_comment_form for [object] as [varname] %}
         {% get_anon_comment_form for [app].[model] [object_id] as [varname] %}
-        {% get_anon_comment_form for [object] replying to [parent_comment_id] as [varname] %}
-        {% get_anon_comment_form for [app].[model] [object_id] replying to [parent_comment_id] as [varname] %}
+        {% get_anon_comment_form for [object] replying to [parent_comment] as [varname] %}
+        {% get_anon_comment_form for [app].[model] [object_id] replying to [parent_comment] as [varname] %}
     """
     return AnonOslCommentFormNode.handle_token(parser, token)
         
@@ -722,7 +720,9 @@ def render_anon_comment_form(parser, token):
     Syntax::
 
         {% render_anon_comment_form for [object] %}
-        {% render_anon_comment_form for [app].[model] [object_id] %}
+        {% render_anon_comment_form for [app].[model] [pk] %}
+        {% render_anon_comment_form for [object] replying to [comment] %}
+        {% render_anon_comment_form for [app].[model] [pk] replying to [comment] %}
     """
     return RenderAnonOslCommentFormNode.handle_token(parser, token)
     
