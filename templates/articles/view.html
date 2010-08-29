@@ -101,6 +101,7 @@
     {% if comment_page.has_previous %}
         <a href="{% output_previous_comment_page_url with comment_page %}">Previous</a>
     {% endif %}
+    Page {{ comment_page.number }} of {{ comment_page.paginator.num_pages }}
     {% if comment_page.has_next %}
         <a href="{% output_next_comment_page_url with comment_page %}">Next</a>
     {% endif %}
