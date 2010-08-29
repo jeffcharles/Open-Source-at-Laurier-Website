@@ -48,7 +48,11 @@ class AbstractUrlNode(template.Node):
     def render(self, context):
         comment = self.comment_object.resolve(context)
         query_string = context['request'].GET.copy()
-        query_string.update({('%s' % self.query_string_key): comment.id})
+        if 'edit_comment' in query_string:
+            del query_string['edit_comment']
+        if 'reply_to' in query_string:
+            del query_string['reply_to']
+        query_string[self.query_string_key] = comment.id
         return ''.join(['?', query_string.urlencode()])
 
 class AnonOslCommentFormNode(CommentFormNode):
