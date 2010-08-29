@@ -291,7 +291,11 @@ class OslCommentListNode(CommentListNode):
                 comment,
                 thread_submit_date,
                 submit_date,
-                edit_timestamp
+                edit_timestamp,
+                parent_comment_user_name,
+                parent_comment_user_url,
+                parent_comment_comment,
+                parent_comment_edit_timestamp
             FROM (
                 SELECT
                     dc.id,
@@ -303,7 +307,11 @@ class OslCommentListNode(CommentListNode):
                     dc.comment,
                     dc.submit_date AS thread_submit_date,
                     dc.submit_date,
-                    oc.edit_timestamp
+                    oc.edit_timestamp,
+                    dc.user_name AS parent_comment_user_name,
+                    dc.user_url AS parent_comment_user_url,
+                    dc.comment AS parent_comment_comment,
+                    oc.edit_timestamp AS parent_comment_edit_timestamp
                 FROM
                     django_comments AS dc
                 JOIN
@@ -328,7 +336,11 @@ class OslCommentListNode(CommentListNode):
                     dc2.comment,
                     dc3.submit_date AS thread_submit_date,
                     dc2.submit_date,
-                    oc2.edit_timestamp
+                    oc2.edit_timestamp,
+                    dc3.user_name AS parent_comment_user_name,
+                    dc3.user_url AS parent_comment_user_url,
+                    dc3.comment AS parent_comment_comment,
+                    oc3.edit_timestamp AS parent_comment_edit_timestamp
                 FROM
                     django_comments AS dc2
                 JOIN
@@ -337,6 +349,9 @@ class OslCommentListNode(CommentListNode):
                 JOIN
                     django_comments AS dc3
                     ON dc3.id = oc2.parent_comment_id
+                JOIN
+                    osl_comments_oslcomment AS oc3
+                    ON dc3.id = oc3.comment_ptr_id
                 WHERE
                     dc2.content_type_id = %(content_type)d AND
                     dc2.object_pk = %(object_pk)s AND

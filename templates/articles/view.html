@@ -60,6 +60,27 @@
     <p>There do not appear to be any comments for this article.</p>
     {% else %}
     <ul id="comment-list">
+        {% if not comments.0.parent %}
+            <li>
+                <div class="comment-header">
+                    {% if comments.0.parent_comment_user_url %}
+                    <a href="{{ comments.0.parent_comment_user_url }}">{{ comments.0.parent_comment_user_name }}</a>
+                    {% else %}
+                        {{ comments.0.parent_comment_user_name }}
+                    {% endif %}
+                    said {{ comments.0.thread_submit_date|timesince }} ago:
+                    {% if comments.0.parent_comment_edit_timestamp != comments.0.thread_submit_date %}
+                        *edited
+                    {% endif %}
+                </div>
+                <blockquote class="comment-body">
+                    {{ comments.0.parent_comment_comment }}
+                </blockquote>
+                <ul class="comment-links">
+                    <li><a href="#">Report this comment</a></li>
+                </ul>
+            </li>
+        {% endif %}
         {% for comment in comments %}
         <li{% if not comment.parent %} class="comment-child"{% endif %}>
             <div class="comment-header">
