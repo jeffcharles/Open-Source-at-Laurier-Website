@@ -99,10 +99,10 @@
     </ul>
     {% get_comment_paginator_page for article as comment_page %}
     {% if comment_page.has_previous %}
-        <a href="?comment_page={{ comment_page.previous_page_number }}">Previous</a>
+        <a href="{% output_previous_comment_page_url with comment_page %}">Previous</a>
     {% endif %}
     {% if comment_page.has_next %}
-        <a href="?comment_page={{ comment_page.next_page_number }}">Next</a>
+        <a href="{% output_next_comment_page_url with comment_page %}">Next</a>
     {% endif %}
     {% endif %}
 </section>

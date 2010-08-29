@@ -13,6 +13,7 @@ from osl_comments.models import CommentsPerPageForContentType, OslComment
 register = template.Library()
 
 EDIT_QUERY_STRING_KEY = 'edit_comment'
+PAGE_QUERY_STRING_KEY = 'comment_page'
 REPLY_QUERY_STRING_KEY = 'reply_to_comment'
 
 class AbstractIsFormPresentNode(template.Node):
@@ -36,6 +37,22 @@ class AbstractIsFormPresentNode(template.Node):
         context[self.as_varname] = \
             context['request'].GET.get(self.form_query_string_key, False)
         return ''
+        
+class AbstractPaginationUrlNode(template.Node):
+    
+    def __init__(self, page):
+        self.page = page
+    
+    @classmethod
+    def handle_token(cls, parser, token):
+        tokens = token.contents.split()
+        
+        # {% output_something_comment_page_url with page %}
+        if len(tokens) != 3:
+            raise template.TemplateSyntaxError("%r tag requires 2 arguments" % tokens[0])
+        if tokens[1] != 'with':
+            raise template.TemplateSyntaxError("First argument for %r tag must be 'with'" % tokens[0])
+        return cls(page = parser.compile_filter(tokens[2]))
         
 class AbstractShouldDisplayFormNode(template.Node):
     query_string_key = None
@@ -221,6 +238,15 @@ class IsEditFormPresentNode(AbstractIsFormPresentNode):
 class IsReplyFormPresentNode(AbstractIsFormPresentNode):
     """Insert whether a reply form is displayed somewhere into the context."""
     form_query_string_key = REPLY_QUERY_STRING_KEY
+    
+class NextPageUrlNode(AbstractPaginationUrlNode):
+    """Output URL to get next page of comments."""
+    
+    def render(self, context):
+        page = self.page.resolve(context)
+        return ''.join(
+            ['?', PAGE_QUERY_STRING_KEY, '=', str(page.next_page_number())]
+        )
 
 class OslCommentListNode(CommentListNode):
     """Insert a list of comments into the context."""
@@ -442,7 +468,15 @@ class OslEditCommentFormNode(CommentFormNode):
             )
         else:
             raise template.TemplateSyntaxError("%r tag takes 4 arguments" % tokens[0])
-                
+
+class PreviousPageUrlNode(AbstractPaginationUrlNode):
+    """Output URL to get previous page of comments."""
+    
+    def render(self, context):
+        page = self.page.resolve(context)
+        return ''.join(
+            ['?', PAGE_QUERY_STRING_KEY, '=', str(page.previous_page_number())]
+        )
 
 class RenderAnonOslCommentFormNode(AnonOslCommentFormNode, 
     RenderCommentFormNode):
@@ -710,6 +744,28 @@ def output_comment_reply_url(parser, token):
     if ignore != 'for':
         raise template.TemplateSyntaxError("First argument in %r must be 'for'" % tokens.contents.split[0])
     return ReplyUrlNode(parser.compile_filter(comment_object))
+
+@register.tag
+def output_next_comment_page_url(parser, token):
+    """
+    Output the URL to get the next page of comments.
+    
+    Syntax::
+    
+        {% output_next_comment_page_url with [page_object] %}
+    """
+    return NextPageUrlNode.handle_token(parser, token)
+
+@register.tag
+def output_previous_comment_page_url(parser, token):
+    """
+    Output the URL to get the previous page of comments.
+    
+    Syntax::
+    
+        {% output_previous_comment_page_url with [page_object] %}
+    """
+    return PreviousPageUrlNode.handle_token(parser, token)
 
 @register.tag
 def render_anon_comment_form(parser, token):
