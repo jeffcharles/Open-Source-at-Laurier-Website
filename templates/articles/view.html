@@ -108,7 +108,9 @@
                     {% if comment.user == request.user %}
                         <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
                     {% endif %}
-                    <li><a href="#">Report this comment</a></li>
+                    {% if comment.user != request.user %}
+                        <li><a href="#">Report this comment</a></li>
+                    {% endif %}
                 </ul>
             {% endif %}
         </li>
