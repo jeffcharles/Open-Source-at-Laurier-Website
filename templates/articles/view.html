@@ -61,7 +61,7 @@
     {% else %}
     <ul id="comment-list">
         {% if not comments.0.parent %}
-            <li>
+            <li class="comment-pagination-parent">
                 <div class="comment-header">
                     {% if comments.0.parent_comment_user_url %}
                     <a href="{{ comments.0.parent_comment_user_url }}">{{ comments.0.parent_comment_user_name }}</a>
