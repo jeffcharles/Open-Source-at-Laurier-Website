@@ -77,7 +77,9 @@
                     {{ comments.0.parent_comment_comment }}
                 </blockquote>
                 <ul class="comment-links">
-                    <li><a href="#">Report this comment</a></li>
+                    {% if comments.0.parent_comment_user_id != request.user.id %}
+                        <li><a href="#">Report this comment</a></li>
+                    {% endif %}
                 </ul>
             </li>
         {% endif %}
