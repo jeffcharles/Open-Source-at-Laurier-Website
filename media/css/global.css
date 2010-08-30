@@ -49,10 +49,6 @@ body {
     margin: 5px 0px 5px 10px;
 }
 
-.comment-child {
-    padding-left: 3.0em;
-}
-
 .comment-links a {
     color: #666666;
 }
@@ -101,6 +97,14 @@ body {
     border-bottom: 1px dotted #333333;
     padding-bottom: 10px;
     padding-top: 10px;
+}
+
+#content #comments #comment-list li.comment-child {
+    padding-left: 3.0em;
+}
+
+#content #comments > #comment-list > li {
+    padding: 10px;
 }
 
 #content img {
