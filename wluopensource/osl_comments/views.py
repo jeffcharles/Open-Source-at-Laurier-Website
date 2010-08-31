@@ -4,6 +4,8 @@ from django.contrib.comments.views import comments
 from django.contrib.comments.views.comments import CommentPostBadRequest
 from django.contrib.comments.views.utils import confirmation_view, next_redirect
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 
