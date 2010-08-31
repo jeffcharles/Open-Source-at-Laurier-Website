@@ -292,11 +292,13 @@ class OslCommentListNode(CommentListNode):
                 thread_submit_date,
                 submit_date,
                 edit_timestamp,
+                transformed_comment,
                 parent_comment_user_id,
                 parent_comment_user_name,
                 parent_comment_user_url,
                 parent_comment_comment,
-                parent_comment_edit_timestamp
+                parent_comment_edit_timestamp,
+                parent_comment_transformed_comment
             FROM (
                 SELECT
                     dc.id,
@@ -309,11 +311,13 @@ class OslCommentListNode(CommentListNode):
                     dc.submit_date AS thread_submit_date,
                     dc.submit_date,
                     oc.edit_timestamp,
+                    oc.transformed_comment,
                     dc.user_id AS parent_comment_user_id,
                     dc.user_name AS parent_comment_user_name,
                     dc.user_url AS parent_comment_user_url,
                     dc.comment AS parent_comment_comment,
-                    oc.edit_timestamp AS parent_comment_edit_timestamp
+                    oc.edit_timestamp AS parent_comment_edit_timestamp,
+                    oc.transformed_comment AS parent_comment_transformed_comment
                 FROM
                     django_comments AS dc
                 JOIN
@@ -339,11 +343,13 @@ class OslCommentListNode(CommentListNode):
                     dc3.submit_date AS thread_submit_date,
                     dc2.submit_date,
                     oc2.edit_timestamp,
+                    oc2.transformed_comment,
                     dc3.user_id AS parent_comment_user_id,
                     dc3.user_name AS parent_comment_user_name,
                     dc3.user_url AS parent_comment_user_url,
                     dc3.comment AS parent_comment_comment,
-                    oc3.edit_timestamp AS parent_comment_edit_timestamp
+                    oc3.edit_timestamp AS parent_comment_edit_timestamp,
+                    oc3.transformed_comment AS parent_comment_transformed_comment
                 FROM
                     django_comments AS dc2
                 JOIN

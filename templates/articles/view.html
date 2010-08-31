@@ -74,7 +74,7 @@
                     {% endif %}
                 </div>
                 <blockquote class="comment-body">
-                    {{ comments.0.parent_comment_comment }}
+                    {{ comments.0.parent_comment_transformed_comment|safe }}
                 </blockquote>
                 <ul class="comment-links">
                     {% if comments.0.parent_comment_user_id != request.user.id %}
@@ -101,7 +101,7 @@
                 {% render_edit_comment_form for comment %}
             {% else %}
                 <blockquote class="comment-body">
-                    {{ comment.comment }}
+                    {{ comment.transformed_comment|safe }}
                 </blockquote>
                 <ul class="comment-links">
                     {% if comment.parent %}

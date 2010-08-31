@@ -3,10 +3,18 @@ from django.contrib.comments.signals import comment_was_posted, comment_will_be_
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
+import markdown
+
 class OslComment(Comment):
     parent_comment = models.ForeignKey(Comment, blank=True, null=True, related_name='parent_comment')
     inline_to_object = models.BooleanField()
     edit_timestamp = models.DateTimeField()
+    transformed_comment = models.TextField(editable=False)
+    
+    def save(self, force_insert=False, force_update=False):
+        md = markdown.Markdown(safe_mode="escape")
+        self.transformed_comment = md.convert(self.comment)
+        super(OslComment, self).save(force_insert, force_update)
 
 def comment_edit_timestamp_injection_handler(sender, **kwargs):
     if 'comment' in kwargs:

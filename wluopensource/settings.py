@@ -126,6 +126,7 @@ INSTALLED_APPS = (
     'django.contrib.comments',
     'django.contrib.contenttypes',
     'django.contrib.humanize',
+    'django.contrib.markup',
     'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.sitemaps',
