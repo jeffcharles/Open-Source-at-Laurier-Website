@@ -1,0 +1,78 @@
+{% load osl_comments_lib %}
+{% if not comment_list %}
+    <p>There does not appear to be anything here.</p>
+{% else %}
+    <ul id="comment-list">
+        {% if not comment_list.0.parent %}
+            <li class="comment-pagination-parent">
+                <div class="comment-header">
+                    {% if comment_list.0.parent_comment_user_url %}
+                    <a href="{{ comment_list.0.parent_comment_user_url }}">{{ comment_list.0.parent_comment_user_name }}</a>
+                    {% else %}
+                        {{ comment_list.0.parent_comment_user_name }}
+                    {% endif %}
+                    said {{ comment_list.0.thread_submit_date|timesince }} ago:
+                    {% if comment_list.0.parent_comment_edit_timestamp != comment_list.0.thread_submit_date %}
+                        *edited
+                    {% endif %}
+                </div>
+                <blockquote class="comment-body">
+                    {{ comment_list.0.parent_comment_transformed_comment|safe }}
+                </blockquote>
+                <ul class="comment-links">
+                    {% if request.user.is_authenticated and comment_list.0.parent_comment_user_id != request.user.id %}
+                        <li><a href="#">Report this comment</a></li>
+                    {% endif %}
+                </ul>
+            </li>
+        {% endif %}
+        {% for comment in comment_list %}
+        <li{% if not comment.parent %} class="comment-child"{% endif %}>
+            <div class="comment-header">
+                {% if comment.url %}
+                    <a href="{{ comment.url }}">{{ comment.name }}</a>
+                {% else %}
+                    {{ comment.name }}
+                {% endif %}
+                said {{ comment.submit_date|timesince }} ago:
+                {% if comment.edit_timestamp != comment.submit_date %}
+                    *edited
+                {% endif %}
+            </div>
+            {% should_display_edit_form for comment as display_edit_form %}
+            {% if display_edit_form %}
+                {% render_edit_comment_form for comment %}
+            {% else %}
+                <blockquote class="comment-body">
+                    {{ comment.transformed_comment|safe }}
+                </blockquote>
+                <ul class="comment-links">
+                    {% if comment.parent %}
+                        <li><a href="{% output_comment_reply_url for comment %}">Reply</a></li>
+                    {% endif %}
+                    {% if comment.user == request.user %}
+                        <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
+                    {% endif %}
+                    {% if request.user.is_authenticated and comment.user != request.user %}
+                        <li><a href="#">Report this comment</a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}
+        </li>
+        {% should_display_reply_form for comment as display_reply_form %}
+        {% if display_reply_form %}
+            <li class="comment-child">{% render_anon_comment_form for article replying to comment %}</li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+    {% get_comment_paginator_page for article as comment_page %}
+    {% if comment_page.has_previous %}
+        <a href="{% output_previous_comment_page_url with comment_page %}">Previous</a>
+    {% endif %}
+    {% if comment_page.has_previous or comment_page.has_next %}
+        Page {{ comment_page.number }} of {{ comment_page.paginator.num_pages }}
+    {% endif %}
+    {% if comment_page.has_next %}
+        <a href="{% output_next_comment_page_url with comment_page %}">Next</a>
+    {% endif %}
+{% endif %}

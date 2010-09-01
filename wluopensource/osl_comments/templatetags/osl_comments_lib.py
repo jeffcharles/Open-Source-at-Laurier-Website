@@ -1,7 +1,9 @@
 from django import template
 from django.conf import settings
 from django.contrib import comments
-from django.contrib.comments.templatetags.comments import BaseCommentNode, CommentFormNode, CommentListNode, RenderCommentFormNode
+from django.contrib.comments.templatetags.comments import (BaseCommentNode, 
+    CommentFormNode, CommentListNode, RenderCommentFormNode, 
+    RenderCommentListNode)
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_unicode
@@ -9,6 +11,8 @@ from django.utils.encoding import smart_unicode
 import osl_comments
 from osl_comments.forms import AnonOslCommentForm, AuthOslCommentForm, OslEditCommentForm
 from osl_comments.models import CommentsPerPageForContentType, OslComment
+
+import pdb
 
 register = template.Library()
 
@@ -549,6 +553,54 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode,
 
         raise template.TemplateSyntaxError("%r tag requires 2, 3, 5, or 6 arguments" % tokens[0])
         
+class RenderOslCommentListNode(OslCommentListNode, RenderCommentListNode):
+    """Render the comment list directly"""
+
+    @classmethod
+    def handle_token(cls, parser, token):
+        tokens = token.contents.split()
+        if tokens[1] != 'for':
+            raise template.TemplateSyntaxError("First argument in %r tag must be 'for'" % tokens[0])
+        
+        # {% render_threaded_comment_list for obj %}
+        if len(tokens) == 3:
+            return cls(object_expr = parser.compile_filter(tokens[2]))
+        
+        # {% render_threaded_comment_list for app.model pk %}
+        if len(tokens) == 4:
+            return cls(
+                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
+                object_pk_expr = parser.compile_filter(tokens[3])
+            )
+        
+        # {% render_threaded_comment_list for obj sorted by column %}
+        if len(tokens) == 6:
+            if tokens[3] != 'sorted':
+                raise template.TemplateSyntaxError("Third argument for %r tag must be 'sorted'" % tokens[0])
+            if tokens[4] != 'by':
+                raise template.TemplateSyntaxError("Fourth argument for %r tag must be 'by'" % tokens[0])
+            return cls(
+                object_expr = parser.compile_filter(tokens[2]),
+                sorted_by = tokens[5]
+            )
+            
+        # {% render_threaded_comment_list for app.model pk sorted by column %}
+        if len(tokens) == 7:
+            if tokens[4] != 'sorted':
+                raise template.TemplateSyntaxError("Fourth argument for %r tag must be 'sorted'" % tokens[0])
+            if tokens[5] != 'by':
+                raise template.TemplateSyntaxError("Fifth argument for %r tag must be 'by'" % tokens[0])
+            return cls(
+                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
+                object_pk_expr = parser.compile_filter(tokens[3]),
+                sorted_by = tokens[6]
+            )
+            
+        raise template.TemplateSyntaxError("%r tags takes 2, 3, 5, or 6 arguments" % tokens[0])
+        
+    def render(self, context):
+        return RenderCommentListNode.render(self, context)
+        
 class RenderOslEditCommentNode(OslEditCommentFormNode):
     
     @classmethod
@@ -816,6 +868,20 @@ def render_edit_comment_form(parser, token):
         {% render_edit_comment_form for [comment] %}
     """
     return RenderOslEditCommentNode.handle_token(parser, token)
+
+@register.tag
+def render_threaded_comment_list(parser, token):
+    """
+    Renders the list of comments for the given params.
+
+    Syntax::
+
+        {% render_threaded_comment_list for [object] %}
+        {% render_threaded_comment_list for [app].[model] [object_id] %}
+        {% render_threaded_comment_list for [object] sorted by [column] %}
+        {% render_threaded_comment_list for [app].[model] [object_id] sorted by [column] %}
+    """
+    return RenderOslCommentListNode.handle_token(parser, token)
 
 @register.tag
 def should_display_edit_form(parser, token):
