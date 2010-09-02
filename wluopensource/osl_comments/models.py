@@ -1,5 +1,5 @@
 from django.contrib.comments.models import Comment
-from django.contrib.comments.signals import comment_was_posted, comment_will_be_posted
+from django.contrib.comments.signals import comment_was_posted
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
