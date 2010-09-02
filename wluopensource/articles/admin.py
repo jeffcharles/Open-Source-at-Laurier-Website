@@ -19,16 +19,16 @@ class ArticleAdmin(admin.ModelAdmin):
             'fields': ('title', 'authors', 'description', 'markdown_content')
         }),
         (None, {
-            'fields': ('status', 'disable_comments',)
+            'fields': ('status', 'enable_comments',)
         }),
         third_fieldset
     )
     form = ArticleForm
-    list_display = ('title', 'description', 'status', 'disable_comments', 
+    list_display = ('title', 'description', 'status', 'enable_comments', 
         'slug',)
     list_display_links = ('title',)
-    list_editable = ('description', 'status', 'disable_comments',)
-    list_filter = ('authors', 'status', 'disable_comments',)
+    list_editable = ('description', 'status', 'enable_comments',)
+    list_filter = ('authors', 'status', 'enable_comments',)
     prepopulated_fields = {'slug': ('title',)}
     save_on_top = True
     search_fields = ['title', 'description']

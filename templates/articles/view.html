@@ -51,7 +51,7 @@
 
     {% is_edit_form_present as edit_form_present %}
     {% is_reply_form_present as reply_form_present %}
-    {% if not edit_form_present and not reply_form_present %}
+    {% if article.enable_comments and not edit_form_present and not reply_form_present %}
         {% render_anon_comment_form for article %}
     {% endif %}
     

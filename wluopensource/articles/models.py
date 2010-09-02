@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from django.contrib.auth.models import User
+from django.contrib.comments.moderation import CommentModerator, moderator
 from django.contrib.sitemaps import ping_google, SitemapNotFound
 from django.db import models
 from django.db.models.signals import post_init
@@ -34,7 +35,7 @@ class Article(models.Model):
     content = models.TextField(editable=False)
     status = models.IntegerField(choices=STATUS_CHOICES, default=LIVE_STATUS,
         db_index=True)
-    disable_comments = models.BooleanField('disable comments?', default=False)
+    enable_comments = models.BooleanField('enable comments?', default=True)
     slug = models.SlugField(max_length=50)
     if "tagging" in settings.INSTALLED_APPS:
         tags = TagField()
@@ -167,3 +168,10 @@ class ArticleForm(ModelForm):
                 "alphanumeric characters and spaces or dashes")
         permalink_title = permalink_title.replace(" ", "-")
         return permalink_title
+        
+class ArticleModerator(CommentModerator):
+    email_notification = True
+    enable_field = 'enable_comments'
+    
+moderator.register(Article, ArticleModerator)
+
