@@ -14,13 +14,12 @@ class OslComment(Comment):
     def save(self, force_insert=False, force_update=False):
         md = markdown.Markdown(safe_mode="escape")
         self.transformed_comment = md.convert(self.comment)
+        
+        if not self.id:
+            # if new comment, not edited comment
+            self.edit_timestamp = self.submit_date
+        
         super(OslComment, self).save(force_insert, force_update)
-
-def comment_edit_timestamp_injection_handler(sender, **kwargs):
-    if 'comment' in kwargs:
-        comment = kwargs['comment']
-        comment.edit_timestamp = comment.submit_date
-comment_will_be_posted.connect(comment_edit_timestamp_injection_handler)
 
 def comment_success_flash_handler(sender, **kwargs):
     if 'request' in kwargs:
