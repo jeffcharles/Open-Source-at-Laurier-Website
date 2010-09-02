@@ -641,7 +641,8 @@ class RenderOslCommentListNode(OslCommentListNode):
             context.push()
             liststr = render_to_string(template_search_list, {
                 "comment_list" : self.get_context_value_from_queryset(context, qs),
-                "comments_enabled" : self.comments_enabled.resolve(context)
+                "comments_enabled" : self.comments_enabled.resolve(context),
+                "object": self.object_expr.resolve(context)
             }, context)
             context.pop()
             return liststr

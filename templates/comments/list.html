@@ -61,11 +61,11 @@
         </li>
         {% should_display_reply_form for comment as display_reply_form %}
         {% if display_reply_form %}
-            <li class="comment-child">{% render_anon_comment_form for article replying to comment %}</li>
+            <li class="comment-child">{% render_anon_comment_form for object replying to comment %}</li>
         {% endif %}
         {% endfor %}
     </ul>
-    {% get_comment_paginator_page for article as comment_page %}
+    {% get_comment_paginator_page for object as comment_page %}
     {% if comment_page.has_previous %}
         <a href="{% output_previous_comment_page_url with comment_page %}">Previous</a>
     {% endif %}
