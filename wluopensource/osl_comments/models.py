@@ -18,6 +18,9 @@ class OslComment(Comment):
         if not self.id:
             # if new comment, not edited comment
             self.edit_timestamp = self.submit_date
+            
+        if self.user:
+            self.url = self.user.get_profile().url
         
         super(OslComment, self).save(force_insert, force_update)
 
@@ -25,15 +28,6 @@ def comment_success_flash_handler(sender, **kwargs):
     if 'request' in kwargs:
         kwargs['request'].flash['comment_response'] = 'Your comment has been added!'
 comment_was_posted.connect(comment_success_flash_handler)
-
-def comment_user_url_injection_handler(sender, **kwargs):
-    if 'request' in kwargs and kwargs['request'].user.is_authenticated() and \
-        'comment' in kwargs:
-        
-        comment = kwargs['comment']
-        comment.url = comment.user.get_profile().url
-        comment.save()
-comment_was_posted.connect(comment_user_url_injection_handler)
 
 class CommentsPerPageForContentType(models.Model):
     content_type = models.OneToOneField(ContentType)
