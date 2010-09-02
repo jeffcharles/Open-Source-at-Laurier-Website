@@ -55,6 +55,6 @@
         {% render_anon_comment_form for article %}
     {% endif %}
     
-    {% render_threaded_comment_list for article sorted by newest %}
+    {% render_threaded_comment_list for article sorted by newest with comments article.enable_comments %}
 </section>
 {% endblock %}

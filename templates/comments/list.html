@@ -47,10 +47,10 @@
                     {{ comment.transformed_comment|safe }}
                 </blockquote>
                 <ul class="comment-links">
-                    {% if comment.parent %}
+                    {% if comment.parent and comments_enabled %}
                         <li><a href="{% output_comment_reply_url for comment %}">Reply</a></li>
                     {% endif %}
-                    {% if comment.user == request.user %}
+                    {% if comment.user == request.user and comments_enabled %}
                         <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
                     {% endif %}
                     {% if request.user.is_authenticated and comment.user != request.user %}

@@ -553,8 +553,17 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode,
 
         raise template.TemplateSyntaxError("%r tag requires 2, 3, 5, or 6 arguments" % tokens[0])
         
-class RenderOslCommentListNode(OslCommentListNode, RenderCommentListNode):
+class RenderOslCommentListNode(OslCommentListNode):
     """Render the comment list directly"""
+    
+    def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, 
+        as_varname=None, comment=None, sorted_by=None, comments_enabled=None):
+    
+        super(RenderOslCommentListNode, self).__init__(ctype=ctype, 
+            object_pk_expr=object_pk_expr, object_expr=object_expr, 
+            as_varname=as_varname, comment=comment, sorted_by=sorted_by)
+            
+        self.comments_enabled = comments_enabled
 
     @classmethod
     def handle_token(cls, parser, token):
@@ -562,44 +571,82 @@ class RenderOslCommentListNode(OslCommentListNode, RenderCommentListNode):
         if tokens[1] != 'for':
             raise template.TemplateSyntaxError("First argument in %r tag must be 'for'" % tokens[0])
         
-        # {% render_threaded_comment_list for obj %}
-        if len(tokens) == 3:
-            return cls(object_expr = parser.compile_filter(tokens[2]))
-        
-        # {% render_threaded_comment_list for app.model pk %}
-        if len(tokens) == 4:
+        # {% render_threaded_comment_list for obj with comments comments_enabled_field %}
+        if len(tokens) == 6:
+            if tokens[3] != 'with':
+                raise template.TemplateSyntaxError("Third argument in %r tag must be 'with'" % tokens[0])
+            if tokens[4] != 'comments':
+                raise template.TemplateSyntaxError("Fourth argument in %r tag must be 'comments'" % tokens[0])
             return cls(
-                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
-                object_pk_expr = parser.compile_filter(tokens[3])
+                object_expr = parser.compile_filter(tokens[2]),
+                comments_enabled = parser.compile_filter(tokens[5])
             )
         
-        # {% render_threaded_comment_list for obj sorted by column %}
-        if len(tokens) == 6:
+        # {% render_threaded_comment_list for app.model pk with comments comments_enabled_field %}
+        if len(tokens) == 7:
+            if tokens[4] != 'with':
+                raise template.TemplateSyntaxError("Fourth argument in %r tag must be 'with'" % tokens[0])
+            if tokens[5] != 'comments':
+                raise template.TemplateSyntaxError("Fifth argument in %r tag must be 'comments'" % tokens[0])
+            return cls(
+                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
+                object_pk_expr = parser.compile_filter(tokens[3]),
+                comments_enabled = parser.compile_filter(tokens[6])
+            )
+        
+        # {% render_threaded_comment_list for obj sorted by column with comments comments_enabled_field %}
+        if len(tokens) == 9:
             if tokens[3] != 'sorted':
                 raise template.TemplateSyntaxError("Third argument for %r tag must be 'sorted'" % tokens[0])
             if tokens[4] != 'by':
                 raise template.TemplateSyntaxError("Fourth argument for %r tag must be 'by'" % tokens[0])
+            if tokens[6] != 'with':
+                raise template.TemplateSyntaxError("Sixth argument for %r tag must be 'with'" % tokens[0])
+            if tokens[7] != 'comments':
+                raise template.TemplateSyntaxError("Seventh argument for %r tag must be 'comments'" % tokens[0])
             return cls(
                 object_expr = parser.compile_filter(tokens[2]),
-                sorted_by = tokens[5]
+                sorted_by = tokens[5],
+                comments_enabled = parser.compile_filter(tokens[8])
             )
             
-        # {% render_threaded_comment_list for app.model pk sorted by column %}
-        if len(tokens) == 7:
+        # {% render_threaded_comment_list for app.model pk sorted by column with comments comments_enabled_field %}
+        if len(tokens) == 10:
             if tokens[4] != 'sorted':
                 raise template.TemplateSyntaxError("Fourth argument for %r tag must be 'sorted'" % tokens[0])
             if tokens[5] != 'by':
                 raise template.TemplateSyntaxError("Fifth argument for %r tag must be 'by'" % tokens[0])
+            if tokens[7] != 'with':
+                raise template.TemplateSyntaxError("Seventh argument for %r tag must be 'with'" % tokens[0])
+            if tokens[8] != 'comments':
+                raise template.TemplateSyntaxError("Eighth argument for %r tag must be 'comments'" % tokens[0])
             return cls(
                 ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
                 object_pk_expr = parser.compile_filter(tokens[3]),
-                sorted_by = tokens[6]
+                sorted_by = tokens[6],
+                comments_enabled = parser.compile_filter(tokens[9])
             )
             
-        raise template.TemplateSyntaxError("%r tags takes 2, 3, 5, or 6 arguments" % tokens[0])
+        raise template.TemplateSyntaxError("%r tags takes 5, 6, 8, or 9 arguments" % tokens[0])
         
     def render(self, context):
-        return RenderCommentListNode.render(self, context)
+        ctype, object_pk = self.get_target_ctype_pk(context)
+        if object_pk:
+            template_search_list = [
+                "comments/%s/%s/list.html" % (ctype.app_label, ctype.model),
+                "comments/%s/list.html" % ctype.app_label,
+                "comments/list.html"
+            ]
+            qs = self.get_query_set(context)
+            context.push()
+            liststr = render_to_string(template_search_list, {
+                "comment_list" : self.get_context_value_from_queryset(context, qs),
+                "comments_enabled" : self.comments_enabled.resolve(context)
+            }, context)
+            context.pop()
+            return liststr
+        else:
+            return ''
         
 class RenderOslEditCommentNode(OslEditCommentFormNode):
     
@@ -876,10 +923,10 @@ def render_threaded_comment_list(parser, token):
 
     Syntax::
 
-        {% render_threaded_comment_list for [object] %}
-        {% render_threaded_comment_list for [app].[model] [object_id] %}
-        {% render_threaded_comment_list for [object] sorted by [column] %}
-        {% render_threaded_comment_list for [app].[model] [object_id] sorted by [column] %}
+        {% render_threaded_comment_list for [object] with comments [comments_enabled_field] %}
+        {% render_threaded_comment_list for [app].[model] [object_id] with comments [comments_enabled_field] %}
+        {% render_threaded_comment_list for [object] sorted by [column] with comments [comments_enabled_field] %}
+        {% render_threaded_comment_list for [app].[model] [object_id] sorted by [column] with comments [comments_enabled_field] %}
     """
     return RenderOslCommentListNode.handle_token(parser, token)
 
