@@ -1,0 +1,6 @@
+A new comment has been posted on {{ content_object }}<{{ content_object.get_absolute_url }}> by an {% if comment.user %}authenticated{% else %}unauthenticated{% endif %} user:
+
+{{ comment.user_name }}{% if comment.user_url %}<{{ comment.user_url }}>{% endif %} posted on {{ comment.submit_date }}:
+
+{{ comment.comment }}
+
