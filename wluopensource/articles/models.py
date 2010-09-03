@@ -2,13 +2,15 @@
 from datetime import datetime
 
 from django.contrib.auth.models import User
-from django.contrib.comments.moderation import CommentModerator, moderator
+from django.contrib.comments.moderation import moderator
 from django.contrib.sitemaps import ping_google, SitemapNotFound
 from django.db import models
 from django.db.models.signals import post_init
 from django.forms import ModelForm
 
 import markdown
+
+from osl_comments.moderation import OslCommentModerator
 
 import settings
 if "tagging" in settings.INSTALLED_APPS:
@@ -169,9 +171,5 @@ class ArticleForm(ModelForm):
         permalink_title = permalink_title.replace(" ", "-")
         return permalink_title
         
-class ArticleModerator(CommentModerator):
-    email_notification = True
-    enable_field = 'enable_comments'
-    
-moderator.register(Article, ArticleModerator)
+moderator.register(Article, OslCommentModerator)
 

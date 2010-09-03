@@ -5,6 +5,16 @@ from django.db import models
 
 import markdown
 
+class CommentsBannedFromIpAddress(models.Model):
+    ip_address = models.IPAddressField(primary_key=True)
+    comments_banned = models.BooleanField(default=True)
+    
+    def __unicode__(self):
+        return "%s, Banned: %s" % (self.ip_address, self.comments_banned)
+    
+    class Meta:
+        verbose_name_plural = "Comments banned from IP addresses"
+
 class OslComment(Comment):
     parent_comment = models.ForeignKey(Comment, blank=True, null=True, related_name='parent_comment')
     inline_to_object = models.BooleanField()

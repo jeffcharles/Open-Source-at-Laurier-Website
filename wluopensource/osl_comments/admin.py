@@ -1,7 +1,13 @@
 from django.contrib import admin
 from django.contrib.comments.admin import CommentsAdmin
 
-from osl_comments.models import CommentsPerPageForContentType, OslComment
+from osl_comments.models import (CommentsBannedFromIpAddress, 
+    CommentsPerPageForContentType, OslComment)
+
+class CommentsBannedFromIpAddressAdmin(admin.ModelAdmin):
+    pass
+admin.site.register(CommentsBannedFromIpAddress,
+    CommentsBannedFromIpAddressAdmin)
 
 class CommentsPerPageForContentTypeAdmin(admin.ModelAdmin):
     pass
