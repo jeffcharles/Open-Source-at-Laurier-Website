@@ -12,8 +12,6 @@ import osl_comments
 from osl_comments.forms import AnonOslCommentForm, AuthOslCommentForm, OslEditCommentForm
 from osl_comments.models import CommentsPerPageForContentType, OslComment
 
-import pdb
-
 register = template.Library()
 
 EDIT_QUERY_STRING_KEY = 'edit_comment'
