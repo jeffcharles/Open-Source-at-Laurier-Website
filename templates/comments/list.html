@@ -23,6 +23,9 @@
                     {% if request.user.is_authenticated and comment_list.0.parent_comment_user_id != request.user.id %}
                         <li><a href="#">Report this comment</a></li>
                     {% endif %}
+                    {% if perms.osl_comments.add_commentsbannedfromipaddress %}
+                        <li><a href="#">Ban IP address</a></li>
+                    {% endif %}
                 </ul>
             </li>
         {% endif %}
@@ -55,6 +58,9 @@
                     {% endif %}
                     {% if request.user.is_authenticated and comment.user != request.user %}
                         <li><a href="#">Report this comment</a></li>
+                    {% endif %}
+                    {% if perms.osl_comments.add_commentsbannedfromipaddress %}
+                        <li><a href="#">Ban IP address</a></li>
                     {% endif %}
                 </ul>
             {% endif %}
