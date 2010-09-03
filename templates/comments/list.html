@@ -24,7 +24,7 @@
                         <li><a href="#">Report this comment</a></li>
                     {% endif %}
                     {% if perms.osl_comments.add_commentsbannedfromipaddress %}
-                        <li><a href="#">Ban IP address</a></li>
+                        <li><a href="{% url osl_comments.views.ban_ip_address comment.id %}">Ban IP address</a></li>
                     {% endif %}
                 </ul>
             </li>
@@ -60,7 +60,7 @@
                         <li><a href="#">Report this comment</a></li>
                     {% endif %}
                     {% if perms.osl_comments.add_commentsbannedfromipaddress %}
-                        <li><a href="#">Ban IP address</a></li>
+                        <li><a href="{% url osl_comments.views.ban_ip_address comment.id %}">Ban IP address</a></li>
                     {% endif %}
                 </ul>
             {% endif %}

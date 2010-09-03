@@ -1,16 +1,27 @@
 from datetime import datetime
 
+from django.contrib.auth.decorators import permission_required
 from django.contrib.comments.views import comments
 from django.contrib.comments.views.comments import CommentPostBadRequest
 from django.contrib.comments.views.utils import confirmation_view, next_redirect
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.shortcuts import render_to_response
+from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 
 from osl_comments.forms import OslEditCommentForm
-from osl_comments.models import OslComment
+from osl_comments.models import CommentsBannedFromIpAddress, OslComment
+
+@permission_required('osl_comments.add_commentsbannedfromipaddress')
+def ban_ip_address(request, comment_id):
+    referring_page = request.META['HTTP_REFERER']
+    comment = OslComment.objects.get(pk=comment_id)
+    ban, created = CommentsBannedFromIpAddress.objects.get_or_create(
+        ip_address=comment.ip_address)
+    ban.comments_banned = True
+    ban.save()
+    return redirect(referring_page or '/')
 
 @require_POST
 def edit_comment(request, next=None):
