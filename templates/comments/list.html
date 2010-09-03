@@ -21,7 +21,7 @@
                 </blockquote>
                 <ul class="comment-links">
                     {% if request.user.is_authenticated and comment_list.0.parent_comment_user_id != request.user.id %}
-                        <li><a href="#">Report this comment</a></li>
+                        <li><a href="{% url comments-flag comment_list.0.parent_comment_id %}">Report this comment</a></li>
                     {% endif %}
                     {% if perms.osl_comments.add_commentsbannedfromipaddress %}
                         <li><a href="{% url osl_comments.views.ban_ip_address comment_list.0.parent_comment_id %}">Ban IP address</a></li>
@@ -57,7 +57,7 @@
                         <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
                     {% endif %}
                     {% if request.user.is_authenticated and comment.user != request.user %}
-                        <li><a href="#">Report this comment</a></li>
+                        <li><a href="{% url comments-flag comment.id %}">Report this comment</a></li>
                     {% endif %}
                     {% if perms.osl_comments.add_commentsbannedfromipaddress %}
                         <li><a href="{% url osl_comments.views.ban_ip_address comment.id %}">Ban IP address</a></li>
