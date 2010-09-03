@@ -1,8 +1,13 @@
 from django.contrib import admin
 from django.contrib.comments.admin import CommentsAdmin
+from django.contrib.comments.models import CommentFlag
 
 from osl_comments.models import (CommentsBannedFromIpAddress, 
     CommentsPerPageForContentType, OslComment)
+
+class CommentFlagAdmin(admin.ModelAdmin):
+    pass
+admin.site.register(CommentFlag, CommentFlagAdmin)
 
 class CommentsBannedFromIpAddressAdmin(admin.ModelAdmin):
     pass
