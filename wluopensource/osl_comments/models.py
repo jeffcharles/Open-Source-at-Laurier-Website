@@ -1,5 +1,6 @@
-from django.contrib.comments.models import Comment
-from django.contrib.comments.signals import comment_was_posted
+from django.contrib.comments.models import Comment, CommentFlag
+from django.contrib.comments.signals import (comment_was_flagged, 
+    comment_was_posted)
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -42,4 +43,13 @@ comment_was_posted.connect(comment_success_flash_handler)
 class CommentsPerPageForContentType(models.Model):
     content_type = models.OneToOneField(ContentType)
     number_per_page = models.IntegerField()
+    
+def flag_success_flash_handler(sender, **kwargs):
+    if 'flag' in kwargs and \
+        kwargs['flag'].flag == CommentFlag.SUGGEST_REMOVAL and \
+        'created' in kwargs and kwargs['created'] and 'request' in kwargs:
+        
+        kwargs['request'].flash['comment_response'] = \
+            'The comment has been reported!'
+comment_was_flagged.connect(flag_success_flash_handler)
 
