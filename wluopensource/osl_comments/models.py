@@ -67,3 +67,12 @@ def flag_success_flash_handler(sender, **kwargs):
             'The comment has been reported!'
 comment_was_flagged.connect(flag_success_flash_handler)
 
+def moderate_success_flash_handler(sender, **kwargs):
+    if 'flag' in kwargs and \
+        kwargs['flag'].flag == CommentFlag.MODERATOR_DELETION and \
+        'request' in kwargs:
+        
+        kwargs['request'].flash['comment_response'] = \
+            'The comment has been moderated!'
+comment_was_flagged.connect(moderate_success_flash_handler)
+
