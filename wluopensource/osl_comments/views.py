@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.comments.views import comments
 from django.contrib.comments.views.comments import CommentPostBadRequest
 from django.contrib.comments.views.utils import confirmation_view, next_redirect
@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 from osl_comments.forms import OslEditCommentForm
 from osl_comments.models import CommentsBannedFromIpAddress, OslComment
 
+@login_required
 @permission_required('osl_comments.add_commentsbannedfromipaddress')
 def ban_ip_address(request, comment_id):
     referring_page = request.META['HTTP_REFERER']
@@ -23,6 +24,7 @@ def ban_ip_address(request, comment_id):
     ban.save()
     return redirect(referring_page or '/')
 
+@login_required
 @require_POST
 def edit_comment(request, next=None):
     # get data
