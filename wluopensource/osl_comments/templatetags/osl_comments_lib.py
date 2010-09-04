@@ -296,7 +296,7 @@ class OslCommentListNode(CommentListNode):
                 edit_timestamp,
                 transformed_comment,
                 is_removed,
-                is_moderated,
+                is_deleted_by_user,
                 parent_comment_user_id,
                 parent_comment_user_name,
                 parent_comment_user_url,
@@ -304,7 +304,7 @@ class OslCommentListNode(CommentListNode):
                 parent_comment_edit_timestamp,
                 parent_comment_transformed_comment,
                 parent_comment_is_removed,
-                parent_comment_is_moderated
+                parent_comment_is_deleted_by_user
             FROM (
                 SELECT
                     dc.id,
@@ -319,7 +319,7 @@ class OslCommentListNode(CommentListNode):
                     dc.is_removed,
                     oc.edit_timestamp,
                     oc.transformed_comment,
-                    oc.is_moderated,
+                    oc.is_deleted_by_user,
                     dc.user_id AS parent_comment_user_id,
                     dc.user_name AS parent_comment_user_name,
                     dc.user_url AS parent_comment_user_url,
@@ -327,7 +327,7 @@ class OslCommentListNode(CommentListNode):
                     dc.is_removed AS parent_comment_is_removed,
                     oc.edit_timestamp AS parent_comment_edit_timestamp,
                     oc.transformed_comment AS parent_comment_transformed_comment,
-                    oc.is_moderated AS parent_comment_is_moderated
+                    oc.is_deleted_by_user AS parent_comment_is_deleted_by_user
                 FROM
                     django_comments AS dc
                 JOIN
@@ -354,7 +354,7 @@ class OslCommentListNode(CommentListNode):
                     dc2.is_removed,
                     oc2.edit_timestamp,
                     oc2.transformed_comment,
-                    oc2.is_moderated,
+                    oc2.is_deleted_by_user,
                     dc3.user_id AS parent_comment_user_id,
                     dc3.user_name AS parent_comment_user_name,
                     dc3.user_url AS parent_comment_user_url,
@@ -362,7 +362,7 @@ class OslCommentListNode(CommentListNode):
                     dc3.is_removed AS parent_comment_is_removed,
                     oc3.edit_timestamp AS parent_comment_edit_timestamp,
                     oc3.transformed_comment AS parent_comment_transformed_comment,
-                    oc3.is_moderated AS parent_comment_is_moderated
+                    oc3.is_deleted_by_user AS parent_comment_is_deleted_by_user
                 FROM
                     django_comments AS dc2
                 JOIN
