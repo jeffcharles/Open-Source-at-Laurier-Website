@@ -22,6 +22,10 @@ class OslComment(Comment):
     inline_to_object = models.BooleanField(default=False)
     edit_timestamp = models.DateTimeField()
     transformed_comment = models.TextField(editable=False)
+    is_moderated = models.BooleanField(default=False,
+        help_text='Check this box if the comment is inappropriate. ' \
+                    'A "This comment has been moderated" message will ' \
+                    'be displayed instead.')
     
     def save(self, force_insert=False, force_update=False):
         md = markdown.Markdown(safe_mode="escape")
