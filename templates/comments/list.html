@@ -7,18 +7,36 @@
         {% if not comment_list.0.parent %}
             <li class="comment-pagination-parent">
                 <div class="comment-header">
-                    {% if comment_list.0.parent_comment_user_url %}
-                    <a href="{{ comment_list.0.parent_comment_user_url }}">{{ comment_list.0.parent_comment_user_name }}</a>
+                    {% if not comment_list.0.parent_comment_is_removed and not comment_list.0.parent_comment_is_moderated %}
+                        {% if comment_list.0.parent_comment_user_url %}
+                        <a href="{{ comment_list.0.parent_comment_user_url }}">{{ comment_list.0.parent_comment_user_name }}</a>
+                        {% else %}
+                            {{ comment_list.0.parent_comment_user_name }}
+                        {% endif %}
                     {% else %}
-                        {{ comment_list.0.parent_comment_user_name }}
+                        {% if comment_list.0.parent_comment_is_removed %}
+                            [deleted]
+                        {% endif %}
+                        {% if comment_list.0.parent_comment_is_moderated %}
+                            [moderated]
+                        {% endif %}
                     {% endif %}
                     said {{ comment_list.0.thread_submit_date|timesince }} ago:
-                    {% if comment_list.0.parent_comment_edit_timestamp != comment_list.0.thread_submit_date %}
+                    {% if comment_list.0.parent_comment_edit_timestamp != comment_list.0.thread_submit_date and not comment_list.0.parent_comment_is_removed and not comment_list.0.parent_comment_is_moderated %}
                         *edited
                     {% endif %}
                 </div>
                 <blockquote class="comment-body">
-                    {{ comment_list.0.parent_comment_transformed_comment|safe }}
+                    {% if not comment_list.0.parent_comment_is_removed and not comment_list.0.parent_comment_is_moderated %}
+                        {{ comment_list.0.parent_comment_transformed_comment|safe }}
+                    {% else %}
+                        {% if comment_list.0.parent_comment_is_removed %}
+                            This comment has been deleted
+                        {% endif %}
+                        {% if comment_list.0.parent_comment_is_moderated %}
+                            This comment has been moderated
+                        {% endif %}
+                    {% endif %}
                 </blockquote>
                 <ul class="comment-links">
                     {% if request.user.is_authenticated and comment_list.0.parent_comment_user_id != request.user.id %}
@@ -33,31 +51,49 @@
         {% for comment in comment_list %}
         <li{% if not comment.parent %} class="comment-child"{% endif %}><a name="c{{ comment.id }}">
             <div class="comment-header">
-                {% if comment.url %}
-                    <a href="{{ comment.url }}">{{ comment.name }}</a>
+                {% if not comment.is_removed and not comment.is_moderated %}
+                    {% if comment.url %}
+                        <a href="{{ comment.url }}">{{ comment.name }}</a>
+                    {% else %}
+                        {{ comment.name }}
+                    {% endif %}
                 {% else %}
-                    {{ comment.name }}
+                    {% if comment.is_removed %}
+                        [deleted]
+                    {% endif %}
+                    {% if comment.is_moderated %}
+                        [moderated]
+                    {% endif %}
                 {% endif %}
                 said {{ comment.submit_date|timesince }} ago:
-                {% if comment.edit_timestamp != comment.submit_date %}
+                {% if comment.edit_timestamp != comment.submit_date and not comment.is_removed and not comment.is_moderated %}
                     *edited
                 {% endif %}
             </div>
             {% should_display_edit_form for comment as display_edit_form %}
-            {% if display_edit_form and not is_banned_from_commenting %}
+            {% if display_edit_form and not comment.is_removed and not comment.is_moderated and not is_banned_from_commenting %}
                 {% render_edit_comment_form for comment %}
             {% else %}
                 <blockquote class="comment-body">
-                    {{ comment.transformed_comment|safe }}
+                    {% if not comment.is_removed and not comment.is_moderated %}
+                        {{ comment.transformed_comment|safe }}
+                    {% else %}
+                        {% if comment.is_removed %}
+                            This comment has been deleted
+                        {% endif %}
+                        {% if comment.is_moderated %}
+                            This comment has been moderated
+                        {% endif %}
+                    {% endif %}
                 </blockquote>
                 <ul class="comment-links">
-                    {% if comment.parent and comments_enabled and not is_banned_from_commenting %}
+                    {% if comment.parent and comments_enabled and not comment.is_removed and not comment.is_moderated and not is_banned_from_commenting %}
                         <li><a href="{% output_comment_reply_url for comment %}">Reply</a></li>
                     {% endif %}
-                    {% if comment.user == request.user and comments_enabled and not is_banned_from_commenting %}
+                    {% if comment.user == request.user and comments_enabled and not comment.is_removed and not comment.is_moderated and not is_banned_from_commenting %}
                         <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
                     {% endif %}
-                    {% if request.user.is_authenticated and comment.user != request.user %}
+                    {% if request.user.is_authenticated and comment.user != request.user and not comment.is_removed and not comment.is_moderated %}
                         <li><a href="{% url comments-flag comment.id %}">Report this comment</a></li>
                     {% endif %}
                     {% if perms.osl_comments.add_commentsbannedfromipaddress %}
@@ -67,7 +103,7 @@
             {% endif %}
         </a></li>
         {% should_display_reply_form for comment as display_reply_form %}
-        {% if display_reply_form and not is_banned_from_commenting %}
+        {% if display_reply_form and not comment.is_removed and not comment.is_moderated and not is_banned_from_commenting %}
             <li class="comment-child">{% render_anon_comment_form for object replying to comment %}</li>
         {% endif %}
         {% endfor %}

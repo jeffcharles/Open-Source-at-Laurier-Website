@@ -295,12 +295,16 @@ class OslCommentListNode(CommentListNode):
                 submit_date,
                 edit_timestamp,
                 transformed_comment,
+                is_removed,
+                is_moderated,
                 parent_comment_user_id,
                 parent_comment_user_name,
                 parent_comment_user_url,
                 parent_comment_comment,
                 parent_comment_edit_timestamp,
-                parent_comment_transformed_comment
+                parent_comment_transformed_comment,
+                parent_comment_is_removed,
+                parent_comment_is_moderated
             FROM (
                 SELECT
                     dc.id,
@@ -312,14 +316,18 @@ class OslCommentListNode(CommentListNode):
                     dc.comment,
                     dc.submit_date AS thread_submit_date,
                     dc.submit_date,
+                    dc.is_removed,
                     oc.edit_timestamp,
                     oc.transformed_comment,
+                    oc.is_moderated,
                     dc.user_id AS parent_comment_user_id,
                     dc.user_name AS parent_comment_user_name,
                     dc.user_url AS parent_comment_user_url,
                     dc.comment AS parent_comment_comment,
+                    dc.is_removed AS parent_comment_is_removed,
                     oc.edit_timestamp AS parent_comment_edit_timestamp,
-                    oc.transformed_comment AS parent_comment_transformed_comment
+                    oc.transformed_comment AS parent_comment_transformed_comment,
+                    oc.is_moderated AS parent_comment_is_moderated
                 FROM
                     django_comments AS dc
                 JOIN
@@ -343,14 +351,18 @@ class OslCommentListNode(CommentListNode):
                     dc2.comment,
                     dc3.submit_date AS thread_submit_date,
                     dc2.submit_date,
+                    dc2.is_removed,
                     oc2.edit_timestamp,
                     oc2.transformed_comment,
+                    oc2.is_moderated,
                     dc3.user_id AS parent_comment_user_id,
                     dc3.user_name AS parent_comment_user_name,
                     dc3.user_url AS parent_comment_user_url,
                     dc3.comment AS parent_comment_comment,
+                    dc3.is_removed AS parent_comment_is_removed,
                     oc3.edit_timestamp AS parent_comment_edit_timestamp,
-                    oc3.transformed_comment AS parent_comment_transformed_comment
+                    oc3.transformed_comment AS parent_comment_transformed_comment,
+                    oc3.is_moderated AS parent_comment_is_moderated
                 FROM
                     django_comments AS dc2
                 JOIN
