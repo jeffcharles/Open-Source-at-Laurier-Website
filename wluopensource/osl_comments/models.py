@@ -2,6 +2,7 @@ from django.contrib.comments.models import Comment, CommentFlag
 from django.contrib.comments.signals import (comment_was_flagged, 
     comment_was_posted)
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 import markdown
@@ -40,10 +41,22 @@ def comment_success_flash_handler(sender, **kwargs):
         kwargs['request'].flash['comment_response'] = 'Your comment has been added!'
 comment_was_posted.connect(comment_success_flash_handler)
 
+class CommentsPerPageForContentTypeManager(models.Manager):
+    
+    def get_comments_per_page_for_content_type(self, content_type):
+        """
+        Returns the number of comments on a page for the given content type.
+        """
+        try:
+            return self.get(content_type=content_type).number_per_page
+        except ObjectDoesNotExist:
+            return getattr(settings, 'DEFAULT_COMMENTS_PER_PAGE', 100)
+
 class CommentsPerPageForContentType(models.Model):
     content_type = models.OneToOneField(ContentType)
     number_per_page = models.IntegerField()
-    
+    objects = CommentsPerPageForContentTypeManager()
+            
 def flag_success_flash_handler(sender, **kwargs):
     if 'flag' in kwargs and \
         kwargs['flag'].flag == CommentFlag.SUGGEST_REMOVAL and \

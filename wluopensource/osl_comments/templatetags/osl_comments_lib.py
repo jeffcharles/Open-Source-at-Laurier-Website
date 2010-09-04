@@ -225,7 +225,8 @@ class CommentPaginationPageNode(BaseCommentNode):
             comment_list = comment_list.filter(is_removed=False)
         
         comment_paginator = Paginator(comment_list, 
-            get_comments_per_page_for_content_type(ctype))
+            CommentsPerPageForContentType.objects.get_comments_per_page_for_content_type(
+            ctype))
         context[self.as_varname] = comment_paginator.page(
             get_comment_page(context))
         return ''
@@ -282,7 +283,9 @@ class OslCommentListNode(CommentListNode):
         if getattr(settings, 'COMMENTS_HIDE_REMOVED', True):
             removed_comments_condition = 'is_removed = False'
             
-        num_comments_per_page = get_comments_per_page_for_content_type(ctype)
+        num_comments_per_page = \
+            CommentsPerPageForContentType.objects.get_comments_per_page_for_content_type(
+            ctype)
         
         get_threaded_comments_sql = """
             SELECT
@@ -732,13 +735,6 @@ class UserIsBannedNode(template.Node):
         finally:
             context[self.as_varname] = user_is_banned
             return ''
-
-def get_comments_per_page_for_content_type(content_type):
-    """Returns the number of comments on a page for the given content type."""
-    try:
-        return CommentsPerPageForContentType.objects.get(content_type=content_type).number_per_page
-    except CommentsPerPageForContentType.DoesNotExist:
-        return getattr(settings, 'DEFAULT_COMMENTS_PER_PAGE', 100)
 
 @register.simple_tag
 def edit_comment_form_target():
