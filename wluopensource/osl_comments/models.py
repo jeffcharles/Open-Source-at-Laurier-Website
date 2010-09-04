@@ -19,7 +19,7 @@ class CommentsBannedFromIpAddress(models.Model):
 
 class OslComment(Comment):
     parent_comment = models.ForeignKey(Comment, blank=True, null=True, related_name='parent_comment')
-    inline_to_object = models.BooleanField()
+    inline_to_object = models.BooleanField(default=False)
     edit_timestamp = models.DateTimeField()
     transformed_comment = models.TextField(editable=False)
     
