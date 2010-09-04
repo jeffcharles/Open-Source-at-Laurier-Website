@@ -31,7 +31,7 @@
             </li>
         {% endif %}
         {% for comment in comment_list %}
-        <li{% if not comment.parent %} class="comment-child"{% endif %}>
+        <li{% if not comment.parent %} class="comment-child"{% endif %}><a name="c{{ comment.id }}">
             <div class="comment-header">
                 {% if comment.url %}
                     <a href="{{ comment.url }}">{{ comment.name }}</a>
@@ -65,7 +65,7 @@
                     {% endif %}
                 </ul>
             {% endif %}
-        </li>
+        </a></li>
         {% should_display_reply_form for comment as display_reply_form %}
         {% if display_reply_form and not is_banned_from_commenting %}
             <li class="comment-child">{% render_anon_comment_form for object replying to comment %}</li>
