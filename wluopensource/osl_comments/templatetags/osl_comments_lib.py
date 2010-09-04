@@ -278,10 +278,6 @@ class OslCommentListNode(CommentListNode):
         else:
             first_order_by = 'thread_submit_date DESC'
             second_order_by = 'submit_date DESC'
-        
-        removed_comments_condition = 'id IS NOT NULL'    
-        if getattr(settings, 'COMMENTS_HIDE_REMOVED', True):
-            removed_comments_condition = 'is_removed = False'
             
         num_comments_per_page = \
             CommentsPerPageForContentType.objects.get_comments_per_page_for_content_type(
@@ -334,7 +330,6 @@ class OslCommentListNode(CommentListNode):
                     dc.object_pk = %(object_pk)s AND
                     dc.site_id = %(site_id)d AND
                     dc.is_public = TRUE AND
-                    dc.%(removed_comments_condition)s AND
                     oc.inline_to_object = False AND
                     oc.parent_comment_id IS NULL
                 UNION
@@ -372,8 +367,6 @@ class OslCommentListNode(CommentListNode):
                     dc2.object_pk = %(object_pk)s AND
                     dc2.site_id = %(site_id)d AND
                     dc2.is_public = True AND
-                    dc2.%(removed_comments_condition)s AND
-                    dc3.%(removed_comments_condition)s AND
                     oc2.inline_to_object = False AND
                     oc2.parent_comment_id IS NOT NULL
                 ) AS t
@@ -390,7 +383,6 @@ class OslCommentListNode(CommentListNode):
             'content_type': ctype.id,
             'object_pk': "'%s'" % object_pk,
             'site_id': settings.SITE_ID,
-            'removed_comments_condition': removed_comments_condition,
             'first_thread_order_by': first_order_by,
             'second_thread_order_by': second_order_by,
             'limit': num_comments_per_page, 
