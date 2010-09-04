@@ -51,7 +51,8 @@
 
     {% is_edit_form_present as edit_form_present %}
     {% is_reply_form_present as reply_form_present %}
-    {% if article.enable_comments and not edit_form_present and not reply_form_present %}
+    {% user_is_banned_from_commenting as is_banned_from_commenting %}
+    {% if article.enable_comments and not edit_form_present and not reply_form_present and not is_banned_from_commenting %}
         {% render_anon_comment_form for article %}
     {% endif %}
     

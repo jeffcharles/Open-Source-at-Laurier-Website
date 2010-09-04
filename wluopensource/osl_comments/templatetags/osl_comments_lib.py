@@ -10,7 +10,8 @@ from django.utils.encoding import smart_unicode
 
 import osl_comments
 from osl_comments.forms import AnonOslCommentForm, AuthOslCommentForm, OslEditCommentForm
-from osl_comments.models import CommentsPerPageForContentType, OslComment
+from osl_comments.models import (CommentsBannedFromIpAddress, 
+    CommentsPerPageForContentType, OslComment)
 
 register = template.Library()
 
@@ -701,6 +702,36 @@ class ShouldDisplayReplyFormNode(AbstractShouldDisplayFormNode):
         if context[self.as_varname] and not comment.parent:
             context[self.as_varname] = False
         return ''
+        
+class UserIsBannedNode(template.Node):
+    """Insert whether the current user is banned from commenting."""
+    
+    def __init__(self, as_varname):
+        self.as_varname = as_varname
+        
+    @classmethod
+    def handle_token(cls, parser, token):
+        tokens = token.contents.split()
+        
+        # {% user_is_banned_from_commenting_node as varname %}
+        if len(tokens) != 3:
+            raise template.TemplateSyntaxError("%r tag takes 2 arguments" % tokens[0])
+        if tokens[1] != 'as':
+            raise template.TemplateSyntaxError("First argument in %r tag must be 'for'" % tokens[0])
+        return cls(as_varname = tokens[2])
+    
+    def render(self, context):
+        user_ip_address = context['request'].META['REMOTE_ADDR']
+        user_is_banned = False
+        try:
+            user_is_banned = \
+                CommentsBannedFromIpAddress.objects.get(
+                ip_address = user_ip_address).comments_banned
+        except CommentsBannedFromIpAddress.DoesNotExist:
+            user_is_banned = False
+        finally:
+            context[self.as_varname] = user_is_banned
+            return ''
 
 def get_comments_per_page_for_content_type(content_type):
     """Returns the number of comments on a page for the given content type."""
@@ -950,4 +981,15 @@ def should_display_reply_form(parser, token):
         {% should_display_reply_form for [comment] as [varname] %}
     """
     return ShouldDisplayReplyFormNode.handle_token(parser, token)
+    
+@register.tag
+def user_is_banned_from_commenting(parser, token):
+    """
+    Gets whether the current user is banned from commenting.
+    
+    Syntax::
+    
+        {% user_is_banned_from_commenting as [varname] %}
+    """
+    return UserIsBannedNode.handle_token(parser, token)
 

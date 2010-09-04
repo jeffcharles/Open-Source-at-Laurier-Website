@@ -2,6 +2,7 @@
 {% if not comment_list %}
     <p>There does not appear to be anything here.</p>
 {% else %}
+    {% user_is_banned_from_commenting as is_banned_from_commenting %}
     <ul id="comment-list">
         {% if not comment_list.0.parent %}
             <li class="comment-pagination-parent">
@@ -43,17 +44,17 @@
                 {% endif %}
             </div>
             {% should_display_edit_form for comment as display_edit_form %}
-            {% if display_edit_form %}
+            {% if display_edit_form and not is_banned_from_commenting %}
                 {% render_edit_comment_form for comment %}
             {% else %}
                 <blockquote class="comment-body">
                     {{ comment.transformed_comment|safe }}
                 </blockquote>
                 <ul class="comment-links">
-                    {% if comment.parent and comments_enabled %}
+                    {% if comment.parent and comments_enabled and not is_banned_from_commenting %}
                         <li><a href="{% output_comment_reply_url for comment %}">Reply</a></li>
                     {% endif %}
-                    {% if comment.user == request.user and comments_enabled %}
+                    {% if comment.user == request.user and comments_enabled and not is_banned_from_commenting %}
                         <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
                     {% endif %}
                     {% if request.user.is_authenticated and comment.user != request.user %}
@@ -66,7 +67,7 @@
             {% endif %}
         </li>
         {% should_display_reply_form for comment as display_reply_form %}
-        {% if display_reply_form %}
+        {% if display_reply_form and not is_banned_from_commenting %}
             <li class="comment-child">{% render_anon_comment_form for object replying to comment %}</li>
         {% endif %}
         {% endfor %}
