@@ -1,15 +1,19 @@
 from datetime import datetime
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib import comments as comment_app
 from django.contrib.comments.views import comments
 from django.contrib.comments.views.comments import CommentPostBadRequest
 from django.contrib.comments.views.utils import confirmation_view, next_redirect
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.shortcuts import redirect, render_to_response
-from django.template import RequestContext
+from django.http import HttpResponseForbidden
+from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.template import RequestContext, loader
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 
+from osl_comments import signals
 from osl_comments.forms import OslEditCommentForm
 from osl_comments.models import CommentsBannedFromIpAddress, OslComment
 
@@ -23,6 +27,50 @@ def ban_ip_address(request, comment_id):
     ban.comments_banned = True
     ban.save()
     return redirect(referring_page or '/')
+    
+@login_required
+def delete_comment(request, comment_id, next=None):
+    """
+    Deletes a comment. Confirmation on GET, action on POST.
+    
+    Templates: `comments/delete_by_user.html`, 
+               `comments/delete_by_user_forbidden.html`
+    Context:
+        comment
+            the deleted `comments.comment` object
+    """
+    comment = get_object_or_404(comment_app.get_model(), pk=comment_id, 
+        site__pk=settings.SITE_ID)
+    
+    # Ensure requesting user is same user who posted comment
+    if request.user != comment.user:
+        t = loader.get_template('comments/delete_by_user_forbidden.html')
+        c = RequestContext(request)
+        return HttpResponseForbidden(t.render(c))
+
+    # Delete on POST
+    if request.method == 'POST':
+        comment.is_deleted_by_user = True
+        comment.save()
+        signals.comment_was_deleted_by_user.send(
+            sender = comment.__class__,
+            comment = comment,
+            request = request
+        )
+        return next_redirect(request.POST.copy(), next, delete_by_user_done, 
+            c=comment.pk)
+
+    # Render a form on GET
+    else:
+        return render_to_response('comments/delete_by_user.html',
+            {'comment': comment, "next": next},
+            RequestContext(request)
+        )
+        
+delete_by_user_done = confirmation_view(
+    template = "comments/deleted_by_user.html",
+    doc = 'Displays a "comment was deleted" success page.'
+)
 
 @login_required
 @require_POST

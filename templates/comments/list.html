@@ -39,6 +39,9 @@
                     {% endif %}
                 </blockquote>
                 <ul class="comment-links">
+                    {% if request.user.is_authenticated and request.user.id == comment_list.0.parent_comment_user_id and not comment_list.0.parent_comment_is_removed and not comment_list.0.parent_comment_is_deleted_by_user %}
+                        <li><a href="{% url osl_comments.views.delete_comment comment_list.0.parent_comment_id %}">Delete</a></li>
+                    {% endif %}
                     {% if request.user.is_authenticated and comment_list.0.parent_comment_user_id != request.user.id %}
                         {% if perms.comments.can_moderate %}
                             <li><a href="{% url comments-delete comment_list.0.parent_comment_id %}">Moderate this comment</a></li>
@@ -96,6 +99,9 @@
                     {% endif %}
                     {% if comment.user == request.user and comments_enabled and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
                         <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
+                    {% endif %}
+                    {% if request.user.is_authenticated and comment.user == request.user and not comment.is_removed and not comment.is_deleted_by_user %}
+                        <li><a href="{% url osl_comments.views.delete_comment comment.id %}">Delete</a></li>
                     {% endif %}
                     {% if request.user.is_authenticated and comment.user != request.user and not comment.is_removed and not comment.is_deleted_by_user %}
                         {% if perms.comments.can_moderate %}
