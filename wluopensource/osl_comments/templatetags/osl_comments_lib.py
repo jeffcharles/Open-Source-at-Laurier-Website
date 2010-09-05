@@ -222,7 +222,7 @@ class CommentPaginationPageNode(BaseCommentNode):
         )
 
         if getattr(settings, 'COMMENTS_HIDE_REMOVED', True):
-            comment_list = comment_list.filter(is_removed=False)
+            comment_list = comment_list.filter(is_public=True)
         
         comment_paginator = Paginator(comment_list, 
             CommentsPerPageForContentType.objects.get_comments_per_page_for_content_type(
