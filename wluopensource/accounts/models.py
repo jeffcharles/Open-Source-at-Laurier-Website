@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 
 class UserProfile(models.Model):
     user = models.ForeignKey(User, blank=True, unique=True)
-    url = models.URLField("Website", blank=True, verify_exists=False)
+    url = models.URLField("Website", blank=True)
     
     def __unicode__(self):
         return self.user.username
