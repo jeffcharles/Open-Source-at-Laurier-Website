@@ -7,7 +7,8 @@ from django.db import models
 
 import markdown
 
-from osl_comments.signals import comment_was_deleted_by_user
+from osl_comments.signals import (comment_was_deleted_by_user, 
+    ip_address_ban_was_updated)
 
 class CommentsBannedFromIpAddress(models.Model):
     ip_address = models.IPAddressField(primary_key=True)
@@ -17,7 +18,20 @@ class CommentsBannedFromIpAddress(models.Model):
         return "%s, Banned: %s" % (self.ip_address, self.comments_banned)
     
     class Meta:
+        permissions = (
+            ("can_ban", "Can ban or un-ban IP addresses from commenting"),
+        )
         verbose_name_plural = "Comments banned from IP addresses"
+        
+def ip_address_ban_update_success_flash_handler(sender, **kwargs):
+    if 'banned' in kwargs and 'request' in kwargs:
+        if kwargs['banned']:
+            kwargs['request'].flash['comment_response'] = \
+                'The IP address has been banned from commenting!'
+        else:
+            kwargs['request'].flash['comment_response'] = \
+                'The IP address has been un-banned from commenting!'
+ip_address_ban_was_updated.connect(ip_address_ban_update_success_flash_handler)
 
 class OslComment(Comment):
     parent_comment = models.ForeignKey(Comment, blank=True, null=True, related_name='parent_comment')

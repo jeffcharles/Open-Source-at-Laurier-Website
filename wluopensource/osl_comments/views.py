@@ -7,7 +7,7 @@ from django.contrib.comments.views import comments
 from django.contrib.comments.views.comments import CommentPostBadRequest
 from django.contrib.comments.views.utils import confirmation_view, next_redirect
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext, loader
 from django.views.decorators.csrf import csrf_protect
@@ -17,17 +17,6 @@ from osl_comments import signals
 from osl_comments.forms import OslEditCommentForm
 from osl_comments.models import CommentsBannedFromIpAddress, OslComment
 
-@login_required
-@permission_required('osl_comments.add_commentsbannedfromipaddress')
-def ban_ip_address(request, comment_id):
-    referring_page = request.META['HTTP_REFERER']
-    comment = OslComment.objects.get(pk=comment_id)
-    ban, created = CommentsBannedFromIpAddress.objects.get_or_create(
-        ip_address=comment.ip_address)
-    ban.comments_banned = True
-    ban.save()
-    return redirect(referring_page or '/')
-    
 @login_required
 def delete_comment(request, comment_id, next=None):
     """
@@ -137,5 +126,57 @@ def edit_comment(request, next=None):
 comment_edited = confirmation_view(
     template = "comments/edit_confirmed.html",
     doc = """Display a "comment was edited" success page."""
+)
+
+@login_required
+@permission_required('osl_comments.can_ban')
+def update_ip_address_ban(request, comment_id, next=None):
+    try:
+        comment = OslComment.objects.get(pk=comment_id)
+    except OslComment.DoesNotExist:
+        return HttpResponseBadRequest()
+        
+    if request.method == 'GET':
+        try:    
+            banned = \
+                CommentsBannedFromIpAddress.objects.get(
+                ip_address=comment.ip_address).comments_banned
+        except CommentsBannedFromIpAddress.DoesNotExist:
+            banned = False
+        return render_to_response('comments/update_ip_address_ban.html',
+            {'banned': banned},
+            RequestContext(request)
+        )
+    
+    if request.method == 'POST':
+        data = request.POST
+        banned_str = data.get('ban', None)
+        if banned_str == 'True':
+            banned = True
+        elif banned_str == 'False':
+            banned = False
+        else:
+            return HttpResponseBadRequest()
+        
+        try:
+            ban = CommentsBannedFromIpAddress.objects.get(
+                ip_address=comment.ip_address)
+        except CommentsBannedFromIpAddress.DoesNotExist:
+            ban = CommentsBannedFromIpAddress(ip_address=comment.ip_address)
+        ban.comments_banned = banned
+        ban.save()
+        
+        signals.ip_address_ban_was_updated.send(
+            sender = comment.__class__,
+            banned = banned,
+            request = request
+        )
+        
+        return next_redirect(request.POST.copy(), next, 
+            update_ip_address_ban_done)
+            
+update_ip_address_ban_done = confirmation_view(
+    template = "comments/update_ip_address_ban_done.html",
+    doc = """Display a "ip address ban updated" success page."""
 )
     

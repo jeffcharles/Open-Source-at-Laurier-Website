@@ -49,8 +49,8 @@
                             <li><a href="{% url comments-flag comment_list.0.parent_comment_id %}">Report this comment</a></li>
                         {% endif %}                                    
                     {% endif %}
-                    {% if perms.osl_comments.add_commentsbannedfromipaddress %}
-                        <li><a href="{% url osl_comments.views.ban_ip_address comment_list.0.parent_comment_id %}">Ban IP address</a></li>
+                    {% if perms.osl_comments.can_ban %}
+                        <li><a href="{% url osl_comments.views.update_ip_address_ban comment_list.0.parent_comment_id %}">Examine IP address</a></li>
                     {% endif %}
                 </ul>
             </li>
@@ -110,8 +110,8 @@
                             <li><a href="{% url comments-flag comment.id %}">Report this comment</a></li>
                         {% endif %}
                     {% endif %}
-                    {% if perms.osl_comments.add_commentsbannedfromipaddress %}
-                        <li><a href="{% url osl_comments.views.ban_ip_address comment.id %}">Ban IP address</a></li>
+                    {% if perms.osl_comments.can_ban %}
+                        <li><a href="{% url osl_comments.views.update_ip_address_ban comment.id %}">Examine IP address</a></li>
                     {% endif %}
                 </ul>
             {% endif %}
