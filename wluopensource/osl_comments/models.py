@@ -79,6 +79,9 @@ class CommentsPerPageForContentType(models.Model):
     content_type = models.OneToOneField(ContentType)
     number_per_page = models.IntegerField()
     objects = CommentsPerPageForContentTypeManager()
+    
+    def __unicode__(self):
+        return "%s: %s" % (self.content_type, self.number_per_page)
             
 def flag_success_flash_handler(sender, **kwargs):
     if 'flag' in kwargs and \
