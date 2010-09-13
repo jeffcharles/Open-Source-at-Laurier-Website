@@ -40,6 +40,9 @@ class OslComment(Comment):
     transformed_comment = models.TextField(editable=False)
     is_deleted_by_user = models.BooleanField(default=False)
     
+    class Meta:
+        verbose_name = "comment"
+    
     def save(self, force_insert=False, force_update=False):
         md = markdown.Markdown(safe_mode="escape")
         self.transformed_comment = md.convert(self.comment)
