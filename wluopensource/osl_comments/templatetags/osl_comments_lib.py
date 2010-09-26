@@ -413,7 +413,6 @@ class OslCommentListNode(CommentListNode):
             sql = ''.join([get_threaded_comments_sql, limit_sql])
         else:
             sql = get_threaded_comments_sql
-        print sql
         
         qs = self.comment_model.objects.raw(sql)
 
