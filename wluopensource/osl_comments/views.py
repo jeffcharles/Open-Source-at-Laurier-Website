@@ -139,7 +139,7 @@ def redirect_view(request, content_type_id, object_id):
     """
     from django.contrib.contenttypes.views import shortcut
     response = shortcut(request, content_type_id, object_id)
-    original_url = response.__dict__['_headers']['location'][1] # FIXME: should not be relying on internal implementation details
+    original_url = response['location']
     
     # Add in no pagination query string key
     url_list = list(urlparse.urlparse(original_url))    
@@ -152,8 +152,8 @@ def redirect_view(request, content_type_id, object_id):
     new_qs = urllib.urlencode(query_string_dict)
     
     url.extend([new_qs, fragment])
-    location_tuple = ('Location', urlparse.urlunparse(url)) # FIXME: should not be relying on internal implementation details
-    response.__dict__['_headers']['location'] = location_tuple # FIXME: should not be relying on internal implementation details
+    url_string = urlparse.urlunparse(url)
+    response['location'] = url_string
     return response
 
 @login_required
