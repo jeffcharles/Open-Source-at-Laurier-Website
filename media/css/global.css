@@ -240,6 +240,15 @@ p.error {
     color: #FF0000;
 }
 
+p.flash {
+    background-color: #FFFF99;
+    font-weight: bold;
+    margin: auto;
+    padding: 5px;
+    text-align: center;
+    width: 75%;
+}
+
 #primary-navbar {
     background-color: #FF6600;
     font-size: 1.2em;
