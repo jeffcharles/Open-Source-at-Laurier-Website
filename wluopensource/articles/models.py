@@ -2,7 +2,6 @@
 from datetime import datetime
 
 from django.contrib.auth.models import User
-from django.contrib.comments.moderation import moderator
 from django.contrib.sitemaps import ping_google, SitemapNotFound
 from django.db import models
 from django.db.models.signals import post_init
@@ -10,7 +9,7 @@ from django.forms import ModelForm
 
 import markdown
 
-from osl_comments.moderation import OslCommentModerator
+from osl_comments.moderation import moderator, OslCommentModerator
 
 import settings
 if "tagging" in settings.INSTALLED_APPS:

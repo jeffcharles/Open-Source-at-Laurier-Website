@@ -120,10 +120,27 @@ def edit_comment(request, next=None):
             RequestContext(request, {})
         )
         
+    responses = signals.comment_will_be_edited.send(
+        sender  = comment.__class__,
+        comment = comment,
+        request = request
+    )
+    
+    for (receiver, response) in responses:
+        if response == False:
+            return CommentPostBadRequest(
+                "comment_will_be_edited receiver %r killed the comment" % receiver.__name__)
+        
     # update comment content
     comment.comment = data.get('comment')
     comment.edit_timestamp = datetime.now()
     comment.save()
+    
+    signals.comment_was_edited.send(
+        sender  = comment.__class__,
+        comment = comment,
+        request = request
+    )
     
     return next_redirect(data, next, comment_edited, c=comment._get_pk_val())
 

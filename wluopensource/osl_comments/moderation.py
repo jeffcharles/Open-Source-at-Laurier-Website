@@ -1,6 +1,8 @@
-from django.contrib.comments.moderation import CommentModerator
+from django.contrib import comments
+from django.contrib.comments.moderation import CommentModerator, Moderator
 from django.core.exceptions import ObjectDoesNotExist
 
+from osl_comments import signals
 from osl_comments.models import CommentsBannedFromIpAddress
 
 class OslCommentModerator(CommentModerator):
@@ -32,4 +34,16 @@ class OslCommentModerator(CommentModerator):
             finally:
                 comment_allowed_from_ip = not comment_banned_from_ip
                 return comment_allowed_from_ip
+
+class OslModerator(Moderator):
+    """Registers editing alongside posting signals with the moderator."""
+    
+    def connect(self):
+        super(OslModerator, self).connect()
+        signals.comment_will_be_edited.connect(self.pre_save_moderation, 
+            sender=comments.get_model())
+        signals.comment_was_edited.connect(self.post_save_moderation, 
+            sender=comments.get_model())
+            
+moderator = OslModerator()
 
