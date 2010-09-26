@@ -1,3 +1,5 @@
+import urlparse
+
 from django import template
 from django.conf import settings
 from django.contrib import comments
@@ -12,6 +14,7 @@ import osl_comments
 from osl_comments.forms import AnonOslCommentForm, AuthOslCommentForm, OslEditCommentForm
 from osl_comments.models import (CommentsBannedFromIpAddress, 
     CommentsPerPageForContentType, OslComment)
+from osl_comments.views import NO_PAGINATION_QUERY_STRING_KEY
 
 register = template.Library()
 
@@ -221,9 +224,13 @@ class CommentPaginationPageNode(BaseCommentNode):
             is_public = True
         )
 
-        comment_paginator = Paginator(comment_list, 
-            CommentsPerPageForContentType.objects.get_comments_per_page_for_content_type(
-            ctype))
+        if is_paginated(context):
+            comment_paginator = Paginator(comment_list, 
+                CommentsPerPageForContentType.objects.get_comments_per_page_for_content_type(
+                ctype))
+        else:
+            comment_paginator = Paginator(comment_list, len(comment_list))
+            
         context[self.as_varname] = comment_paginator.page(
             get_comment_page(context))
         return ''
@@ -384,21 +391,31 @@ class OslCommentListNode(CommentListNode):
                 thread_id ASC,
                 parent DESC,
                 %(second_thread_order_by)s
-            LIMIT
-                %(limit)d
-            OFFSET
-                %(offset)d
         """ % {
             'content_type': ctype.id,
             'object_pk': "'%s'" % object_pk,
             'site_id': settings.SITE_ID,
             'first_thread_order_by': first_order_by,
             'second_thread_order_by': second_order_by,
+        }
+        
+        limit_sql = """
+            LIMIT
+                %(limit)d
+            OFFSET
+                %(offset)d
+        """ % {
             'limit': num_comments_per_page, 
             'offset': (get_comment_page(context) - 1) * num_comments_per_page
         }
         
-        qs = self.comment_model.objects.raw(get_threaded_comments_sql)
+        if is_paginated(context):
+            sql = ''.join([get_threaded_comments_sql, limit_sql])
+        else:
+            sql = get_threaded_comments_sql
+        print sql
+        
+        qs = self.comment_model.objects.raw(sql)
 
         return qs
     
@@ -849,6 +866,21 @@ def is_edit_form_present(parser, token):
         {% is_edit_form_present as [varname] %}
     """
     return IsEditFormPresentNode.handle_token(parser, token)
+    
+def is_paginated(context):
+    """Gets whether or not the page should be paginated."""
+    
+    # Check to make sure referring page is from same domain (should paginate
+    # if referring domain is different since don't want search engines pointing
+    # to non-paginated comments)
+    referer = context['request'].META.get('HTTP_REFERER', None)
+    current_url = context['request'].build_absolute_uri()
+    no_pagination = \
+        context['request'].GET.get(NO_PAGINATION_QUERY_STRING_KEY, False)
+        
+    return not (referer and 
+        urlparse.urlparse(referer)[1] == urlparse.urlparse(current_url)[1] and 
+        no_pagination)
     
 @register.tag
 def is_reply_form_present(parser, token):

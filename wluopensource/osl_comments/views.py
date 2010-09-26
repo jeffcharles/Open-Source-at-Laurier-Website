@@ -1,4 +1,6 @@
 from datetime import datetime
+import urllib
+import urlparse
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
@@ -16,6 +18,8 @@ from django.views.decorators.http import require_POST
 from osl_comments import signals
 from osl_comments.forms import OslEditCommentForm
 from osl_comments.models import CommentsBannedFromIpAddress, OslComment
+
+NO_PAGINATION_QUERY_STRING_KEY = 'np'
 
 @login_required
 def delete_comment(request, comment_id, next=None):
@@ -127,6 +131,30 @@ comment_edited = confirmation_view(
     template = "comments/edit_confirmed.html",
     doc = """Display a "comment was edited" success page."""
 )
+
+def redirect_view(request, content_type_id, object_id):
+    """
+    Used instead of standard comments-url-redirect view to allow for no 
+    pagination.
+    """
+    from django.contrib.contenttypes.views import shortcut
+    response = shortcut(request, content_type_id, object_id)
+    original_url = response.__dict__['_headers']['location'][1] # FIXME: should not be relying on internal implementation details
+    
+    # Add in no pagination query string key
+    url_list = list(urlparse.urlparse(original_url))    
+    url = url_list[:4]
+    query_string = url_list[4]
+    fragment = url_list[5]
+    
+    query_string_dict = urlparse.parse_qs(query_string)
+    query_string_dict.update({NO_PAGINATION_QUERY_STRING_KEY: '1'})
+    new_qs = urllib.urlencode(query_string_dict)
+    
+    url.extend([new_qs, fragment])
+    location_tuple = ('Location', urlparse.urlunparse(url)) # FIXME: should not be relying on internal implementation details
+    response.__dict__['_headers']['location'] = location_tuple # FIXME: should not be relying on internal implementation details
+    return response
 
 @login_required
 @permission_required('osl_comments.can_ban')

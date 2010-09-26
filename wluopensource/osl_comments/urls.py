@@ -1,13 +1,13 @@
 from django.conf.urls.defaults import *
 from django.contrib.comments.urls import urlpatterns
 
-urlpatterns += patterns('',
-    (r'^delete_comment/(?P<comment_id>\d+)/$', 'osl_comments.views.delete_comment'),
-    (r'^deleted_comment/$', 'osl_comments.views.delete_by_user_done'),
-    (r'^edit/$', 'osl_comments.views.edit_comment'),
-    (r'^edited/$', 'osl_comments.views.comment_edited'),
-    (r'^ip_address_ban/(?P<comment_id>\d+)/$', 'osl_comments.views.update_ip_address_ban'),
-    (r'^ip_address_ban_update_done/$', 'osl_comments.views.update_ip_address_ban_done'),
-    url(r'^cr/(\d+)/(.+)/$', 'django.views.defaults.shortcut', name='comments-url-redirect'),
+urlpatterns += patterns('osl_comments.views',
+    (r'^delete_comment/(?P<comment_id>\d+)/$', 'delete_comment'),
+    (r'^deleted_comment/$', 'delete_by_user_done'),
+    (r'^edit/$', 'edit_comment'),
+    (r'^edited/$', 'comment_edited'),
+    (r'^ip_address_ban/(?P<comment_id>\d+)/$', 'update_ip_address_ban'),
+    (r'^ip_address_ban_update_done/$', 'update_ip_address_ban_done'),
+    url(r'^ocr/(\d+)/(.+)/$', 'redirect_view', name='osl-comments-url-redirect'),
 )
 

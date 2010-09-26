@@ -2,6 +2,7 @@ from django.contrib.comments.models import Comment, CommentFlag
 from django.contrib.comments.signals import (comment_was_flagged, 
     comment_was_posted)
 from django.contrib.contenttypes.models import ContentType
+from django.core import urlresolvers
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
@@ -42,6 +43,16 @@ class OslComment(Comment):
     
     class Meta:
         verbose_name = "comment"
+        
+    def get_content_object_url(self):
+        """
+        Get a URL suitable for redirecting to the content object.
+        """
+        return urlresolvers.reverse(
+            "osl-comments-url-redirect",
+            args=(self.content_type_id, self.object_pk)
+        )
+        
     
     def save(self, force_insert=False, force_update=False):
         md = markdown.Markdown(safe_mode="escape")
