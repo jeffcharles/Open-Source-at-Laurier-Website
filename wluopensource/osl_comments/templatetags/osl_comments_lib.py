@@ -108,7 +108,7 @@ class AbstractUrlNode(template.Node):
         if REPLY_QUERY_STRING_KEY in query_string:
             del query_string[REPLY_QUERY_STRING_KEY]
         query_string[self.query_string_key] = comment.id
-        return ''.join(['?', query_string.urlencode()])
+        return ''.join(['?', query_string.urlencode(), '#c', str(comment.id)])
 
 class AnonOslCommentFormNode(CommentFormNode):
     
