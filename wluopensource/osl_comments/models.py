@@ -53,6 +53,13 @@ class OslComment(Comment):
             args=(self.content_type_id, self.object_pk)
         )
         
+    def is_flagged(self):
+        """Returns true if comment is flagged for moderation."""
+        return (
+            CommentFlag.objects.filter(comment=self)
+            .filter(flag=CommentFlag.SUGGEST_REMOVAL).exists()
+        )
+        
     
     def save(self, force_insert=False, force_update=False):
         md = markdown.Markdown(safe_mode="escape")

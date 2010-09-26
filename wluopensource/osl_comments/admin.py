@@ -30,6 +30,9 @@ class OslCommentsAdmin(CommentsAdmin):
         ('Metadata',
            {'fields': ('submit_date', 'edit_timestamp', 'ip_address', 'is_public', 'is_removed')}
         ),
-     )
+    )
+    
+    list_display = ('name', 'content_type', 'object_pk', 'ip_address', 
+        'submit_date', 'is_public', 'is_removed', 'is_flagged')
 admin.site.register(OslComment, OslCommentsAdmin)
 
