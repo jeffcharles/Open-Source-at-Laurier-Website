@@ -8,8 +8,8 @@ from django.db import models
 
 import markdown
 
-from osl_comments.signals import (comment_was_deleted_by_user, 
-    ip_address_ban_was_updated)
+from osl_comments.signals import (comment_was_deleted_by_user,
+    comment_was_edited, ip_address_ban_was_updated)
 
 class CommentsBannedFromIpAddress(models.Model):
     ip_address = models.IPAddressField(primary_key=True)
@@ -84,6 +84,12 @@ def delete_success_flash_handler(sender, **kwargs):
         kwargs['request'].flash['comment_response'] = \
             'Your comment has been deleted!'
 comment_was_deleted_by_user.connect(delete_success_flash_handler)
+
+def edit_success_flash_hanlder(sender, **kwargs):
+    if 'request' in kwargs:
+        kwargs['request'].flash['comment_response'] = \
+            'Your comment has been edited!'
+comment_was_edited.connect(edit_success_flash_hanlder)
 
 class CommentsPerPageForContentTypeManager(models.Manager):
     
