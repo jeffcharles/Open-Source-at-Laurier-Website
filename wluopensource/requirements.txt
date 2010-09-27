@@ -6,6 +6,7 @@ python-openid==2.2.5
 wsgiref>=0.1.2
 django-tagging==0.3.1
 django-announcements==0.1.0
+django-debug-toolbar==0.8.3
 django-flash==1.7.1
 django-mailer==0.1.0
 django-notification==0.1.5

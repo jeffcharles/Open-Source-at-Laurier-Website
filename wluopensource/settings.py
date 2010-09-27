@@ -103,7 +103,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.redirects.middleware.RedirectFallbackMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
-    'socialregistration.middleware.FacebookMiddleware'
+    'socialregistration.middleware.FacebookMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware'
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -134,6 +135,7 @@ INSTALLED_APPS = (
     'accounts',
     'articles',
     'announcements',
+    'debug_toolbar',
     'mailer',
     'notification',
     'osl_comments',
@@ -144,6 +146,7 @@ INSTALLED_APPS = (
 
 AUTH_PROFILE_MODULE = 'accounts.UserProfile'
 COMMENTS_APP = 'osl_comments'
+INTERNAL_IPS = ('127.0.0.1',)
 
 try:
     from local_settings import *
