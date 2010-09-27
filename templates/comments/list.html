@@ -60,7 +60,7 @@
             <div class="comment-header">
                 {% if not comment.is_removed and not comment.is_deleted_by_user %}
                     {% if comment.user_url %}
-                        <a href="{{ comment.url }}">{{ comment.user_name }}</a>
+                        <a href="{{ comment.user_url }}">{{ comment.user_name }}</a>
                     {% else %}
                         {{ comment.user_name }}
                     {% endif %}
