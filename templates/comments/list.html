@@ -97,13 +97,13 @@
                     {% if comment.parent and comments_enabled and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
                         <li><a href="{% output_comment_reply_url for comment %}">Reply</a></li>
                     {% endif %}
-                    {% if comment.user == request.user and comments_enabled and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
+                    {% if comment.user_id == request.user.id and comments_enabled and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
                         <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
                     {% endif %}
-                    {% if request.user.is_authenticated and comment.user == request.user and not comment.is_removed and not comment.is_deleted_by_user %}
+                    {% if request.user.is_authenticated and comment.user_id == request.user.id and not comment.is_removed and not comment.is_deleted_by_user %}
                         <li><a href="{% url osl_comments.views.delete_comment comment.id %}">Delete</a></li>
                     {% endif %}
-                    {% if request.user.is_authenticated and comment.user != request.user and not comment.is_removed and not comment.is_deleted_by_user %}
+                    {% if request.user.is_authenticated and comment.user_id != request.user.id and not comment.is_removed and not comment.is_deleted_by_user %}
                         {% if perms.comments.can_moderate %}
                             <li><a href="{% url comments-delete comment.id %}">Moderate this comment</a></li>
                         {% else %}
