@@ -141,7 +141,8 @@ INSTALLED_APPS = (
     'osl_comments',
     'osl_flatpages',
     'socialregistration',
-    'tagging'
+    'tagging',
+    'voting'
 )
 
 AUTH_PROFILE_MODULE = 'accounts.UserProfile'
