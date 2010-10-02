@@ -1,11 +1,12 @@
-{% load osl_comments_lib %}
+{% load osl_comments_lib voting_tags %}
 {% if not comment_list %}
     <p>There does not appear to be anything here.</p>
 {% else %}
     {% user_is_banned_from_commenting as is_banned_from_commenting %}
+    {% scores_for_objects comment_list as comment_scores %}
     <ul id="comment-list">
         {% if not comment_list.0.parent %}
-            <li class="comment-pagination-parent">
+            <li class="comment comment-pagination-parent">
                 <div class="comment-header">
                     {% if not comment_list.0.parent_comment_is_removed and not comment_list.0.parent_comment_is_deleted_by_user %}
                         {% if comment_list.0.parent_comment_user_url %}
@@ -56,78 +57,93 @@
             </li>
         {% endif %}
         {% for comment in comment_list %}
-        <li{% if not comment.parent %} class="comment-child"{% endif %}><a name="c{{ comment.id }}">
-            <div class="comment-header">
-                {% if not comment.is_removed and not comment.is_deleted_by_user %}
-                    {% if comment.user_url %}
-                        <a href="{{ comment.user_url }}">{{ comment.user_name }}</a>
-                    {% else %}
-                        {{ comment.user_name }}
-                    {% endif %}
+        <li class="comment{% if not comment.parent %} comment-child{% endif %}"><a name="c{{ comment.id }}">
+            <div class="comment-score">
+                <a href="#" title="Up vote">
+                    <img src="{{ MEDIA_URL }}/images/comment-arrows/up-arrow-default.png" alt="Up vote (not selected)" />
+                </a>
+                {% if comment.id in comment_scores %}
+                    {{ comment_scores.comment.id }}
                 {% else %}
-                    {% if comment.is_removed %}
-                        [moderated]
-                    {% endif %}
-                    {% if comment.is_deleted_by_user %}
-                        [deleted]
-                    {% endif %}
+                    0
                 {% endif %}
-                said {{ comment.submit_date|timesince }} ago:
-                {% if comment.edit_timestamp != comment.submit_date and not comment.is_removed and not comment.is_deleted_by_user %}
-                    *edited
-                {% endif %}
+                <a href="#" title="Down vote">
+                    <img src="{{ MEDIA_URL }}/images/comment-arrows/down-arrow-default.png" alt="Down vote (not selected)" />
+                </a>
             </div>
-            {% should_display_edit_form for comment as display_edit_form %}
-            {% if display_edit_form and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
-                {% render_edit_comment_form for comment %}
-            {% else %}
-                <blockquote class="comment-body">
+            <div class="comment-nonscore">
+                <div class="comment-header">
                     {% if not comment.is_removed and not comment.is_deleted_by_user %}
-                        {{ comment.transformed_comment|safe }}
+                        {% if comment.user_url %}
+                            <a href="{{ comment.user_url }}">{{ comment.user_name }}</a>
+                        {% else %}
+                            {{ comment.user_name }}
+                        {% endif %}
                     {% else %}
                         {% if comment.is_removed %}
-                            This comment has been moderated
+                            [moderated]
                         {% endif %}
                         {% if comment.is_deleted_by_user %}
-                            This comment has been deleted
+                            [deleted]
                         {% endif %}
                     {% endif %}
-                </blockquote>
-                <ul class="comment-links">
-                    {% if comment.parent and comments_enabled and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
-                        <li><a href="{% output_comment_reply_url for comment %}">Reply</a></li>
+                    said {{ comment.submit_date|timesince }} ago:
+                    {% if comment.edit_timestamp != comment.submit_date and not comment.is_removed and not comment.is_deleted_by_user %}
+                        *edited
                     {% endif %}
-                    {% if comment.user_id == request.user.id and comments_enabled and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
-                        <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
-                    {% endif %}
-                    {% if request.user.is_authenticated and comment.user_id == request.user.id and not comment.is_removed and not comment.is_deleted_by_user %}
-                        <li><a href="{% url osl_comments.views.delete_comment comment.id %}">Delete</a></li>
-                    {% endif %}
-                    {% if request.user.is_authenticated and comment.user_id != request.user.id and not comment.is_removed and not comment.is_deleted_by_user %}
-                        {% if perms.comments.can_moderate %}
-                            <li><a href="{% url comments-delete comment.id %}">Moderate this comment</a></li>
+                </div>
+                {% should_display_edit_form for comment as display_edit_form %}
+                {% if display_edit_form and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
+                    {% render_edit_comment_form for comment %}
+                {% else %}
+                    <blockquote class="comment-body">
+                        {% if not comment.is_removed and not comment.is_deleted_by_user %}
+                            {{ comment.transformed_comment|safe }}
                         {% else %}
-                            <li><a href="{% url comments-flag comment.id %}">Report this comment</a></li>
+                            {% if comment.is_removed %}
+                                <p>This comment has been moderated</p>
+                            {% endif %}
+                            {% if comment.is_deleted_by_user %}
+                                <p>This comment has been deleted</p>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                    {% if perms.osl_comments.can_ban %}
-                        <li><a href="{% url osl_comments.views.update_ip_address_ban comment.id %}">Examine IP address</a></li>
-                    {% endif %}
-                    {% if request.user.is_authenticated and comment.user_id != request.user.id %}
-                        {% load voting_tags %}
-                        {% vote_by_user request.user on comment as vote %}
-                        {% if not vote or vote.is_downvote %}
-                            <li><a href="{% url vote-comment-up comment.id %}">Vote up</a></li>
+                    </blockquote>
+                    <ul class="comment-links">
+                        {% if comment.parent and comments_enabled and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
+                            <li><a href="{% output_comment_reply_url for comment %}">Reply</a></li>
                         {% endif %}
-                        {% if vote %}
-                            <li><a href="{% url vote-comment-clear comment.id %}">Clear vote</a></li>
+                        {% if comment.user_id == request.user.id and comments_enabled and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
+                            <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
                         {% endif %}
-                        {% if not vote or vote.is_upvote %}
-                            <li><a href="{% url vote-comment-down comment.id %}">Vote down</a></li>
+                        {% if request.user.is_authenticated and comment.user_id == request.user.id and not comment.is_removed and not comment.is_deleted_by_user %}
+                            <li><a href="{% url osl_comments.views.delete_comment comment.id %}">Delete</a></li>
                         {% endif %}
-                    {% endif %}
-                </ul>
-            {% endif %}
+                        {% if request.user.is_authenticated and comment.user_id != request.user.id and not comment.is_removed and not comment.is_deleted_by_user %}
+                            {% if perms.comments.can_moderate %}
+                                <li><a href="{% url comments-delete comment.id %}">Moderate this comment</a></li>
+                            {% else %}
+                                <li><a href="{% url comments-flag comment.id %}">Report this comment</a></li>
+                            {% endif %}
+                        {% endif %}
+                        {% if perms.osl_comments.can_ban %}
+                            <li><a href="{% url osl_comments.views.update_ip_address_ban comment.id %}">Examine IP address</a></li>
+                        {% endif %}
+                        {% if request.user.is_authenticated and comment.user_id != request.user.id %}
+                            {% load voting_tags %}
+                            {% vote_by_user request.user on comment as vote %}
+                            {% if not vote or vote.is_downvote %}
+                                <li><a href="{% url vote-comment-up comment.id %}">Vote up</a></li>
+                            {% endif %}
+                            {% if vote %}
+                                <li><a href="{% url vote-comment-clear comment.id %}">Clear vote</a></li>
+                            {% endif %}
+                            {% if not vote or vote.is_upvote %}
+                                <li><a href="{% url vote-comment-down comment.id %}">Vote down</a></li>
+                            {% endif %}
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
         </a></li>
         {% should_display_reply_form for comment as display_reply_form %}
         {% if display_reply_form and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
