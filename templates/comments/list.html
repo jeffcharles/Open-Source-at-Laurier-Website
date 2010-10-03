@@ -4,6 +4,7 @@
 {% else %}
     {% user_is_banned_from_commenting as is_banned_from_commenting %}
     {% scores_for_objects comment_list as comment_scores %}
+    {% votes_by_user request.user on comment_list as comment_votes %}
     <ul id="comment-list">
         {% if not comment_list.0.parent %}
             <li class="comment comment-pagination-parent">
@@ -59,14 +60,27 @@
         {% for comment in comment_list %}
         <li class="comment{% if not comment.parent %} comment-child{% endif %}"><a name="c{{ comment.id }}">
             <div class="comment-score">
-                <a href="{% url vote-comment object_id=comment.id direction='up' %}" title="Up vote">
-                    <img src="{{ MEDIA_URL }}/images/comment-arrows/up-arrow-default.png" alt="Up vote (not selected)" />
-                </a>
+                {% dict_entry_for_item comment from comment_votes as vote %}
+                {% if not vote.is_upvote %}
+                    <a href="{% url vote-comment object_id=comment.id direction='up' %}" title="Up vote">
+                        <img src="{{ MEDIA_URL }}/images/comment-arrows/up-arrow-default.png" alt="Up vote (not selected)" />
+                    </a>
+                {% else %}
+                    <a href="{% url vote-comment object_id=comment.id direction='clear' %}" title="Clear vote">
+                        <img src="{{ MEDIA_URL }}/images/comment-arrows/up-arrow-selected.png" alt="Clear vote" />
+                    </a>
+                {% endif %}
                 {% dict_entry_for_item comment from comment_scores as score %}
                 {{ score.score|default:0 }}
-                <a href="{% url vote-comment object_id=comment.id direction='down' %}" title="Down vote">
-                    <img src="{{ MEDIA_URL }}/images/comment-arrows/down-arrow-default.png" alt="Down vote (not selected)" />
-                </a>
+                {% if not vote.is_downvote %}
+                    <a href="{% url vote-comment object_id=comment.id direction='down' %}" title="Down vote">
+                        <img src="{{ MEDIA_URL }}/images/comment-arrows/down-arrow-default.png" alt="Down vote (not selected)" />
+                    </a>
+                {% else %}
+                    <a href="{% url vote-comment object_id=comment.id direction='clear' %}" title="Clear vote">
+                        <img src="{{ MEDIA_URL }}/images/comment-arrows/down-arrow-selected.png" alt="Clear vote" />
+                    </a>
+                {% endif %}
             </div>
             <div class="comment-nonscore">
                 <div class="comment-header">
