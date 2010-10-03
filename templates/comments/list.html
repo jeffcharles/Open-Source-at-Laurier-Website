@@ -59,15 +59,12 @@
         {% for comment in comment_list %}
         <li class="comment{% if not comment.parent %} comment-child{% endif %}"><a name="c{{ comment.id }}">
             <div class="comment-score">
-                <a href="#" title="Up vote">
+                <a href="{% url vote-comment object_id=comment.id direction='up' %}" title="Up vote">
                     <img src="{{ MEDIA_URL }}/images/comment-arrows/up-arrow-default.png" alt="Up vote (not selected)" />
                 </a>
-                {% if comment.id in comment_scores %}
-                    {{ comment_scores.comment.id }}
-                {% else %}
-                    0
-                {% endif %}
-                <a href="#" title="Down vote">
+                {% dict_entry_for_item comment from comment_scores as score %}
+                {{ score.score|default:0 }}
+                <a href="{% url vote-comment object_id=comment.id direction='down' %}" title="Down vote">
                     <img src="{{ MEDIA_URL }}/images/comment-arrows/down-arrow-default.png" alt="Down vote (not selected)" />
                 </a>
             </div>
@@ -127,19 +124,6 @@
                         {% endif %}
                         {% if perms.osl_comments.can_ban %}
                             <li><a href="{% url osl_comments.views.update_ip_address_ban comment.id %}">Examine IP address</a></li>
-                        {% endif %}
-                        {% if request.user.is_authenticated and comment.user_id != request.user.id %}
-                            {% load voting_tags %}
-                            {% vote_by_user request.user on comment as vote %}
-                            {% if not vote or vote.is_downvote %}
-                                <li><a href="{% url vote-comment-up comment.id %}">Vote up</a></li>
-                            {% endif %}
-                            {% if vote %}
-                                <li><a href="{% url vote-comment-clear comment.id %}">Clear vote</a></li>
-                            {% endif %}
-                            {% if not vote or vote.is_upvote %}
-                                <li><a href="{% url vote-comment-down comment.id %}">Vote down</a></li>
-                            {% endif %}
                         {% endif %}
                     </ul>
                 {% endif %}
