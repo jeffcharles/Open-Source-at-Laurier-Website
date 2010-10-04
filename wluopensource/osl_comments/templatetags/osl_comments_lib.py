@@ -310,7 +310,8 @@ class OslCommentListNode(CommentListNode):
                 parent_comment_edit_timestamp,
                 parent_comment_transformed_comment,
                 parent_comment_is_removed,
-                parent_comment_is_deleted_by_user
+                parent_comment_is_deleted_by_user,
+                parent_score
             FROM (
                 SELECT
                     dc.id,
@@ -327,6 +328,7 @@ class OslCommentListNode(CommentListNode):
                     oc.edit_timestamp,
                     oc.transformed_comment,
                     oc.is_deleted_by_user,
+                    dc.id AS parent_comment_id,
                     dc.user_id AS parent_comment_user_id,
                     dc.user_name AS parent_comment_user_name,
                     dc.user_url AS parent_comment_user_url,
@@ -363,6 +365,7 @@ class OslCommentListNode(CommentListNode):
                     oc2.edit_timestamp,
                     oc2.transformed_comment,
                     oc2.is_deleted_by_user,
+                    dc3.id AS parent_comment_id,
                     dc3.user_id AS parent_comment_user_id,
                     dc3.user_name AS parent_comment_user_name,
                     dc3.user_url AS parent_comment_user_url,
@@ -415,6 +418,31 @@ class OslCommentListNode(CommentListNode):
                     object_id
             ) AS t2
                 ON t.id = t2.object_id
+            LEFT JOIN (
+                SELECT
+                    object_id,
+                    SUM(vote) AS parent_score
+                FROM
+                    votes
+                JOIN 
+                    django_content_type
+                    ON votes.content_type_id = django_content_type.id
+                WHERE
+                    app_label = 'osl_comments' AND
+                    model = 'oslcomment' AND
+                    object_id IN (
+                        SELECT
+                            id
+                        FROM
+                            django_comments
+                        WHERE
+                            content_type_id = %(content_type)d AND
+                            object_pk = %(object_pk)s
+                    )
+                GROUP BY
+                    object_id
+            ) AS t3
+                ON t.parent_comment_id = t3.object_id
             ORDER BY
                 %(first_thread_order_by)s,
                 thread_id ASC,
