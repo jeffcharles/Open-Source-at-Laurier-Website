@@ -396,8 +396,12 @@ class OslCommentListNode(CommentListNode):
                     SUM(vote) AS score
                 FROM
                     votes
+                JOIN 
+                    django_content_type
+                    ON votes.content_type_id = django_content_type.id
                 WHERE
-                    content_type_id = 34 AND
+                    app_label = 'osl_comments' AND
+                    model = 'oslcomment' AND
                     object_id IN (
                         SELECT
                             id
