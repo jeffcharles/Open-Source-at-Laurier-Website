@@ -302,6 +302,7 @@ class OslCommentListNode(CommentListNode):
                 transformed_comment,
                 is_removed,
                 is_deleted_by_user,
+                score,
                 parent_comment_user_id,
                 parent_comment_user_name,
                 parent_comment_user_url,
@@ -389,6 +390,27 @@ class OslCommentListNode(CommentListNode):
                     oc2.inline_to_object = False AND
                     oc2.parent_comment_id IS NOT NULL
                 ) AS t
+            LEFT JOIN (
+                SELECT
+                    object_id,
+                    SUM(vote) AS score
+                FROM
+                    votes
+                WHERE
+                    content_type_id = 34 AND
+                    object_id IN (
+                        SELECT
+                            id
+                        FROM
+                            django_comments
+                        WHERE
+                            content_type_id = %(content_type)d AND
+                            object_pk = %(object_pk)s
+                    )
+                GROUP BY
+                    object_id
+            ) AS t2
+                ON t.id = t2.object_id
             ORDER BY
                 %(first_thread_order_by)s,
                 thread_id ASC,
