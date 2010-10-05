@@ -273,12 +273,15 @@ class OslCommentListNode(CommentListNode):
         if not object_pk:
             return self.comment_model.objects.none()
         
-        if self.sorted_by == 'oldest':
-            first_order_by = 'thread_submit_date ASC'
-            second_order_by = 'submit_date ASC'
-        elif self.sorted_by == 'newest':
+        if self.sorted_by == 'newest':
             first_order_by = 'thread_submit_date DESC'
             second_order_by = 'submit_date DESC'
+        elif self.sorted_by == 'score':
+            first_order_by = 'parent_score DESC'
+            second_order_by = 'score DESC'
+        elif self.sorted_by == 'oldest':
+            first_order_by = 'thread_submit_date ASC'
+            second_order_by = 'submit_date ASC'
         else:
             first_order_by = 'thread_submit_date DESC'
             second_order_by = 'submit_date DESC'
@@ -302,7 +305,7 @@ class OslCommentListNode(CommentListNode):
                 transformed_comment,
                 is_removed,
                 is_deleted_by_user,
-                score,
+                COALESCE(raw_score, 0) AS score,
                 parent_comment_user_id,
                 parent_comment_user_name,
                 parent_comment_user_url,
@@ -311,7 +314,7 @@ class OslCommentListNode(CommentListNode):
                 parent_comment_transformed_comment,
                 parent_comment_is_removed,
                 parent_comment_is_deleted_by_user,
-                parent_score
+                COALESCE(raw_parent_score, 0) AS parent_score
             FROM (
                 SELECT
                     dc.id,
@@ -396,7 +399,7 @@ class OslCommentListNode(CommentListNode):
             LEFT JOIN (
                 SELECT
                     object_id,
-                    SUM(vote) AS score
+                    SUM(vote) AS raw_score
                 FROM
                     votes
                 JOIN 
@@ -421,7 +424,7 @@ class OslCommentListNode(CommentListNode):
             LEFT JOIN (
                 SELECT
                     object_id,
-                    SUM(vote) AS parent_score
+                    SUM(vote) AS raw_parent_score
                 FROM
                     votes
                 JOIN 
