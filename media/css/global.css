@@ -73,6 +73,17 @@ body {
     width: 30px;
 }
 
+#comment-sorting-links {
+    display: inline;
+    margin-left: 5px;
+}
+
+#comment-sorting-links li {
+    border-bottom: 0px solid #FFFFFF !important;
+    display: inline;
+    margin: 0px 5px 0px 5px;
+}
+
 #comments h1 {
     font-size: 26px;
 }

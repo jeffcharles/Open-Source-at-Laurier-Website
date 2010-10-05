@@ -2,6 +2,12 @@
 {% if not comment_list %}
     <p>There does not appear to be anything here.</p>
 {% else %}
+    Sort by:
+    <ul id="comment-sorting-links">
+        <li><a href="{% output_sort_by_newest_url %}">Newest</a></li>
+        <li><a href="{% output_sort_by_score_url %}">Highest score</a></li>
+        <li><a href="{% output_sort_by_oldest_url %}">Oldest</a></li>
+    </ul>
     {% user_is_banned_from_commenting as is_banned_from_commenting %}
     {% votes_by_user request.user on comment_list as comment_votes %}
     <ul id="comment-list">

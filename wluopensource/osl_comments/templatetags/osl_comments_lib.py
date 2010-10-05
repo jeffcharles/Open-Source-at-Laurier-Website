@@ -21,6 +21,7 @@ register = template.Library()
 EDIT_QUERY_STRING_KEY = 'edit_comment'
 PAGE_QUERY_STRING_KEY = 'comment_page'
 REPLY_QUERY_STRING_KEY = 'reply_to_comment'
+SORT_BY_QUERY_STRING_KEY = 'sort_comments_by'
 
 class AbstractIsFormPresentNode(template.Node):
     form_query_string_key = None
@@ -88,6 +89,21 @@ class AbstractShouldDisplayFormNode(template.Node):
         context[self.as_varname] = \
             context['request'].GET.get(self.query_string_key) == str(comment.id)
         return ''
+
+class AbstractSortByUrlNode(template.Node):
+    sort_by_value = None
+    
+    @classmethod
+    def handle_token(cls, parser, token):
+        tokens = token.contents.split()
+        
+        # {% get_sort_by_url as [varname] %}
+        if len(tokens) != 1:
+            raise template.TemplateSyntaxError("%r tag requires 0 arguments" % tokens[0])
+        return cls()
+        
+    def render(self, context):
+        return ''.join(['?', SORT_BY_QUERY_STRING_KEY, '=', self.sort_by_value])
 
 class AbstractUrlNode(template.Node):
     query_string_key = None
@@ -252,34 +268,31 @@ class NextPageUrlNode(AbstractPaginationUrlNode):
     
     def render(self, context):
         page = self.page.resolve(context)
-        return ''.join(
-            ['?', PAGE_QUERY_STRING_KEY, '=', str(page.next_page_number())]
-        )
+        query_string = context['request'].GET.copy()
+        if EDIT_QUERY_STRING_KEY in query_string:
+            del query_string[EDIT_QUERY_STRING_KEY]
+        if REPLY_QUERY_STRING_KEY in query_string:
+            del query_string[REPLY_QUERY_STRING_KEY]
+        query_string[PAGE_QUERY_STRING_KEY] = str(page.next_page_number())
+        return ''.join(['?', query_string.urlencode()])
 
 class OslCommentListNode(CommentListNode):
     """Insert a list of comments into the context."""
-    
-    def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, 
-        as_varname=None, comment=None, sorted_by=None):
-    
-        super(OslCommentListNode, self).__init__(ctype=ctype, 
-            object_pk_expr=object_pk_expr, object_expr=object_expr, 
-            as_varname=as_varname, comment=comment)
-            
-        self.sorted_by = sorted_by
     
     def get_query_set(self, context):
         ctype, object_pk = self.get_target_ctype_pk(context)
         if not object_pk:
             return self.comment_model.objects.none()
         
-        if self.sorted_by == 'newest':
+        sorted_by = context['request'].GET.get(SORT_BY_QUERY_STRING_KEY)
+        
+        if sorted_by == SortByNewestUrlNode.sort_by_value:
             first_order_by = 'thread_submit_date DESC'
             second_order_by = 'submit_date DESC'
-        elif self.sorted_by == 'score':
+        elif sorted_by == SortByScoreUrlNode.sort_by_value:
             first_order_by = 'parent_score DESC'
             second_order_by = 'score DESC'
-        elif self.sorted_by == 'oldest':
+        elif sorted_by == SortByOldestUrlNode.sort_by_value:
             first_order_by = 'thread_submit_date ASC'
             second_order_by = 'submit_date ASC'
         else:
@@ -502,38 +515,9 @@ class OslCommentListNode(CommentListNode):
                 object_pk_expr = parser.compile_filter(tokens[3]),
                 as_varname = tokens[5],
             )
-            
-        # {% get_comment_list for obj as varname sorted by column %}
-        elif len(tokens) == 8:
-            if tokens[3] != 'as':
-                raise template.TemplateSyntaxError("Third argument in %r must be 'as'" % tokens[0])
-            if tokens[5] != 'sorted':
-                raise template.TemplateSyntaxError("Fifth argument in %r must be 'sorted'" % tokens[0])
-            if tokens[6] != 'by':
-                raise template.TemplateSyntaxError("Sixth argument in %r must be 'by'" % tokens[0])
-            return cls(
-                object_expr = parser.compile_filter(tokens[2]),
-                as_varname = tokens[4],
-                sorted_by = tokens[7],
-            )
-            
-        # {% get_comment_list for app.model pk as varname sorted by column %}
-        elif len(tokens) == 9:
-            if tokens[4] != 'as':
-                raise template.TemplateSyntaxError("Fourth argument in %r must be 'as'" % tokens[0])
-            if tokens[6] != 'sorted':
-                raise template.TemplateSyntaxError("Sixth argument in %r must be 'sorted'" % tokens[0])
-            if tokens[7] != 'by':
-                raise template.TemplateSyntaxError("Seventh argument in %r must be 'by'" % tokens[0])
-            return cls(
-                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
-                object_pk_expr = parser.compile_filter(tokens[3]),
-                as_varname = tokens[5],
-                sorted_by = tokens[8],
-            )
 
         else:
-            raise template.TemplateSyntaxError("%r tag requires 4, 5, 7, or 8 arguments" % tokens[0])
+            raise template.TemplateSyntaxError("%r tag requires 4 or 5 arguments" % tokens[0])
             
 class OslEditCommentFormNode(CommentFormNode):
     
@@ -581,9 +565,13 @@ class PreviousPageUrlNode(AbstractPaginationUrlNode):
     
     def render(self, context):
         page = self.page.resolve(context)
-        return ''.join(
-            ['?', PAGE_QUERY_STRING_KEY, '=', str(page.previous_page_number())]
-        )
+        query_string = context['request'].GET.copy()
+        if EDIT_QUERY_STRING_KEY in query_string:
+            del query_string[EDIT_QUERY_STRING_KEY]
+        if REPLY_QUERY_STRING_KEY in query_string:
+            del query_string[REPLY_QUERY_STRING_KEY]
+        query_string[PAGE_QUERY_STRING_KEY] = str(page.previous_page_number())
+        return ''.join(['?', query_string.urlencode()])
 
 class RenderAnonOslCommentFormNode(AnonOslCommentFormNode, 
     RenderCommentFormNode):
@@ -636,11 +624,11 @@ class RenderOslCommentListNode(OslCommentListNode):
     """Render the comment list directly"""
     
     def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, 
-        as_varname=None, comment=None, sorted_by=None, comments_enabled=None):
+        as_varname=None, comment=None, comments_enabled=None):
     
         super(RenderOslCommentListNode, self).__init__(ctype=ctype, 
             object_pk_expr=object_pk_expr, object_expr=object_expr, 
-            as_varname=as_varname, comment=comment, sorted_by=sorted_by)
+            as_varname=as_varname, comment=comment)
             
         self.comments_enabled = comments_enabled
 
@@ -672,41 +660,8 @@ class RenderOslCommentListNode(OslCommentListNode):
                 object_pk_expr = parser.compile_filter(tokens[3]),
                 comments_enabled = parser.compile_filter(tokens[6])
             )
-        
-        # {% render_threaded_comment_list for obj sorted by column with comments comments_enabled_field %}
-        if len(tokens) == 9:
-            if tokens[3] != 'sorted':
-                raise template.TemplateSyntaxError("Third argument for %r tag must be 'sorted'" % tokens[0])
-            if tokens[4] != 'by':
-                raise template.TemplateSyntaxError("Fourth argument for %r tag must be 'by'" % tokens[0])
-            if tokens[6] != 'with':
-                raise template.TemplateSyntaxError("Sixth argument for %r tag must be 'with'" % tokens[0])
-            if tokens[7] != 'comments':
-                raise template.TemplateSyntaxError("Seventh argument for %r tag must be 'comments'" % tokens[0])
-            return cls(
-                object_expr = parser.compile_filter(tokens[2]),
-                sorted_by = tokens[5],
-                comments_enabled = parser.compile_filter(tokens[8])
-            )
             
-        # {% render_threaded_comment_list for app.model pk sorted by column with comments comments_enabled_field %}
-        if len(tokens) == 10:
-            if tokens[4] != 'sorted':
-                raise template.TemplateSyntaxError("Fourth argument for %r tag must be 'sorted'" % tokens[0])
-            if tokens[5] != 'by':
-                raise template.TemplateSyntaxError("Fifth argument for %r tag must be 'by'" % tokens[0])
-            if tokens[7] != 'with':
-                raise template.TemplateSyntaxError("Seventh argument for %r tag must be 'with'" % tokens[0])
-            if tokens[8] != 'comments':
-                raise template.TemplateSyntaxError("Eighth argument for %r tag must be 'comments'" % tokens[0])
-            return cls(
-                ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
-                object_pk_expr = parser.compile_filter(tokens[3]),
-                sorted_by = tokens[6],
-                comments_enabled = parser.compile_filter(tokens[9])
-            )
-            
-        raise template.TemplateSyntaxError("%r tags takes 5, 6, 8, or 9 arguments" % tokens[0])
+        raise template.TemplateSyntaxError("%r tags takes 5 or 6 arguments" % tokens[0])
         
     def render(self, context):
         ctype, object_pk = self.get_target_ctype_pk(context)
@@ -782,6 +737,15 @@ class ShouldDisplayReplyFormNode(AbstractShouldDisplayFormNode):
         if context[self.as_varname] and not comment.parent:
             context[self.as_varname] = False
         return ''
+        
+class SortByNewestUrlNode(AbstractSortByUrlNode):
+    sort_by_value = 'newest'
+    
+class SortByOldestUrlNode(AbstractSortByUrlNode):
+    sort_by_value = 'oldest'
+    
+class SortByScoreUrlNode(AbstractSortByUrlNode):
+    sort_by_value = 'score'
         
 class UserIsBannedNode(template.Node):
     """Insert whether the current user is banned from commenting."""
@@ -1007,6 +971,39 @@ def output_previous_comment_page_url(parser, token):
         {% output_previous_comment_page_url with [page_object] %}
     """
     return PreviousPageUrlNode.handle_token(parser, token)
+
+@register.tag
+def output_sort_by_newest_url(parser, token):
+    """
+    Output the URL to sort the comments by descending date
+    
+    Syntax::
+        
+        {% output_sort_by_newest_url %}
+    """
+    return SortByNewestUrlNode.handle_token(parser, token)
+    
+@register.tag
+def output_sort_by_oldest_url(parser, token):
+    """
+    Output the URL to sort the comments by ascending date
+    
+    Syntax::
+        
+        {% output_sort_by_oldest_url %}
+    """
+    return SortByOldestUrlNode.handle_token(parser, token)
+    
+@register.tag
+def output_sort_by_score_url(parser, token):
+    """
+    Output the URL to sort the comments by descending score
+    
+    Syntax::
+    
+        {% output_sort_by_score_url %}
+    """
+    return SortByScoreUrlNode.handle_token(parser, token)
 
 @register.tag
 def render_anon_comment_form(parser, token):
