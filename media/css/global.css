@@ -44,9 +44,23 @@ body {
     height: 2.0em;
 }
 
+.comment-arrow {
+    display: block;
+    height: 15px;
+    width: 30px;
+}
+
 .comment-body {
     font-size: 115%;
     margin: 5px 0px 5px 10px;
+}
+
+.comment-downvote-arrow, .comment-downvote-arrow-selected:hover {
+    background-image: url('/media/images/comment-arrows/down-arrow-default.png');
+}
+
+.comment-downvote-arrow-selected, .comment-downvote-arrow:hover {
+    background-image: url('/media/images/comment-arrows/down-arrow-selected.png');
 }
 
 .comment-links a {
@@ -71,6 +85,14 @@ body {
     font-size: 20px;
     text-align: center;
     width: 30px;
+}
+
+.comment-upvote-arrow, .comment-upvote-arrow-selected:hover {
+    background-image: url('/media/images/comment-arrows/up-arrow-default.png');
+}
+
+.comment-upvote-arrow-selected, .comment-upvote-arrow:hover {
+    background-image: url('/media/images/comment-arrows/up-arrow-selected.png');
 }
 
 #comments h1 {
