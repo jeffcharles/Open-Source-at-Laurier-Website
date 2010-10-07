@@ -67,23 +67,15 @@
             <div class="comment-score">
                 {% dict_entry_for_item comment from comment_votes as vote %}
                 {% if not vote.is_upvote %}
-                    <a href="{% url vote-comment object_id=comment.id direction='up' %}" title="Up vote">
-                        <img src="{{ MEDIA_URL }}/images/comment-arrows/up-arrow-default.png" alt="Up vote (not selected)" />
-                    </a>
+                    <a href="{% url vote-comment object_id=comment.id direction='up' %}" title="Up vote" class="comment-arrow comment-upvote-arrow"></a>
                 {% else %}
-                    <a href="{% url vote-comment object_id=comment.id direction='clear' %}" title="Clear vote">
-                        <img src="{{ MEDIA_URL }}/images/comment-arrows/up-arrow-selected.png" alt="Clear vote" />
-                    </a>
+                    <a href="{% url vote-comment object_id=comment.id direction='clear' %}" title="Clear vote" class="comment-arrow comment-upvote-arrow-selected"></a>
                 {% endif %}
                 {{ comment.score|default:0 }}
                 {% if not vote.is_downvote %}
-                    <a href="{% url vote-comment object_id=comment.id direction='down' %}" title="Down vote">
-                        <img src="{{ MEDIA_URL }}/images/comment-arrows/down-arrow-default.png" alt="Down vote (not selected)" />
-                    </a>
+                    <a href="{% url vote-comment object_id=comment.id direction='down' %}" title="Down vote" class="comment-arrow comment-downvote-arrow" ></a>
                 {% else %}
-                    <a href="{% url vote-comment object_id=comment.id direction='clear' %}" title="Clear vote">
-                        <img src="{{ MEDIA_URL }}/images/comment-arrows/down-arrow-selected.png" alt="Clear vote" />
-                    </a>
+                    <a href="{% url vote-comment object_id=comment.id direction='clear' %}" title="Clear vote" class="comment-arrow comment-downvote-arrow-selected"></a>
                 {% endif %}
             </div>
             <div class="comment-nonscore">
