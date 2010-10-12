@@ -97,6 +97,7 @@ body {
     border-bottom: 0px solid #FFFFFF !important;
     display: inline;
     margin: 0px 5px 0px 5px;
+}
 
 .comment-upvote-arrow, .comment-upvote-arrow-selected:hover {
     background-image: url('/media/images/comment-arrows/up-arrow-default.png');
