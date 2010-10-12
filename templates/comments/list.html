@@ -75,7 +75,7 @@
             {% endif %}
         {% endwith %}
         {% for comment in comment_list %}
-        <li class="comment{% if not comment.parent %} comment-child{% endif %}"><a name="c{{ comment.id }}">
+        <li class="comment{% if not comment.parent %} comment-child{% endif %}"><a name="c{{ comment.id }}"></a>
             {% if not comment.is_removed and not comment.is_deleted_by_user %}
                 <div class="comment-score">
                     {% dict_entry_for_item comment from comment_votes as vote %}
@@ -164,7 +164,7 @@
                     </ul>
                 </div>
             {% endif %}
-        </a></li>
+        </li>
         {% should_display_reply_form for comment as display_reply_form %}
         {% if display_reply_form and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
             <li class="comment-child">{% render_anon_comment_form for object replying to comment %}</li>
