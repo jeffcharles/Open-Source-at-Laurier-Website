@@ -50,7 +50,7 @@
                             [moderated] said {{ first_comment.thread_submit_date|timesince }} ago:
                         </div>
                         <blockquote class="comment-body">
-                            This comment has been moderated
+                            <p>This comment has been moderated</p>
                         </blockquote>
                         <ul class="comment-links">
                             {% if perms.osl_comments.can_ban %}
@@ -63,7 +63,7 @@
                             [deleted] said {{ first_comment.thread_submit_date|timesince }} ago:
                         </div>
                         <blockquote class="comment-body">
-                            This comment has been deleted
+                            <p>This comment has been deleted</p>
                         </blockquote>
                         <ul class="comment-links">
                             {% if perms.osl_comments.can_ban %}
