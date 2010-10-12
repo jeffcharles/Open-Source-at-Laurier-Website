@@ -11,57 +11,59 @@
     {% user_is_banned_from_commenting as is_banned_from_commenting %}
     {% votes_by_user request.user on comment_list as comment_votes %}
     <ul id="comment-list">
-        {% if not comment_list.0.parent %}
-            <li class="comment comment-pagination-parent">
-                <div class="comment-header">
-                    {% if not comment_list.0.parent_comment_is_removed and not comment_list.0.parent_comment_is_deleted_by_user %}
-                        {% if comment_list.0.parent_comment_user_url %}
-                        <a href="{{ comment_list.0.parent_comment_user_url }}">{{ comment_list.0.parent_comment_user_name }}</a>
+        {% with comment_list.0 as first_comment %}
+            {% if not first_comment.parent %}
+                <li class="comment comment-pagination-parent">
+                    <div class="comment-header">
+                        {% if not first_comment.parent_comment_is_removed and not first_comment.parent_comment_is_deleted_by_user %}
+                            {% if first_comment.parent_comment_user_url %}
+                            <a href="{{ first_comment.parent_comment_user_url }}">{{ first_comment.parent_comment_user_name }}</a>
+                            {% else %}
+                                {{ first_comment.parent_comment_user_name }}
+                            {% endif %}
                         {% else %}
-                            {{ comment_list.0.parent_comment_user_name }}
+                            {% if first_comment.parent_comment_is_removed %}
+                                [moderated]
+                            {% endif %}
+                            {% if first_comment.parent_comment_is_deleted_by_user %}
+                                [deleted]
+                            {% endif %}
                         {% endif %}
-                    {% else %}
-                        {% if comment_list.0.parent_comment_is_removed %}
-                            [moderated]
+                        said {{ first_comment.thread_submit_date|timesince }} ago:
+                        {% if first_comment.parent_comment_edit_timestamp != first_comment.thread_submit_date and not first_comment.parent_comment_is_removed and not first_comment.parent_comment_is_deleted_by_user %}
+                            *edited
                         {% endif %}
-                        {% if comment_list.0.parent_comment_is_deleted_by_user %}
-                            [deleted]
-                        {% endif %}
-                    {% endif %}
-                    said {{ comment_list.0.thread_submit_date|timesince }} ago:
-                    {% if comment_list.0.parent_comment_edit_timestamp != comment_list.0.thread_submit_date and not comment_list.0.parent_comment_is_removed and not comment_list.0.parent_comment_is_deleted_by_user %}
-                        *edited
-                    {% endif %}
-                </div>
-                <blockquote class="comment-body">
-                    {% if not comment_list.0.parent_comment_is_removed and not comment_list.0.parent_comment_is_deleted_by_user %}
-                        {{ comment_list.0.parent_comment_transformed_comment|safe }}
-                    {% else %}
-                        {% if comment_list.0.parent_comment_is_removed %}
-                            This comment has been moderated
-                        {% endif %}
-                        {% if comment_list.0.parent_comment_is_deleted_by_user %}
-                            This comment has been deleted
-                        {% endif %}
-                    {% endif %}
-                </blockquote>
-                <ul class="comment-links">
-                    {% if request.user.is_authenticated and request.user.id == comment_list.0.parent_comment_user_id and not comment_list.0.parent_comment_is_removed and not comment_list.0.parent_comment_is_deleted_by_user %}
-                        <li><a href="{% url osl_comments.views.delete_comment comment_list.0.parent_comment_id %}">Delete</a></li>
-                    {% endif %}
-                    {% if request.user.is_authenticated and comment_list.0.parent_comment_user_id != request.user.id %}
-                        {% if perms.comments.can_moderate %}
-                            <li><a href="{% url comments-delete comment_list.0.parent_comment_id %}">Moderate this comment</a></li>
+                    </div>
+                    <blockquote class="comment-body">
+                        {% if not first_comment.parent_comment_is_removed and not first_comment.parent_comment_is_deleted_by_user %}
+                            {{ first_comment.parent_comment_transformed_comment|safe }}
                         {% else %}
-                            <li><a href="{% url comments-flag comment_list.0.parent_comment_id %}">Report this comment</a></li>
-                        {% endif %}                                    
-                    {% endif %}
-                    {% if perms.osl_comments.can_ban %}
-                        <li><a href="{% url osl_comments.views.update_ip_address_ban comment_list.0.parent_comment_id %}">Examine IP address</a></li>
-                    {% endif %}
-                </ul>
-            </li>
-        {% endif %}
+                            {% if first_comment.parent_comment_is_removed %}
+                                This comment has been moderated
+                            {% endif %}
+                            {% if first_comment.parent_comment_is_deleted_by_user %}
+                                This comment has been deleted
+                            {% endif %}
+                        {% endif %}
+                    </blockquote>
+                    <ul class="comment-links">
+                        {% if request.user.is_authenticated and request.user.id == first_comment.parent_comment_user_id and not first_comment.parent_comment_is_removed and not first_comment.parent_comment_is_deleted_by_user %}
+                            <li><a href="{% url osl_comments.views.delete_comment first_comment.parent_comment_id %}">Delete</a></li>
+                        {% endif %}
+                        {% if request.user.is_authenticated and first_comment.parent_comment_user_id != request.user.id %}
+                            {% if perms.comments.can_moderate %}
+                                <li><a href="{% url comments-delete first_comment.parent_comment_id %}">Moderate this comment</a></li>
+                            {% else %}
+                                <li><a href="{% url comments-flag first_comment.parent_comment_id %}">Report this comment</a></li>
+                            {% endif %}
+                        {% endif %}
+                        {% if perms.osl_comments.can_ban %}
+                            <li><a href="{% url osl_comments.views.update_ip_address_ban first_comment.parent_comment_id %}">Examine IP address</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+            {% endif %}
+        {% endwith %}
         {% for comment in comment_list %}
         <li class="comment{% if not comment.parent %} comment-child{% endif %}"><a name="c{{ comment.id }}">
             <div class="comment-score">
