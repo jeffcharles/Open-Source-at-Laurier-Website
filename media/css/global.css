@@ -64,6 +64,10 @@ body {
     background-image: url('/media/images/comment-arrows/down-arrow-selected.png');
 }
 
+.comment-links {
+    min-height: 15px;
+}
+
 .comment-links a {
     color: #666666;
 }
