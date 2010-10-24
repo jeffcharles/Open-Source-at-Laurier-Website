@@ -37,7 +37,7 @@ ip_address_ban_was_updated.connect(ip_address_ban_update_success_flash_handler)
 
 class OslComment(Comment):
     parent_comment = models.ForeignKey(Comment, blank=True, null=True, related_name='parent_comment')
-    inline_to_object = models.BooleanField(default=False)
+    inline_to_object = models.BooleanField(db_index=True, default=False)
     edit_timestamp = models.DateTimeField()
     transformed_comment = models.TextField(editable=False)
     is_deleted_by_user = models.BooleanField(default=False)
