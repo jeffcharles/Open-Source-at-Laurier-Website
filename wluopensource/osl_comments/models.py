@@ -10,6 +10,7 @@ import markdown
 
 from osl_comments.signals import (comment_was_deleted_by_user,
     comment_was_edited, ip_address_ban_was_updated)
+import settings
 
 class CommentsBannedFromIpAddress(models.Model):
     ip_address = models.IPAddressField(primary_key=True)
