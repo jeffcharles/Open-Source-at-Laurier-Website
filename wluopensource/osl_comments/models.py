@@ -234,7 +234,7 @@ class OslCommentManager(models.Manager):
         return qs
 
 class OslComment(Comment):
-    parent_comment = models.ForeignKey(Comment, blank=True, null=True, related_name='parent_comment')
+    parent_comment = models.ForeignKey(Comment, blank=True, db_index=True, null=True, related_name='parent_comment')
     inline_to_object = models.BooleanField(db_index=True, default=False)
     edit_timestamp = models.DateTimeField()
     transformed_comment = models.TextField(editable=False)
