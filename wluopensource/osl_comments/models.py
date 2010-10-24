@@ -180,16 +180,7 @@ class OslCommentManager(models.Manager):
                     ON votes.content_type_id = django_content_type.id
                 WHERE
                     app_label = 'osl_comments' AND
-                    model = 'oslcomment' AND
-                    object_id IN (
-                        SELECT
-                            id
-                        FROM
-                            django_comments
-                        WHERE
-                            content_type_id = %(content_type)d AND
-                            object_pk = %(object_pk)s
-                    )
+                    model = 'oslcomment'
                 GROUP BY
                     object_id
             ) AS t2
@@ -205,16 +196,7 @@ class OslCommentManager(models.Manager):
                     ON votes.content_type_id = django_content_type.id
                 WHERE
                     app_label = 'osl_comments' AND
-                    model = 'oslcomment' AND
-                    object_id IN (
-                        SELECT
-                            id
-                        FROM
-                            django_comments
-                        WHERE
-                            content_type_id = %(content_type)d AND
-                            object_pk = %(object_pk)s
-                    )
+                    model = 'oslcomment'
                 GROUP BY
                     object_id
             ) AS t3
