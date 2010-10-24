@@ -365,7 +365,7 @@ class OslCommentListNode(CommentListNode):
                     dc.is_public = TRUE AND
                     oc.inline_to_object = False AND
                     oc.parent_comment_id IS NULL
-                UNION
+                UNION ALL
                 SELECT
                     dc2.id,
                     oc2.comment_ptr_id,
