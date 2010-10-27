@@ -89,42 +89,45 @@ class OslCommentManager(models.Manager):
                 parent_comment_is_deleted_by_user,
                 COALESCE(raw_parent_score, 0) AS parent_score
             FROM (
-                SELECT
-                    dc.id,
-                    oc.comment_ptr_id,
-                    True AS parent,
-                    dc.id AS thread_id,
-                    dc.user_id,
-                    dc.user_name,
-                    dc.user_url,
-                    dc.comment,
-                    dc.submit_date AS thread_submit_date,
-                    dc.submit_date,
-                    dc.is_removed,
-                    oc.edit_timestamp,
-                    oc.transformed_comment,
-                    oc.is_deleted_by_user,
-                    dc.id AS parent_comment_id,
-                    dc.user_id AS parent_comment_user_id,
-                    dc.user_name AS parent_comment_user_name,
-                    dc.user_url AS parent_comment_user_url,
-                    dc.comment AS parent_comment_comment,
-                    dc.is_removed AS parent_comment_is_removed,
-                    oc.edit_timestamp AS parent_comment_edit_timestamp,
-                    oc.transformed_comment AS parent_comment_transformed_comment,
-                    oc.is_deleted_by_user AS parent_comment_is_deleted_by_user
-                FROM
-                    django_comments AS dc
-                JOIN
-                    osl_comments_oslcomment AS oc 
-                    ON dc.id = oc.comment_ptr_id 
-                WHERE
-                    dc.content_type_id = %(content_type)d AND
-                    dc.object_pk = %(object_pk)s AND
-                    dc.site_id = %(site_id)d AND
-                    dc.is_public = TRUE AND
-                    oc.inline_to_object = False AND
-                    oc.parent_comment_id IS NULL
+                WITH parent_comments_result_set AS (
+                    SELECT
+                        dc.id,
+                        oc.comment_ptr_id,
+                        True AS parent,
+                        dc.id AS thread_id,
+                        dc.user_id,
+                        dc.user_name,
+                        dc.user_url,
+                        dc.comment,
+                        dc.submit_date AS thread_submit_date,
+                        dc.submit_date,
+                        dc.is_removed,
+                        oc.edit_timestamp,
+                        oc.transformed_comment,
+                        oc.is_deleted_by_user,
+                        dc.id AS parent_comment_id,
+                        dc.user_id AS parent_comment_user_id,
+                        dc.user_name AS parent_comment_user_name,
+                        dc.user_url AS parent_comment_user_url,
+                        dc.comment AS parent_comment_comment,
+                        dc.is_removed AS parent_comment_is_removed,
+                        oc.edit_timestamp AS parent_comment_edit_timestamp,
+                        oc.transformed_comment AS parent_comment_transformed_comment,
+                        oc.is_deleted_by_user AS parent_comment_is_deleted_by_user
+                    FROM
+                        django_comments AS dc
+                    JOIN
+                        osl_comments_oslcomment AS oc 
+                        ON dc.id = oc.comment_ptr_id 
+                    WHERE
+                        dc.content_type_id = %(content_type)d AND
+                        dc.object_pk = %(object_pk)s AND
+                        dc.site_id = %(site_id)d AND
+                        dc.is_public = TRUE AND
+                        oc.inline_to_object = False AND
+                        oc.parent_comment_id IS NULL
+                )
+                SELECT * FROM parent_comments_result_set
                 UNION ALL
                 SELECT
                     dc2.id,
@@ -135,32 +138,29 @@ class OslCommentManager(models.Manager):
                     dc2.user_name,
                     dc2.user_url,
                     dc2.comment,
-                    dc3.submit_date AS thread_submit_date,
+                    pcrs.submit_date AS thread_submit_date,
                     dc2.submit_date,
                     dc2.is_removed,
                     oc2.edit_timestamp,
                     oc2.transformed_comment,
                     oc2.is_deleted_by_user,
-                    dc3.id AS parent_comment_id,
-                    dc3.user_id AS parent_comment_user_id,
-                    dc3.user_name AS parent_comment_user_name,
-                    dc3.user_url AS parent_comment_user_url,
-                    dc3.comment AS parent_comment_comment,
-                    dc3.is_removed AS parent_comment_is_removed,
-                    oc3.edit_timestamp AS parent_comment_edit_timestamp,
-                    oc3.transformed_comment AS parent_comment_transformed_comment,
-                    oc3.is_deleted_by_user AS parent_comment_is_deleted_by_user
+                    pcrs.id AS parent_comment_id,
+                    pcrs.user_id AS parent_comment_user_id,
+                    pcrs.user_name AS parent_comment_user_name,
+                    pcrs.user_url AS parent_comment_user_url,
+                    pcrs.comment AS parent_comment_comment,
+                    pcrs.is_removed AS parent_comment_is_removed,
+                    pcrs.edit_timestamp AS parent_comment_edit_timestamp,
+                    pcrs.transformed_comment AS parent_comment_transformed_comment,
+                    pcrs.is_deleted_by_user AS parent_comment_is_deleted_by_user
                 FROM
                     django_comments AS dc2
                 JOIN
                     osl_comments_oslcomment AS oc2
                     ON dc2.id = oc2.comment_ptr_id
                 JOIN
-                    django_comments AS dc3
-                    ON dc3.id = oc2.parent_comment_id
-                JOIN
-                    osl_comments_oslcomment AS oc3
-                    ON dc3.id = oc3.comment_ptr_id
+                    parent_comments_result_set AS pcrs
+                    ON pcrs.id = oc2.parent_comment_id
                 WHERE
                     dc2.content_type_id = %(content_type)d AND
                     dc2.object_pk = %(object_pk)s AND
