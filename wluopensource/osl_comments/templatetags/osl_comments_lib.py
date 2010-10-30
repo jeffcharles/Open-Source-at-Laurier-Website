@@ -237,7 +237,8 @@ class CommentPaginationPageNode(BaseCommentNode):
             content_type = ctype,
             object_pk = smart_unicode(object_pk),
             site__pk = settings.SITE_ID,
-            is_public = True
+            is_public = True,
+            inline_to_object = False
         )
 
         if is_paginated(context):
