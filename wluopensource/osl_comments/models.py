@@ -78,7 +78,16 @@ class OslCommentManager(models.Manager):
                 transformed_comment,
                 is_removed,
                 is_deleted_by_user,
+        """
+        if order_method == 'score':
+            get_threaded_comments_sql += """
                 COALESCE(raw_score, 0) AS score,
+            """
+        else:
+            get_threaded_comments_sql += """
+                raw_score AS score,
+            """
+        get_threaded_comments_sql += """
                 parent_comment_user_id,
                 parent_comment_user_name,
                 parent_comment_user_url,
@@ -87,7 +96,16 @@ class OslCommentManager(models.Manager):
                 parent_comment_transformed_comment,
                 parent_comment_is_removed,
                 parent_comment_is_deleted_by_user,
+        """
+        if order_method == 'score':
+            get_threaded_comments_sql += """
                 COALESCE(raw_parent_score, 0) AS parent_score
+            """
+        else:
+            get_threaded_comments_sql += """
+                raw_parent_score AS parent_score
+            """
+        get_threaded_comments_sql += """
             FROM (
                 WITH parent_comments_result_set AS (
                     SELECT
