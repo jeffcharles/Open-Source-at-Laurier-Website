@@ -108,8 +108,17 @@ class OslCommentManager(models.Manager):
                         oc.transformed_comment,
                         oc.is_deleted_by_user,
                         oc.parent_comment_id,
+        """
+        if order_method == 'score':
+            get_threaded_comments_sql += """
                         score.raw_score,
                         score.raw_score AS raw_parent_score
+        """
+        else:
+            get_threaded_comments_sql += """
+                        score.raw_score
+        """
+        get_threaded_comments_sql += """
                     FROM
                         django_comments AS dc
                     JOIN
@@ -157,8 +166,21 @@ class OslCommentManager(models.Manager):
                     oc2.transformed_comment,
                     oc2.is_deleted_by_user,
                     oc2.parent_comment_id,
+        """ % {
+            'content_type': ctype.id,
+            'object_pk': "'%s'" % object_pk,
+            'site_id': settings.SITE_ID
+        }
+        if order_method == 'score':
+            get_threaded_comments_sql += """
                     score2.raw_score,
                     score3.raw_parent_score
+        """
+        else:
+            get_threaded_comments_sql += """
+                    score2.raw_score
+        """
+        get_threaded_comments_sql += """
                 FROM
                     django_comments AS dc2
                 JOIN
@@ -183,6 +205,13 @@ class OslCommentManager(models.Manager):
                         object_id
                 ) AS score2
                     ON dc2.id = score2.object_id
+        """ % {
+            'content_type': ctype.id,
+            'object_pk': "'%s'" % object_pk,
+            'site_id': settings.SITE_ID
+        }
+        if order_method == 'score':
+            get_threaded_comments_sql += """
                 LEFT JOIN (
                     SELECT
                         object_id,
@@ -199,6 +228,8 @@ class OslCommentManager(models.Manager):
                         object_id
                 ) AS score3
                     ON oc2.parent_comment_id = score3.object_id
+        """
+        get_threaded_comments_sql += """
                 WHERE
                     dc2.content_type_id = %(content_type)d AND
                     dc2.object_pk = %(object_pk)s AND
