@@ -68,6 +68,7 @@ class OslCommentManager(models.Manager):
                 id,
                 comment_ptr_id,
                 parent,
+                thread_id,
                 user_id,
                 user_name,
                 user_url,
@@ -82,28 +83,11 @@ class OslCommentManager(models.Manager):
         if order_method == 'score':
             get_threaded_comments_sql += """
                 COALESCE(raw_score, 0) AS score,
+                COALESCE(parent_raw_score, 0) AS score
             """
         else:
             get_threaded_comments_sql += """
-                raw_score AS score,
-            """
-        get_threaded_comments_sql += """
-                parent_comment_user_id,
-                parent_comment_user_name,
-                parent_comment_user_url,
-                parent_comment_comment,
-                parent_comment_edit_timestamp,
-                parent_comment_transformed_comment,
-                parent_comment_is_removed,
-                parent_comment_is_deleted_by_user,
-        """
-        if order_method == 'score':
-            get_threaded_comments_sql += """
-                COALESCE(raw_parent_score, 0) AS parent_score
-            """
-        else:
-            get_threaded_comments_sql += """
-                raw_parent_score AS parent_score
+                raw_score AS score
             """
         get_threaded_comments_sql += """
             FROM (
@@ -123,15 +107,7 @@ class OslCommentManager(models.Manager):
                         oc.edit_timestamp,
                         oc.transformed_comment,
                         oc.is_deleted_by_user,
-                        dc.id AS parent_comment_id,
-                        dc.user_id AS parent_comment_user_id,
-                        dc.user_name AS parent_comment_user_name,
-                        dc.user_url AS parent_comment_user_url,
-                        dc.comment AS parent_comment_comment,
-                        dc.is_removed AS parent_comment_is_removed,
-                        oc.edit_timestamp AS parent_comment_edit_timestamp,
-                        oc.transformed_comment AS parent_comment_transformed_comment,
-                        oc.is_deleted_by_user AS parent_comment_is_deleted_by_user
+                        oc.parent_comment_id
                     FROM
                         django_comments AS dc
                     JOIN
@@ -162,15 +138,7 @@ class OslCommentManager(models.Manager):
                     oc2.edit_timestamp,
                     oc2.transformed_comment,
                     oc2.is_deleted_by_user,
-                    pcrs.id AS parent_comment_id,
-                    pcrs.user_id AS parent_comment_user_id,
-                    pcrs.user_name AS parent_comment_user_name,
-                    pcrs.user_url AS parent_comment_user_url,
-                    pcrs.comment AS parent_comment_comment,
-                    pcrs.is_removed AS parent_comment_is_removed,
-                    pcrs.edit_timestamp AS parent_comment_edit_timestamp,
-                    pcrs.transformed_comment AS parent_comment_transformed_comment,
-                    pcrs.is_deleted_by_user AS parent_comment_is_deleted_by_user
+                    oc2.parent_comment_id
                 FROM
                     django_comments AS dc2
                 JOIN
