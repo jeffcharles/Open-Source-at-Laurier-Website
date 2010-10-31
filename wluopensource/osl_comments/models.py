@@ -337,7 +337,7 @@ class CommentsPerPageForContentTypeManager(models.Manager):
         try:
             return self.get(content_type=content_type).number_per_page
         except ObjectDoesNotExist:
-            return getattr(settings, 'DEFAULT_COMMENTS_PER_PAGE', 100)
+            return getattr(settings, 'DEFAULT_COMMENTS_PER_PAGE', 50)
 
 class CommentsPerPageForContentType(models.Model):
     content_type = models.OneToOneField(ContentType)
