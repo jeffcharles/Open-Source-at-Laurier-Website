@@ -83,7 +83,7 @@ class OslCommentManager(models.Manager):
         if order_method == 'score':
             get_threaded_comments_sql += """
                 COALESCE(raw_score, 0) AS score,
-                COALESCE(parent_raw_score, 0) AS score
+                COALESCE(raw_parent_score, 0) AS parent_score
             """
         else:
             get_threaded_comments_sql += """
@@ -107,12 +107,30 @@ class OslCommentManager(models.Manager):
                         oc.edit_timestamp,
                         oc.transformed_comment,
                         oc.is_deleted_by_user,
-                        oc.parent_comment_id
+                        oc.parent_comment_id,
+                        score.raw_score,
+                        score.raw_score AS raw_parent_score
                     FROM
                         django_comments AS dc
                     JOIN
                         osl_comments_oslcomment AS oc 
                         ON dc.id = oc.comment_ptr_id 
+                    LEFT JOIN (
+                        SELECT
+                            object_id,
+                            SUM(vote) AS raw_score
+                        FROM
+                            votes
+                        JOIN 
+                            django_content_type
+                            ON votes.content_type_id = django_content_type.id
+                        WHERE
+                            app_label = 'osl_comments' AND
+                            model = 'oslcomment'
+                        GROUP BY
+                            object_id
+                    ) AS score
+                        ON dc.id = score.object_id
                     WHERE
                         dc.content_type_id = %(content_type)d AND
                         dc.object_pk = %(object_pk)s AND
@@ -138,7 +156,9 @@ class OslCommentManager(models.Manager):
                     oc2.edit_timestamp,
                     oc2.transformed_comment,
                     oc2.is_deleted_by_user,
-                    oc2.parent_comment_id
+                    oc2.parent_comment_id,
+                    score2.raw_score,
+                    score3.raw_parent_score
                 FROM
                     django_comments AS dc2
                 JOIN
@@ -147,6 +167,38 @@ class OslCommentManager(models.Manager):
                 JOIN
                     parent_comments_result_set AS pcrs
                     ON pcrs.id = oc2.parent_comment_id
+                LEFT JOIN (
+                    SELECT
+                        object_id,
+                        SUM(vote) AS raw_score
+                    FROM
+                        votes
+                    JOIN 
+                        django_content_type
+                        ON votes.content_type_id = django_content_type.id
+                    WHERE
+                        app_label = 'osl_comments' AND
+                        model = 'oslcomment'
+                    GROUP BY
+                        object_id
+                ) AS score2
+                    ON dc2.id = score2.object_id
+                LEFT JOIN (
+                    SELECT
+                        object_id,
+                        SUM(vote) AS raw_parent_score
+                    FROM
+                        votes
+                    JOIN 
+                        django_content_type
+                        ON votes.content_type_id = django_content_type.id
+                    WHERE
+                        app_label = 'osl_comments' AND
+                        model = 'oslcomment'
+                    GROUP BY
+                        object_id
+                ) AS score3
+                    ON oc2.parent_comment_id = score3.object_id
                 WHERE
                     dc2.content_type_id = %(content_type)d AND
                     dc2.object_pk = %(object_pk)s AND
@@ -155,38 +207,6 @@ class OslCommentManager(models.Manager):
                     oc2.inline_to_object = False AND
                     oc2.parent_comment_id IS NOT NULL
                 ) AS t
-            LEFT JOIN (
-                SELECT
-                    object_id,
-                    SUM(vote) AS raw_score
-                FROM
-                    votes
-                JOIN 
-                    django_content_type
-                    ON votes.content_type_id = django_content_type.id
-                WHERE
-                    app_label = 'osl_comments' AND
-                    model = 'oslcomment'
-                GROUP BY
-                    object_id
-            ) AS t2
-                ON t.id = t2.object_id
-            LEFT JOIN (
-                SELECT
-                    object_id,
-                    SUM(vote) AS raw_parent_score
-                FROM
-                    votes
-                JOIN 
-                    django_content_type
-                    ON votes.content_type_id = django_content_type.id
-                WHERE
-                    app_label = 'osl_comments' AND
-                    model = 'oslcomment'
-                GROUP BY
-                    object_id
-            ) AS t3
-                ON t.parent_comment_id = t3.object_id
             ORDER BY
                 %(first_thread_order_by)s,
                 thread_id ASC,
@@ -197,7 +217,7 @@ class OslCommentManager(models.Manager):
             'object_pk': "'%s'" % object_pk,
             'site_id': settings.SITE_ID,
             'first_thread_order_by': first_order_by,
-            'second_thread_order_by': second_order_by,
+            'second_thread_order_by': second_order_by
         }
         
         limit_sql = """
@@ -216,7 +236,7 @@ class OslCommentManager(models.Manager):
             sql = get_threaded_comments_sql
         
         qs = self.raw(sql)
-
+        
         return qs
 
 class OslComment(Comment):
