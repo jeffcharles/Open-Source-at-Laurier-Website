@@ -1,11 +1,13 @@
-{% if not vote.is_upvote %}
-    <a href="{{ upvote_url }}" title="Up vote" class="vote-arrow upvote-arrow"></a>
-{% else %}
-    <a href="{{ clearvote_url }}" title="Clear vote" class="vote-arrow upvote-arrow-selected"></a>
-{% endif %}
-<span class="score-sum">{{ object_score|default:0 }}</span>
-{% if not vote.is_downvote %}
-    <a href="{{ downvote_url }}" title="Down vote" class="vote-arrow downvote-arrow" ></a>
-{% else %}
-    <a href="{{ clearvote_url }}" title="Clear vote" class="vote-arrow downvote-arrow-selected"></a>
-{% endif %}
+<div class="vote-box" data-ajax-url="{{ vote_box_ajax_url }}">
+    {% if not vote.is_upvote %}
+        <a href="{{ upvote_url }}" title="Up vote" class="vote-arrow upvote-arrow"></a>
+    {% else %}
+        <a href="{{ clearvote_url }}" title="Clear vote" class="vote-arrow upvote-arrow-selected"></a>
+    {% endif %}
+    <span class="score-sum">{{ object_score|default:0 }}</span>
+    {% if not vote.is_downvote %}
+        <a href="{{ downvote_url }}" title="Down vote" class="vote-arrow downvote-arrow" ></a>
+    {% else %}
+        <a href="{{ clearvote_url }}" title="Clear vote" class="vote-arrow downvote-arrow-selected"></a>
+    {% endif %}
+</div>
