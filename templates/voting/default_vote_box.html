@@ -3,7 +3,7 @@
 {% else %}
     <a href="{{ clearvote_url }}" title="Clear vote" class="vote-arrow upvote-arrow-selected"></a>
 {% endif %}
-<span class="comment-score-sum">{{ object_score|default:0 }}</span>
+<span class="score-sum">{{ object_score|default:0 }}</span>
 {% if not vote.is_downvote %}
     <a href="{{ downvote_url }}" title="Down vote" class="vote-arrow downvote-arrow" ></a>
 {% else %}

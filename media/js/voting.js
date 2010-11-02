@@ -5,7 +5,7 @@ $(document).ready(function() {
         $.post(selectedAnchor.attr("href"), function(data) {
             var parent = selectedAnchor.parent();
             parent.load(parent.attr("data-ajax-url"), function() {
-                parent.children("span.comment-score-sum").text($.parseJSON(data).score.score);
+                parent.children("span.score-sum").text($.parseJSON(data).score.score);
             });
         });
         return false;
