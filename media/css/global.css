@@ -171,7 +171,7 @@ body {
     margin-bottom: 2px;
 }
 
-.downvote-arrow, .downvote-arrow-selected:hover {
+.downvote-arrow {
     background-image: url('/media/images/comment-arrows/down-arrow-default.png');
 }
 
@@ -323,7 +323,7 @@ ul.comment-links li {
     margin-right: 10px;
 }
 
-.upvote-arrow, .upvote-arrow-selected:hover {
+.upvote-arrow {
     background-image: url('/media/images/comment-arrows/up-arrow-default.png');
 }
 
