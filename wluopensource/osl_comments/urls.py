@@ -22,3 +22,10 @@ urlpatterns += patterns('voting.views',
         name='vote-comment'),
 )
 
+urlpatterns += patterns('osl_voting.views',
+    url(r'^vote_links/(?P<object_id>\d+)/$',
+    'get_vote_box_template',
+    {'model': OslComment, 'vote_url_name': 'vote-comment'},
+    name='get_comment_vote_box_template')
+)
+

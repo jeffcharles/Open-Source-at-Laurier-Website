@@ -15,19 +15,14 @@
             {% with first_comment_parent as comment %}
                 <li class="comment comment-pagination-parent">
                     {% if not comment.is_removed and not comment.is_moderated %}
-                        <div class="comment-score">
+                        <div class="comment-score" data-ajax-url="{% url get_comment_vote_box_template object_id=comment.id %}">
                             {% vote_by_user request.user on comment as vote %}
-                            {% if not vote.is_upvote %}
-                                <a href="{% url vote-comment object_id=comment.id direction='up' %}" title="Up vote" class="comment-arrow comment-upvote-arrow"></a>
-                            {% else %}
-                                <a href="{% url vote-comment object_id=comment.id direction='clear' %}" title="Clear vote" class="comment-arrow comment-upvote-arrow-selected"></a>
-                            {% endif %}
-                            {{ comment.score|default:0 }}
-                            {% if not vote.is_downvote %}
-                                <a href="{% url vote-comment object_id=comment.id direction='down' %}" title="Down vote" class="comment-arrow comment-downvote-arrow" ></a>
-                            {% else %}
-                                <a href="{% url vote-comment object_id=comment.id direction='clear' %}" title="Clear vote" class="comment-arrow comment-downvote-arrow-selected"></a>
-                            {% endif %}
+                            {% url vote-comment object_id=comment.id direction='up' as upvote_url %}
+                            {% url vote-comment object_id=comment.id direction='clear' as clearvote_url %}
+                            {% url vote-comment object_id=comment.id direction='down' as downvote_url %}
+                            {% with comment.score as object_score %}
+                                {% include "voting/default_vote_box.html" %}
+                            {% endwith %}
                         </div>
                         <div class="comment-header">
                             {% if comment.user_url %}
@@ -91,19 +86,14 @@
         {% for comment in comment_list %}
         <li class="comment{% if not comment.parent %} comment-child{% endif %}"><a name="c{{ comment.id }}"></a>
             {% if not comment.is_removed and not comment.is_deleted_by_user %}
-                <div class="comment-score">
+                <div class="comment-score" data-ajax-url="{% url get_comment_vote_box_template object_id=comment.id %}">
                     {% dict_entry_for_item comment from comment_votes as vote %}
-                    {% if not vote.is_upvote %}
-                        <a href="{% url vote-comment object_id=comment.id direction='up' %}" title="Up vote" class="comment-arrow comment-upvote-arrow"></a>
-                    {% else %}
-                        <a href="{% url vote-comment object_id=comment.id direction='clear' %}" title="Clear vote" class="comment-arrow comment-upvote-arrow-selected"></a>
-                    {% endif %}
-                    {{ comment.score|default:0 }}
-                    {% if not vote.is_downvote %}
-                        <a href="{% url vote-comment object_id=comment.id direction='down' %}" title="Down vote" class="comment-arrow comment-downvote-arrow" ></a>
-                    {% else %}
-                        <a href="{% url vote-comment object_id=comment.id direction='clear' %}" title="Clear vote" class="comment-arrow comment-downvote-arrow-selected"></a>
-                    {% endif %}
+                    {% url vote-comment object_id=comment.id direction='up' as upvote_url %}
+                    {% url vote-comment object_id=comment.id direction='clear' as clearvote_url %}
+                    {% url vote-comment object_id=comment.id direction='down' as downvote_url %}
+                    {% with comment.score as object_score %}
+                        {% include "voting/default_vote_box.html" %}
+                    {% endwith %}
                 </div>
                 <div class="comment-nonscore">
                     <div class="comment-header">
