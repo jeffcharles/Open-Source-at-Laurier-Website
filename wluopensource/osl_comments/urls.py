@@ -13,20 +13,24 @@ urlpatterns += patterns('osl_comments.views',
     url(r'^ocr/(\d+)/(.+)/$', 'redirect_view', name='osl-comments-url-redirect'),
 )
 
+VOTE_ON_OBJECT_URL_NAME = 'vote-comment'
+
 urlpatterns += patterns('voting.views',
     url(r'^vote/(?P<object_id>\d+)/(?P<direction>up|down|clear)/$', 
         'vote_on_object', 
         {'model': OslComment, 'template_object_name': 'comment', 
         'allow_xmlhttprequest': True, 
         'template_name': 'comments/confirm_vote.html'},
-        name='vote-comment'),
+        name=VOTE_ON_OBJECT_URL_NAME),
 )
+
+GET_VOTE_BOX_TEMPLATE_URL_NAME = 'get_comment_vote_box_template'
 
 urlpatterns += patterns('osl_voting.views',
     url(r'^vote_links/(?P<object_id>\d+)/$',
     'get_vote_box_template',
-    {'model': OslComment, 'vote_url_name': 'vote-comment', 
-    'vote_box_url_name': 'get_comment_vote_box_template'},
-    name='get_comment_vote_box_template')
+    {'model': OslComment, 'vote_url_name': VOTE_ON_OBJECT_URL_NAME, 
+    'vote_box_url_name': GET_VOTE_BOX_TEMPLATE_URL_NAME},
+    name=GET_VOTE_BOX_TEMPLATE_URL_NAME)
 )
 
