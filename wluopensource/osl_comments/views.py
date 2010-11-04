@@ -9,7 +9,8 @@ from django.contrib.comments.views import comments
 from django.contrib.comments.views.comments import CommentPostBadRequest
 from django.contrib.comments.views.utils import confirmation_view, next_redirect
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from django.http import (HttpResponse, HttpResponseBadRequest, 
+    HttpResponseForbidden)
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext, loader
 from django.views.decorators.csrf import csrf_protect
@@ -148,6 +149,16 @@ comment_edited = confirmation_view(
     template = "comments/edit_confirmed.html",
     doc = """Display a "comment was edited" success page."""
 )
+
+@require_POST
+@permission_required('comments.can_moderate')
+def moderate(request, comment_id, next=None):
+    if not request.is_ajax:
+        return redirect('comments-delete', comment_id)
+    from django.contrib.comments.views.moderation import perform_delete
+    comment = get_object_or_404(OslComment, pk=comment_id, site__pk=settings.SITE_ID)
+    perform_delete(request, comment)
+    return HttpResponse(status=200)
 
 def redirect_view(request, content_type_id, object_id):
     """

@@ -10,6 +10,7 @@ urlpatterns += patterns('osl_comments.views',
     (r'^edited/$', 'comment_edited'),
     (r'^ip_address_ban/(?P<comment_id>\d+)/$', 'update_ip_address_ban'),
     (r'^ip_address_ban_update_done/$', 'update_ip_address_ban_done'),
+    (r'^moderate/(?P<comment_id>\d+)/$', 'moderate'),
     url(r'^ocr/(\d+)/(.+)/$', 'redirect_view', name='osl-comments-url-redirect'),
 )
 

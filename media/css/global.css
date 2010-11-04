@@ -183,6 +183,10 @@ header {
     display: block;
 }
 
+.hidden {
+    display: none;
+}
+
 footer {
     background-color: #333333;
     color: #CCCCCC;

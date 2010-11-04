@@ -1,0 +1,89 @@
+{% load osl_comments_lib voting_tags %}
+<a name="c{{ comment.id }}"></a>
+{% if not comment.is_removed and not comment.is_deleted_by_user %}
+    <div class="comment-score">
+        {% dict_entry_for_item comment from comment_votes as vote %}
+        {% url vote-comment object_id=comment.id direction='up' as upvote_url %}
+        {% url vote-comment object_id=comment.id direction='clear' as clearvote_url %}
+        {% url vote-comment object_id=comment.id direction='down' as downvote_url %}
+        {% url get_comment_vote_box_template object_id=comment.id as vote_box_ajax_url %}
+        {% with comment.score as object_score %}
+            {% include "voting/default_vote_box.html" %}
+        {% endwith %}
+    </div>
+    <div class="comment-nonscore">
+        <div class="comment-header">
+            {% if comment.user_url %}
+                <a href="{{ comment.user_url }}">{{ comment.user_name }}</a>
+            {% else %}
+                {{ comment.user_name }}
+            {% endif %}
+            said {{ comment.submit_date|timesince }} ago:
+            {% if comment.edit_timestamp != comment.submit_date %}
+                *edited
+            {% endif %}
+        </div>
+        {% should_display_edit_form for comment as display_edit_form %}
+        {% if display_edit_form and not is_banned_from_commenting %}
+            {% render_edit_comment_form for comment %}
+        {% else %}
+            <blockquote class="comment-body">
+                {{ comment.transformed_comment|safe }}
+            </blockquote>
+            <ul class="comment-links">
+                {% if comment.parent and comments_enabled and not is_banned_from_commenting %}
+                    <li><a href="{% output_comment_reply_url for comment %}">Reply</a></li>
+                {% endif %}
+                {% if comment.user_id == request.user.id and comments_enabled and not is_banned_from_commenting %}
+                    <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
+                {% endif %}
+                {% if request.user.is_authenticated and comment.user_id == request.user.id %}
+                    <li><a href="{% url osl_comments.views.delete_comment comment.id %}">Delete</a></li>
+                {% endif %}
+                {% if request.user.is_authenticated and comment.user_id != request.user.id %}
+                    {% if perms.comments.can_moderate %}
+                        <li class="moderate-comment">
+                            <a href="{% url comments-delete comment.id %}">Moderate this comment</a>
+                            <span class="hidden">Are you sure? <a class="yes" href="{% url osl_comments.views.moderate comment_id=comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
+                        </li>
+                    {% else %}
+                        <li><a href="{% url comments-flag comment.id %}">Report this comment</a></li>
+                    {% endif %}
+                {% endif %}
+                {% if perms.osl_comments.can_ban %}
+                    <li><a href="{% url osl_comments.views.update_ip_address_ban comment.id %}">Examine IP address</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+{% endif %}
+{% if comment.is_removed %}
+    <div class="comment-nonscore">
+        <div class="comment-header">
+            [moderated] said {{ comment.submit_date|timesince }} ago:
+        </div>
+        <blockquote class="comment-body">
+            <p>This comment has been moderated</p>
+        </blockquote>
+        <ul class="comment-links">
+            {% if perms.osl_comments.can_ban %}
+                <li><a href="{% url osl_comments.views.update_ip_address_ban comment.id %}">Examine IP address</a></li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}
+{% if comment.is_deleted_by_user %}
+    <div class="comment-nonscore">
+        <div class="comment-header">
+            [deleted] said {{ comment.submit_date|timesince }} ago:
+        </div>
+        <blockquote class="comment-body">
+            <p>This comment has been deleted</p>
+        </blockquote>
+        <ul class="comment-links">
+            {% if perms.osl_comments.can_ban %}
+                <li><a href="{% url osl_comments.views.update_ip_address_ban comment.id %}">Examine IP address</a></li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}
