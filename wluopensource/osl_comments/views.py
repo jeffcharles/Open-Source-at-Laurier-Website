@@ -156,6 +156,20 @@ comment_edited = confirmation_view(
 )
 
 @require_POST
+@login_required
+def flag(request, comment_id, next=None):
+    if not request.is_ajax:
+        return redirect('django.contrib.comments.views.moderation.flag', 
+            comment_id)
+            
+    from django.contrib.comment.views.moderation import perform_flag
+    comment = get_object_or_404(OslComment, pk=comment_id, 
+        site__pk=settings.SITE_ID)
+    perform_flag(request, comment)
+    
+    return HttpResponse(status=200)
+
+@require_POST
 @permission_required('comments.can_moderate')
 def moderate(request, comment_id, next=None):
     if not request.is_ajax:

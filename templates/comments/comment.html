@@ -42,12 +42,16 @@
                 {% endif %}
                 {% if request.user.is_authenticated and comment.user_id != request.user.id %}
                     {% if perms.comments.can_moderate %}
-                        <li class="moderate-comment">
+                        <li class="moderate-comment comment-action-confirmation-required">
                             <a href="{% url comments-delete comment.id %}">Moderate this comment</a>
-                            <span class="hidden">Are you sure? <a class="yes" href="{% url osl_comments.views.moderate comment_id=comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
+                            <span class="hidden action-confirmation">Are you sure? <a class="yes" href="{% url osl_comments.views.moderate comment_id=comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
                         </li>
                     {% else %}
-                        <li><a href="{% url comments-flag comment.id %}">Report this comment</a></li>
+                        <li class="flag-comment comment-action-confirmation-required">
+                            <a href="{% url comments-flag comment.id %}">Report this comment</a>
+                            <span class="hidden action-confirmation">Are you sure? <a class="yes" href="{% url osl_comments.views.flag comment_id=comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
+                            <span class="hidden action-performed">Comment reported</span>
+                        </li>
                     {% endif %}
                 {% endif %}
                 {% if perms.osl_comments.can_ban %}
