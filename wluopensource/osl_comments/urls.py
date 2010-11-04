@@ -4,6 +4,7 @@ from django.contrib.comments.urls import urlpatterns
 from osl_comments.models import OslComment
 
 urlpatterns += patterns('osl_comments.views',
+    (r'^comment/(?P<comment_id>\d+)/$', 'get_comment'),
     (r'^delete_comment/(?P<comment_id>\d+)/$', 'delete_comment'),
     (r'^deleted_comment/$', 'delete_by_user_done'),
     (r'^edit/$', 'edit_comment'),

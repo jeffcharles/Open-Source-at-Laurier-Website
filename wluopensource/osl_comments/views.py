@@ -66,6 +66,11 @@ delete_by_user_done = confirmation_view(
     doc = 'Displays a "comment was deleted" success page.'
 )
 
+def get_comment(request, comment_id):
+    comment = get_object_or_404(OslComment, pk=comment_id)
+    return render_to_response('comments/comment.html',
+        {'comment': comment}, context_instance=RequestContext(request))
+
 @login_required
 @require_POST
 def edit_comment(request, next=None):
@@ -154,11 +159,15 @@ comment_edited = confirmation_view(
 @permission_required('comments.can_moderate')
 def moderate(request, comment_id, next=None):
     if not request.is_ajax:
-        return redirect('comments-delete', comment_id)
+        return redirect('django.contrib.comments.views.moderation.delete', 
+            comment_id)
+        
     from django.contrib.comments.views.moderation import perform_delete
-    comment = get_object_or_404(OslComment, pk=comment_id, site__pk=settings.SITE_ID)
+    comment = get_object_or_404(OslComment, pk=comment_id, 
+        site__pk=settings.SITE_ID)
     perform_delete(request, comment)
-    return HttpResponse(status=200)
+    
+    return redirect('osl_comments.views.get_comment', comment_id=comment_id)
 
 def redirect_view(request, content_type_id, object_id):
     """
