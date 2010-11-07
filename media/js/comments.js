@@ -40,4 +40,31 @@ $(document).ready(function() {
         return false;
     });
     
+    $("li.reply-to-comment > a.close-comment-reply").live('click', function() {
+        $("li.comment-reply-form").remove();
+        
+        var clickedLink = $(this);
+        clickedLink.addClass("hidden");
+        clickedLink.siblings("a.open-comment-reply").removeClass("hidden");
+        
+        return false;
+    });
+    
+    $("li.reply-to-comment > a.open-comment-reply").live('click', function() {
+        $("li.comment-reply-form").remove();
+        $("a.close-comment-reply").addClass("hidden");
+        $("a.open-comment-reply").removeClass("hidden");
+        
+        var clickedReplyLink = $(this);
+        
+        $.get(clickedReplyLink.attr("data-ajax-url"), function(reply_form_html) {
+            clickedReplyLink.closest("li.comment").after(reply_form_html);
+        });
+        
+        clickedReplyLink.addClass("hidden");
+        clickedReplyLink.siblings("a.close-comment-reply").removeClass("hidden");
+        
+        return false;
+    });
+    
 });

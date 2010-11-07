@@ -10,6 +10,7 @@
     </ul>
     {% user_is_banned_from_commenting as is_banned_from_commenting %}
     {% votes_by_user request.user on comment_list as comment_votes %}
+    {% get_object_ctype for object as object_ctype %}
     <ul id="comment-list">
         {% if not comment_list.0.parent %}
             {% with first_comment_parent as comment %}
@@ -33,7 +34,7 @@
         </li>
         {% should_display_reply_form for comment as display_reply_form %}
         {% if display_reply_form and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
-            <li class="comment-child">{% render_anon_comment_form for object replying to comment %}</li>
+            {% include "comments/reply_form_container.html" %}
         {% endif %}
         {% endfor %}
     </ul>

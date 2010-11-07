@@ -31,7 +31,10 @@
             </blockquote>
             <ul class="comment-links">
                 {% if comment.parent and comments_enabled and not is_banned_from_commenting %}
-                    <li><a href="{% output_comment_reply_url for comment %}">Reply</a></li>
+                    <li class="reply-to-comment">
+                        <a class="open-comment-reply" href="{% output_comment_reply_url for comment %}" data-ajax-url="{% url osl_comments.views.get_ajax_reply_form obj_ctype_pk=object_ctype.pk obj_pk=object.pk comment_pk=comment.pk %}">Reply</a>
+                        <a class="close-comment-reply hidden" href="#">Close Reply</a>
+                    </li>
                 {% endif %}
                 {% if comment.user_id == request.user.id and comments_enabled and not is_banned_from_commenting %}
                     <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>

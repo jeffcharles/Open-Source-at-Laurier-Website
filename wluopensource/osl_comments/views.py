@@ -8,6 +8,7 @@ from django.contrib import comments as comment_app
 from django.contrib.comments.views import comments
 from django.contrib.comments.views.comments import CommentPostBadRequest
 from django.contrib.comments.views.utils import confirmation_view, next_redirect
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import (HttpResponse, HttpResponseBadRequest, 
     HttpResponseForbidden)
@@ -172,6 +173,16 @@ def flag(request, comment_id, next=None):
     perform_flag(request, comment)
     
     return HttpResponse(status=200)
+
+def get_ajax_reply_form(request, obj_ctype_pk, obj_pk, comment_pk):
+    obj_model = ContentType.objects.get(pk=obj_ctype_pk).model_class()
+    obj = obj_model.objects.get(pk=obj_pk)
+    comment = OslComment.objects.get(pk=comment_pk)
+    return render_to_response(
+        "comments/reply_form_container.html",
+        {'object': obj, 'comment': comment},
+        RequestContext(request)
+    )
 
 @require_POST
 @permission_required('comments.can_moderate')

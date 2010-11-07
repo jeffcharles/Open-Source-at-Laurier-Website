@@ -7,6 +7,7 @@ from django.contrib.comments.models import CommentFlag
 from django.contrib.comments.templatetags.comments import (BaseCommentNode, 
     CommentFormNode, CommentListNode, RenderCommentFormNode, 
     RenderCommentListNode)
+from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_unicode
@@ -264,6 +265,17 @@ class CommentPaginationPageNode(BaseCommentNode):
             
         context[self.as_varname] = comment_paginator.page(
             get_comment_page(context))
+        return ''
+        
+class ContentTypeNode(template.Node):
+
+    def __init__(self, object_expr, as_varname):
+        self.object_expr = object_expr
+        self.as_varname = as_varname
+        
+    def render(self, context):
+        obj = self.object_expr.resolve(context)
+        context[self.as_varname] = ContentType.objects.get_for_model(obj)
         return ''
 
 class EditUrlNode(AbstractUrlNode):
@@ -764,6 +776,27 @@ def get_flags_by_user_for_comments(parser, token):
         user=parser.compile_filter(tokens[2]),
         comments=parser.compile_filter(tokens[4]),
         as_varname=tokens[6]
+    )
+    
+@register.tag
+def get_object_ctype(parser, token):
+    """
+    Gets the given object's content type
+    
+    Syntax::
+    
+        {% get_object_ctype for [object] as [varname] %}
+    """
+    tokens = token.contents.split()
+    if len(tokens) != 5:
+        raise template.TemplateSyntaxError("%r tag requires four arguments" % tokens[0])
+    if tokens[1] != 'for':
+        raise template.TemplateSyntaxError("First argument for %r tag must be 'for'" % tokens[0])
+    if tokens[3] != 'as':
+        raise template.TemplateSyntaxError("Third argument for %r tag must be 'as'" % tokens[0])
+    return ContentTypeNode(
+        object_expr=parser.compile_filter(tokens[2]),
+        as_varname=tokens[4]
     )
     
 @register.tag
