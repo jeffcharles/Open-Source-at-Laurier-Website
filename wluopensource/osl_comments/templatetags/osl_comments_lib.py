@@ -289,6 +289,10 @@ class FlagsByUserForComments(template.Node):
         except TypeError: # if only got passed one comment
             comment_pk_list = [comments.pk]
         user = self.user.resolve(context)
+        
+        if not user.is_authenticated():
+            return ''
+        
         qs = CommentFlag.objects.filter(user=user, comment__in=comment_pk_list, flag=CommentFlag.SUGGEST_REMOVAL)
         flag_dictionary = dict([(item.comment.pk, True) for item in qs])
         for comment_pk in comment_pk_list:
