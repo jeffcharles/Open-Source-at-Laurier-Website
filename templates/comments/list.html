@@ -14,10 +14,12 @@
         {% if not comment_list.0.parent %}
             {% with first_comment_parent as comment %}
                 <li class="comment comment-pagination-parent">
+                    {% get_flags_by_user_for_comments by request.user for comment as flags %}
                     {% include "comments/comment.html" %}
                 </li>
             {% endwith %}
         {% endif %}
+        {% get_flags_by_user_for_comments by request.user for comment_list as flags %}
         {% for comment in comment_list %}
         <li class="comment{% if not comment.parent %} comment-child{% endif %}">
             {% include "comments/comment.html" %}

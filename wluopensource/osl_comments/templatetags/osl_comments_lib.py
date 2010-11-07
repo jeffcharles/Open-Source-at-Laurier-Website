@@ -3,6 +3,7 @@ import urlparse
 from django import template
 from django.conf import settings
 from django.contrib import comments
+from django.contrib.comments.models import CommentFlag
 from django.contrib.comments.templatetags.comments import (BaseCommentNode, 
     CommentFormNode, CommentListNode, RenderCommentFormNode, 
     RenderCommentListNode)
@@ -211,6 +212,19 @@ class AnonOslCommentFormNode(CommentFormNode):
             )
         
         raise template.TemplateSyntaxError("%r tag requires 4, 5, 7, or 8 arguments" % tokens[0])
+        
+class BoolEntryFromFlags(template.Node):
+    
+    def __init__(self, comment, flag_dict, as_varname):
+        self.comment = comment
+        self.flag_dict = flag_dict
+        self.as_varname = as_varname
+        
+    def render(self, context):
+        flag_dict = self.flag_dict.resolve(context)
+        comment = self.comment.resolve(context)
+        context[self.as_varname] = flag_dict.get(comment.pk, None)
+        return ''
 
 class CommentPaginationPageNode(BaseCommentNode):
     """Insert a comment pagination object into the context."""
@@ -255,6 +269,33 @@ class CommentPaginationPageNode(BaseCommentNode):
 class EditUrlNode(AbstractUrlNode):
     query_string_key = EDIT_QUERY_STRING_KEY
     type_of_object = 'Edit'
+    
+class FlagsByUserForComments(template.Node):
+    """
+    Returns a dictionary of booleans for whether the given comments are flagged.
+    """
+    
+    def __init__(self, user, comments, as_varname):
+        self.user = user
+        self.comments = comments
+        self.as_varname = as_varname
+        
+    def render(self, context):
+        comment_pk_list = []
+        comments = self.comments.resolve(context)
+        try:
+            for comment in comments:
+                comment_pk_list.append(comment.pk)
+        except TypeError: # if only got passed one comment
+            comment_pk_list = [comments.pk]
+        user = self.user.resolve(context)
+        qs = CommentFlag.objects.filter(user=user, comment__in=comment_pk_list, flag=CommentFlag.SUGGEST_REMOVAL)
+        flag_dictionary = dict([(item.comment.pk, True) for item in qs])
+        for comment_pk in comment_pk_list:
+            if comment_pk not in flag_dictionary:
+                flag_dictionary[comment_pk] = False
+        context[self.as_varname] = flag_dictionary
+        return ''
     
 class IsEditFormPresentNode(AbstractIsFormPresentNode):
     """Insert whether an edit form is displayed somewhere into the context."""
@@ -596,6 +637,29 @@ class UserIsBannedNode(template.Node):
             context[self.as_varname] = user_is_banned
             return ''
 
+@register.tag
+def bool_entry_from_flags(parser, token):
+    """
+    Get the boolean value out of the flags dictionary for whether this post was 
+    flagged.
+    
+    Syntax::
+    
+        {% bool_entry_from_flags [comment] from [flag_dict] as [varname] %}
+    """
+    tokens = token.contents.split()
+    if len(tokens) != 6:
+        raise template.TemplateSyntaxError("%r tag requires 5 arguments" % tokens[0])
+    if tokens[2] != 'from':
+        raise template.TemplateSyntaxError("Second argument in %r tag must be 'from'" % tokens[0])
+    if tokens[4] != 'as':
+        raise template.TemplateSyntaxError("Fourth argument in %r tag must be 'as'" % tokens[0])
+    return BoolEntryFromFlags(
+        comment=parser.compile_filter(tokens[1]), 
+        flag_dict=parser.compile_filter(tokens[3]), 
+        as_varname=tokens[5]
+    )
+
 @register.simple_tag
 def edit_comment_form_target():
     """
@@ -672,7 +736,32 @@ def get_edit_comment_form(parser, token):
         {% get_edit_comment_form for [comment] as [varname] %}
     """
     return OslEditCommentFormNode.handle_token(parser, token)
-        
+    
+@register.tag
+def get_flags_by_user_for_comments(parser, token):
+    """
+    Gets a dictionary where the key is the comment's primary key and the value
+    is a boolean representing whether the comment has been flagged by the user
+    
+    Syntax::
+    
+        {% get_flags_by_user_for_comments by [user] for [comment_list] as [varname] %}
+    """
+    tokens = token.contents.split()
+    if len(tokens) != 7:
+        raise template.TemplateSyntaxError("%r tag requires 6 arguments" % tokens[0])
+    if tokens[1] != 'by':
+        raise template.TemplateSyntaxError("First argument for %r tag must be 'by'" % tokens[0])
+    if tokens[3] != 'for':
+        raise template.TemplateSyntaxError("Third argument for %r tag must be 'for'" % tokens[0])
+    if tokens[5] != 'as':
+        raise template.TemplateSyntaxError("Fifth argument for %r tag must be 'as'" % tokens[0])
+    return FlagsByUserForComments(
+        user=parser.compile_filter(tokens[2]),
+        comments=parser.compile_filter(tokens[4]),
+        as_varname=tokens[6]
+    )
+    
 @register.tag
 def get_threaded_comment_list(parser, token):
     """
