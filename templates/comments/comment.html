@@ -37,7 +37,10 @@
                     <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
                 {% endif %}
                 {% if request.user.is_authenticated and comment.user_id == request.user.id %}
-                    <li><a href="{% url osl_comments.views.delete_comment comment.id %}">Delete</a></li>
+                    <li class="delete-comment comment-action-confirmation-required">
+                        <a href="{% url osl_comments.views.delete_comment comment.id %}">Delete</a>
+                        <span class="hidden action-confirmation">Are you sure? <a class="yes" href="{% url osl_comments.views.delete_comment comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
+                    </li>
                 {% endif %}
                 {% if request.user.is_authenticated and comment.user_id != request.user.id %}
                     {% if perms.comments.can_moderate %}

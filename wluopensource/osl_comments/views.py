@@ -51,7 +51,11 @@ def delete_comment(request, comment_id, next=None):
             comment = comment,
             request = request
         )
-        return next_redirect(request.POST.copy(), next, delete_by_user_done, 
+        if request.is_ajax():
+            return redirect('osl_comments.views.get_comment', 
+                comment_id=comment_id)
+        else:
+            return next_redirect(request.POST.copy(), next, delete_by_user_done, 
             c=comment.pk)
 
     # Render a form on GET

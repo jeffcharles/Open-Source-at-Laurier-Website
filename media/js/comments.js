@@ -14,6 +14,14 @@ $(document).ready(function() {
         return false;
     });
     
+    $("li.delete-comment > span.action-confirmation > a.yes").live('click', function() {
+        var clickedAnchor = $(this);
+        $.post(clickedAnchor.attr("href"), function(comment_html) {
+            clickedAnchor.closest("li.comment").html(comment_html);
+        });
+        return false;
+    });
+    
     $("li.flag-comment > span.action-confirmation > a.yes").live('click', function() {
         var clickedAnchor = $(this);
         var parentSpan = $(this).parent();
