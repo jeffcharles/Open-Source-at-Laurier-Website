@@ -2,12 +2,11 @@
 <a name="c{{ comment.id }}"></a>
 {% if not comment.is_removed and not comment.is_deleted_by_user %}
     <div class="comment-score">
-        {% dict_entry_for_item comment from comment_votes as vote %}
         {% url vote-comment object_id=comment.id direction='up' as upvote_url %}
         {% url vote-comment object_id=comment.id direction='clear' as clearvote_url %}
         {% url vote-comment object_id=comment.id direction='down' as downvote_url %}
         {% url get_comment_vote_box_template object_id=comment.id as vote_box_ajax_url %}
-        {% with comment.score as object_score %}
+        {% with comment_score as object_score %}
             {% include "voting/default_vote_box.html" %}
         {% endwith %}
     </div>

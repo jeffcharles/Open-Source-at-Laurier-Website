@@ -14,15 +14,22 @@
         {% if not comment_list.0.parent %}
             {% with first_comment_parent as comment %}
                 <li class="comment comment-pagination-parent">
-                    {% get_flags_by_user_for_comments by request.user for comment as flags %}
-                    {% include "comments/comment.html" %}
+                    {% score_for_object comment as comment_score %}
+                    {% with comment_score.score as comment_score %}
+                        {% vote_by_user request.user on comment as vote %}
+                        {% get_flags_by_user_for_comments by request.user for comment as flags %}
+                        {% include "comments/comment.html" %}
+                    {% endwith %}
                 </li>
             {% endwith %}
         {% endif %}
         {% get_flags_by_user_for_comments by request.user for comment_list as flags %}
         {% for comment in comment_list %}
         <li class="comment{% if not comment.parent %} comment-child{% endif %}">
-            {% include "comments/comment.html" %}
+            {% with comment.score as comment_score %}
+                {% dict_entry_for_item comment from comment_votes as vote %}
+                {% include "comments/comment.html" %}
+            {% endwith %}
         </li>
         {% should_display_reply_form for comment as display_reply_form %}
         {% if display_reply_form and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
