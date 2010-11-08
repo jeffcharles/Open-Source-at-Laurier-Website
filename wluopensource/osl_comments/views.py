@@ -83,6 +83,11 @@ def edit_comment(request, next=None):
     data = request.POST.copy()
     next = data.get('next', next)
     
+    # see if user wants to cancel
+    cancel = 'cancel' in data
+    if cancel:
+        return redirect(data['cancel_url'])
+    
     # get comment and raise error if id is wrong
     comment_id = data.get('comment_id')
     if comment_id is None:

@@ -1,3 +1,4 @@
+import urllib
 import urlparse
 
 from django import template
@@ -583,7 +584,23 @@ class RenderOslEditCommentNode(OslEditCommentFormNode):
                 "comments/edit_form.html"
             ]
             context.push()
-            formstr = render_to_string(template_search_list, {"form" : self.get_form(context)}, context)
+            
+            current_url = urlparse.urlparse(context['request'].get_full_path())
+            qs_dict = urlparse.parse_qs(current_url[4])
+            fragment = ''
+            if EDIT_QUERY_STRING_KEY in qs_dict:
+                fragment = ''.join(['c', qs_dict.get(EDIT_QUERY_STRING_KEY, '')[0]])
+                del qs_dict[EDIT_QUERY_STRING_KEY]
+            url = list(current_url)
+            url[4] = urllib.urlencode(qs_dict)
+            url[5] = fragment
+            cancel_url = urlparse.urlunparse(url)
+            
+            formstr = render_to_string(
+                template_search_list, 
+                {"form" : self.get_form(context), "cancel_url": cancel_url}, 
+                context
+            )
             context.pop()
             return formstr
         else:

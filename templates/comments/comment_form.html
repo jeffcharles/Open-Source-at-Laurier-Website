@@ -22,6 +22,10 @@
             <td></td><td>
                 <input type="submit" name="post" class="submit-post" value="Post" />
                 <input type="submit" name="preview" class="submit-preview" value="Preview" />
+                {% if cancel_url %}
+                    <input type="hidden" name="cancel_url" value="{{ cancel_url }}" />
+                    <input type="submit" name="cancel" class="submit-cancel" value="Cancel" />
+                {% endif %}
             </td><td></td>
         </tr>
     </table>

@@ -1,4 +1,11 @@
 $(document).ready(function() {
+
+    $("form.edit-comment input[name='cancel']").live('click', function() {
+        var commentContainer = $(this).closest("div.comment-nonscore");
+        commentContainer.children("form.edit-comment").addClass("hidden");
+        commentContainer.children("div.hidden").children("blockquote.comment-body, ul.comment-links").unwrap();
+        return false;
+    });
     
     $("li.comment-action-confirmation-required > a").live('click', function() {
         var clickedAnchor = $(this);
@@ -24,11 +31,19 @@ $(document).ready(function() {
     
     $("li.edit-comment > a").live('click', function() {
         var clickedAnchor = $(this);
-        $.get(clickedAnchor.attr("data-ajax-url"), function(edit_form_html) {
-            var commentContainer = clickedAnchor.closest("div.comment-nonscore");
-            commentContainer.children("blockquote.comment-body, ul.comment-links").wrapAll("<div class='hidden' />");
-            commentContainer.children("div.comment-header").after(edit_form_html);
-        });
+        var commentContainer = $(this).closest("div.comment-nonscore");
+        var editForm = commentContainer.children("form.edit-comment");
+        var commentBodyAndLinks = commentContainer.children("blockquote.comment-body, ul.comment-links");
+        var editFormExists = editForm.length;
+        if(editFormExists) {
+            commentBodyAndLinks.wrapAll("<div class='hidden' />");
+            editForm.removeClass("hidden");
+        } else {
+            $.get(clickedAnchor.attr("data-ajax-url"), function(edit_form_html) {
+                commentBodyAndLinks.wrapAll("<div class='hidden' />");
+                commentContainer.children("div.comment-header").after(edit_form_html);
+            });
+        }
         return false;
     });
     
