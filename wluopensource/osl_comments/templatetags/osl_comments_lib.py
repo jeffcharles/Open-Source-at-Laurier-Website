@@ -592,7 +592,7 @@ class RenderOslEditCommentNode(OslEditCommentFormNode):
                 fragment = ''.join(['c', qs_dict.get(EDIT_QUERY_STRING_KEY, '')[0]])
                 del qs_dict[EDIT_QUERY_STRING_KEY]
             url = list(current_url)
-            url[4] = urllib.urlencode(qs_dict)
+            url[4] = urllib.urlencode(qs_dict, True)
             url[5] = fragment
             cancel_url = urlparse.urlunparse(url)
             
