@@ -22,6 +22,16 @@ $(document).ready(function() {
         return false;
     });
     
+    $("li.edit-comment > a").live('click', function() {
+        var clickedAnchor = $(this);
+        $.get(clickedAnchor.attr("data-ajax-url"), function(edit_form_html) {
+            var commentContainer = clickedAnchor.closest("div.comment-nonscore");
+            commentContainer.children("blockquote.comment-body, ul.comment-links").wrapAll("<div class='hidden' />");
+            commentContainer.children("div.comment-header").after(edit_form_html);
+        });
+        return false;
+    });
+    
     $("li.flag-comment > span.action-confirmation > a.yes").live('click', function() {
         var clickedAnchor = $(this);
         var parentSpan = $(this).parent();

@@ -174,6 +174,14 @@ def flag(request, comment_id, next=None):
     
     return HttpResponse(status=200)
 
+def get_ajax_edit_form(request, comment_pk):
+    comment = OslComment.objects.get(pk=comment_pk)
+    return render_to_response(
+        "comments/render_edit_form.html",
+        {'comment': comment},
+        RequestContext(request)
+    )
+
 def get_ajax_reply_form(request, obj_ctype_pk, obj_pk, comment_pk):
     obj_model = ContentType.objects.get(pk=obj_ctype_pk).model_class()
     obj = obj_model.objects.get(pk=obj_pk)

@@ -37,7 +37,9 @@
                     </li>
                 {% endif %}
                 {% if comment.user_id == request.user.id and comments_enabled and not is_banned_from_commenting %}
-                    <li><a href="{% output_comment_edit_url for comment %}">Edit</a></li>
+                    <li class="edit-comment">
+                        <a href="{% output_comment_edit_url for comment %}" data-ajax-url="{% url osl_comments.views.get_ajax_edit_form comment_pk=comment.pk %}">Edit</a>
+                    </li>
                 {% endif %}
                 {% if request.user.is_authenticated and comment.user_id == request.user.id %}
                     <li class="delete-comment comment-action-confirmation-required">
