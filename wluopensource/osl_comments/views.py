@@ -153,7 +153,7 @@ def edit_comment(request, next=None):
         request = request
     )
     
-    return next_redirect(data, next, comment_edited, c=comment._get_pk_val())
+    return next_redirect(data, next, comment_edited)
 
 comment_edited = confirmation_view(
     template = "comments/edit_confirmed.html",

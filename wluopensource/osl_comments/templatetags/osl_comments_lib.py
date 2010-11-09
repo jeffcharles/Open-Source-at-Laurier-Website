@@ -585,10 +585,6 @@ class RenderOslEditCommentNode(OslEditCommentFormNode):
             ]
             context.push()
             
-            next_url = None
-            if context['request'].is_ajax():
-                next_url = context['request'].META['HTTP_REFERER']
-            
             current_url = urlparse.urlparse(context['request'].get_full_path())
             qs_dict = urlparse.parse_qs(current_url[4])
             fragment = ''
@@ -599,6 +595,12 @@ class RenderOslEditCommentNode(OslEditCommentFormNode):
             url[4] = urllib.urlencode(qs_dict, True)
             url[5] = fragment
             cancel_url = urlparse.urlunparse(url)
+            
+            next_url = None
+            if context['request'].is_ajax():
+                next_url = context['request'].META['HTTP_REFERER']
+            else:
+                next_url = cancel_url
             
             formstr = render_to_string(
                 template_search_list, 
