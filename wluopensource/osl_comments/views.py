@@ -71,11 +71,6 @@ delete_by_user_done = confirmation_view(
     doc = 'Displays a "comment was deleted" success page.'
 )
 
-def get_comment(request, comment_id):
-    comment = get_object_or_404(OslComment, pk=comment_id)
-    return render_to_response('comments/comment.html',
-        {'comment': comment}, context_instance=RequestContext(request))
-
 @login_required
 @require_POST
 def edit_comment(request, next=None):
@@ -196,6 +191,11 @@ def get_ajax_reply_form(request, obj_ctype_pk, obj_pk, comment_pk):
         {'object': obj, 'comment': comment},
         RequestContext(request)
     )
+
+def get_comment(request, comment_id):
+    comment = get_object_or_404(OslComment, pk=comment_id)
+    return render_to_response('comments/comment.html',
+        {'comment': comment}, context_instance=RequestContext(request))
 
 @require_POST
 @permission_required('comments.can_moderate')
