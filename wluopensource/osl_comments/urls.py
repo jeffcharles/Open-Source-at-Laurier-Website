@@ -15,6 +15,7 @@ urlpatterns += patterns('osl_comments.views',
     (r'^ip_address_ban_update_done/$', 'update_ip_address_ban_done'),
     (r'^moderate/(?P<comment_id>\d+)/$', 'moderate'),
     url(r'^ocr/(\d+)/(.+)/$', 'redirect_view', name='osl-comments-url-redirect'),
+    (r'^post2/$', 'post_comment'),
     (r'^reply_form/(?P<obj_ctype_pk>\d+)/(?P<obj_pk>\d+)/(?P<comment_pk>\d+)/$', 
         'get_ajax_reply_form')
 )

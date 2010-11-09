@@ -488,6 +488,40 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode,
 
         raise template.TemplateSyntaxError("%r tag requires 2, 3, 5, or 6 arguments" % tokens[0])
         
+    def render(self, context):
+        ctype, object_pk = self.get_target_ctype_pk(context)
+        if object_pk:
+            template_search_list = [
+                "comments/%s/%s/form.html" % (ctype.app_label, ctype.model),
+                "comments/%s/form.html" % ctype.app_label,
+                "comments/form.html"
+            ]
+            context.push()
+            
+            current_url = urlparse.urlparse(context['request'].get_full_path())
+            qs_dict = urlparse.parse_qs(current_url[4])
+            fragment = ''
+            if REPLY_QUERY_STRING_KEY in qs_dict:
+                fragment = ''.join(['c', qs_dict.get(REPLY_QUERY_STRING_KEY, '')[0]])
+                del qs_dict[REPLY_QUERY_STRING_KEY]
+            url = list(current_url)
+            url[4] = urllib.urlencode(qs_dict, True)
+            url[5] = fragment
+            cancel_url = urlparse.urlunparse(url)
+            
+            next_url = None
+            if context['request'].is_ajax():
+                next_url = context['request'].META['HTTP_REFERER']
+            else:
+                next_url = cancel_url
+                
+            formstr = render_to_string(template_search_list, 
+                {"form" : self.get_form(context), "next": next_url}, context)
+            context.pop()
+            return formstr
+        else:
+            return ''
+            
 class RenderOslCommentListNode(OslCommentListNode):
     """Render the comment list directly"""
     

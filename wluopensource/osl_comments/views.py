@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import comments as comment_app
 from django.contrib.comments.views import comments
-from django.contrib.comments.views.comments import CommentPostBadRequest
+from django.contrib.comments.views.comments import CommentPostBadRequest, comment_done
 from django.contrib.comments.views.utils import confirmation_view, next_redirect
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -210,6 +210,17 @@ def moderate(request, comment_id, next=None):
     perform_delete(request, comment)
     
     return redirect('osl_comments.views.get_comment', comment_id=comment_id)
+
+@csrf_protect
+@require_POST
+def post_comment(request, next=None, using=None):
+    """Wraps Django's post_comment view to handle the redirect better."""
+    response = comments.post_comment(request, next, using)
+    if response.status_code == 302:
+        data = request.POST.copy()
+        return next_redirect(data, next, comment_done)
+    else:
+        return response
 
 def redirect_view(request, content_type_id, object_id):
     """
