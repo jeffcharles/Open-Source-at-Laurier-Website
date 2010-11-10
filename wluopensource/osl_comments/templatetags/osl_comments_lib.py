@@ -495,7 +495,10 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode,
             ]
             context.push()
             
-            next_url = context['request'].get_full_path()
+            if not context['request'].is_ajax():
+                next_url = context['request'].get_full_path()
+            else:
+                next_url = context['request'].META['HTTP_REFERER']
             
             formstr = render_to_string(template_search_list, 
                 {"form" : self.get_form(context), "next": next_url}, context)
