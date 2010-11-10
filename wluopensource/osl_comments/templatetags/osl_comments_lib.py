@@ -17,14 +17,11 @@ import osl_comments
 from osl_comments.forms import AnonOslCommentForm, AuthOslCommentForm, OslEditCommentForm
 from osl_comments.models import (CommentsBannedFromIpAddress, 
     CommentsPerPageForContentType, OslComment)
+from osl_comments.templatetags import (EDIT_QUERY_STRING_KEY, 
+    PAGE_QUERY_STRING_KEY, REPLY_QUERY_STRING_KEY, SORT_BY_QUERY_STRING_KEY)
 from osl_comments.views import NO_PAGINATION_QUERY_STRING_KEY
 
 register = template.Library()
-
-EDIT_QUERY_STRING_KEY = 'edit_comment'
-PAGE_QUERY_STRING_KEY = 'comment_page'
-REPLY_QUERY_STRING_KEY = 'reply_to_comment'
-SORT_BY_QUERY_STRING_KEY = 'sort_comments_by'
 
 class AbstractIsFormPresentNode(template.Node):
     form_query_string_key = None
@@ -498,23 +495,8 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode,
             ]
             context.push()
             
-            current_url = urlparse.urlparse(context['request'].get_full_path())
-            qs_dict = urlparse.parse_qs(current_url[4])
-            fragment = ''
-            if REPLY_QUERY_STRING_KEY in qs_dict:
-                fragment = ''.join(['c', qs_dict.get(REPLY_QUERY_STRING_KEY, '')[0]])
-                del qs_dict[REPLY_QUERY_STRING_KEY]
-            url = list(current_url)
-            url[4] = urllib.urlencode(qs_dict, True)
-            url[5] = fragment
-            cancel_url = urlparse.urlunparse(url)
+            next_url = context['request'].get_full_path()
             
-            next_url = None
-            if context['request'].is_ajax():
-                next_url = context['request'].META['HTTP_REFERER']
-            else:
-                next_url = cancel_url
-                
             formstr = render_to_string(template_search_list, 
                 {"form" : self.get_form(context), "next": next_url}, context)
             context.pop()

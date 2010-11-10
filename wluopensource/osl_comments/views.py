@@ -20,6 +20,8 @@ from django.views.decorators.http import require_POST
 from osl_comments import signals
 from osl_comments.forms import OslEditCommentForm
 from osl_comments.models import CommentsBannedFromIpAddress, OslComment
+from osl_comments.templatetags import (EDIT_QUERY_STRING_KEY, 
+    REPLY_QUERY_STRING_KEY)
 
 NO_PAGINATION_QUERY_STRING_KEY = 'np'
 
@@ -216,11 +218,26 @@ def moderate(request, comment_id, next=None):
 def post_comment(request, next=None, using=None):
     """Wraps Django's post_comment view to handle the redirect better."""
     response = comments.post_comment(request, next, using)
+    
     if response.status_code == 302:
-        data = request.POST.copy()
-        return next_redirect(data, next, comment_done)
-    else:
-        return response
+        # Move the comment pk in the query string to the URL fragment 
+        # (and clear out delete and reply key values pairs as well)
+        redirect_location = response['location']
+        redirect_url = list(urlparse.urlparse(redirect_location))
+        redirect_qs = urlparse.parse_qs(redirect_url[4])
+        comment_pk = ''
+        if 'c' in redirect_qs:
+            comment_pk = redirect_qs['c'][0]
+            del redirect_qs['c']
+        if EDIT_QUERY_STRING_KEY in redirect_qs:
+            del redirect_qs[EDIT_QUERY_STRING_KEY]
+        if REPLY_QUERY_STRING_KEY in redirect_qs:
+            del redirect_qs[REPLY_QUERY_STRING_KEY]
+        redirect_url[4] = urllib.urlencode(redirect_qs, True)
+        redirect_url[5] = ''.join(['c', comment_pk])
+        response['location'] = urlparse.urlunparse(redirect_url)
+    
+    return response
 
 def redirect_view(request, content_type_id, object_id):
     """
