@@ -217,6 +217,10 @@ def moderate(request, comment_id, next=None):
 @require_POST
 def post_comment(request, next=None, using=None):
     """Wraps Django's post_comment view to handle the redirect better."""
+    data = request.POST.copy()
+    if 'cancel' in data:
+        return redirect(data['cancel_url'])
+    
     response = comments.post_comment(request, next, using)
     
     if response.status_code == 302:

@@ -500,8 +500,21 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode,
             else:
                 next_url = context['request'].META['HTTP_REFERER']
             
+            cancel_url = None
+            if self.parent_comment:
+                url = list(urlparse.urlparse(next_url))
+                url_qs = urlparse.parse_qs(url[4])
+                if REPLY_QUERY_STRING_KEY in url_qs:
+                    del url_qs[REPLY_QUERY_STRING_KEY]
+                url[4] = urllib.urlencode(url_qs, True)
+                parent_comment = self.parent_comment.resolve(context)
+                url[5] = ''.join(['c', str(parent_comment.pk)])
+                cancel_url = urlparse.urlunparse(url)
+            
             formstr = render_to_string(template_search_list, 
-                {"form" : self.get_form(context), "next": next_url}, context)
+                {"form" : self.get_form(context), "next": next_url, 
+                "cancel_url": cancel_url}, 
+                context)
             context.pop()
             return formstr
         else:
