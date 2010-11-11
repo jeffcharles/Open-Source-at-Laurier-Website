@@ -7,6 +7,17 @@ $(document).ready(function() {
         return false;
     });
     
+    $("form.post-comment input[name='cancel']").live('click', function() {
+        var replyLi = $(this).closest("li.comment-reply-form");
+        replyLi.addClass("hidden");
+        
+        var parentLi = replyLi.prev();
+        parentLi.find("a.close-comment-reply").addClass("hidden");
+        parentLi.find("a.open-comment-reply").removeClass("hidden");
+        
+        return false;
+    });
+    
     $("li.comment-action-confirmation-required > a").live('click', function() {
         var clickedAnchor = $(this);
         clickedAnchor.addClass("hidden");
@@ -66,9 +77,10 @@ $(document).ready(function() {
     });
     
     $("li.reply-to-comment > a.close-comment-reply").live('click', function() {
-        $("li.comment-reply-form").remove();
-        
         var clickedLink = $(this);
+        
+        clickedLink.closest("li.comment").next("li.comment-reply-form").addClass("hidden");
+        
         clickedLink.addClass("hidden");
         clickedLink.siblings("a.open-comment-reply").removeClass("hidden");
         
@@ -76,15 +88,22 @@ $(document).ready(function() {
     });
     
     $("li.reply-to-comment > a.open-comment-reply").live('click', function() {
-        $("li.comment-reply-form").remove();
+        $("li.comment-reply-form").addClass("hidden");
         $("a.close-comment-reply").addClass("hidden");
         $("a.open-comment-reply").removeClass("hidden");
         
         var clickedReplyLink = $(this);
         
-        $.get(clickedReplyLink.attr("data-ajax-url"), function(reply_form_html) {
-            clickedReplyLink.closest("li.comment").after(reply_form_html);
-        });
+        var commentLi = clickedReplyLink.closest("li.comment");
+        var replyForm = commentLi.next("li.comment-reply-form");
+        var replyFormExists = replyForm.length > 0;
+        if(replyFormExists) {
+            replyForm.removeClass("hidden");
+        } else {
+            $.get(clickedReplyLink.attr("data-ajax-url"), function(reply_form_html) {
+                commentLi.after(reply_form_html);
+            });
+        }
         
         clickedReplyLink.addClass("hidden");
         clickedReplyLink.siblings("a.close-comment-reply").removeClass("hidden");
