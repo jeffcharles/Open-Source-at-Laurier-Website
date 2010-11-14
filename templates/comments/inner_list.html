@@ -1,0 +1,19 @@
+{% load osl_comments_lib voting_tags %}
+{% user_is_banned_from_commenting as is_banned_from_commenting %}
+{% votes_by_user request.user on comment_list as comment_votes %}
+{% get_flags_by_user_for_comments by request.user for comment_list as flags %}
+{% for comment in comment_list %}
+<li class="comment{% if not comment.parent %} comment-child{% endif %}">
+    {% with comment.score as comment_score %}
+        {% dict_entry_for_item comment from comment_votes as vote %}
+        {% include "comments/comment.html" %}
+    {% endwith %}
+</li>
+{% should_display_reply_form for comment as display_reply_form %}
+{% if display_reply_form and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
+    {% include "comments/reply_form_container.html" %}
+{% endif %}
+{% endfor %}
+{% if display_load_more %}
+    <div class="load-more-comments hidden"><a href="{% url osl_comments.views.load_more object_ctype_pk object_pk sorted_by next_comment_page %}">Load More Comments...</a></div>
+{% endif %}

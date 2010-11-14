@@ -1,5 +1,22 @@
 $(document).ready(function() {
 
+    (function() {
+        if($("div.comment-pagination").children("a[rel='next']").length > 0) {
+            $("div.load-more-comments").removeClass("hidden");
+            $("div.comment-pagination").remove();
+        }
+    })();
+    
+    $("div.load-more-comments > a").live('click', function() {
+        var loadMoreElement = $(this).parent();
+        $.get($(this).attr("href"), function(commentListHtml) {
+            loadMoreElement.after(commentListHtml);
+            loadMoreElement.remove();
+            $("div.load-more-comments").removeClass("hidden");
+        });
+        return false;
+    });
+
     $("form.edit-comment input[name='cancel']").live('click', function() {
         var commentContainer = $(this).closest("div.comment-nonscore");
         commentContainer.children("form.edit-comment").addClass("hidden");

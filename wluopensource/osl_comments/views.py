@@ -14,12 +14,14 @@ from django.http import (HttpResponse, HttpResponseBadRequest,
     HttpResponseForbidden)
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext, loader
+from django.utils.encoding import smart_unicode
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 
 from osl_comments import signals
 from osl_comments.forms import OslEditCommentForm
-from osl_comments.models import CommentsBannedFromIpAddress, OslComment
+from osl_comments.models import (CommentsBannedFromIpAddress, 
+    CommentsPerPageForContentType, OslComment)
 from osl_comments.templatetags import (EDIT_QUERY_STRING_KEY, 
     REPLY_QUERY_STRING_KEY)
 
@@ -198,6 +200,42 @@ def get_comment(request, comment_id):
     comment = get_object_or_404(OslComment, pk=comment_id)
     return render_to_response('comments/comment.html',
         {'comment': comment}, context_instance=RequestContext(request))
+
+def load_more(request, obj_ctype_pk, obj_pk, order_method, page_to_load):
+    """Renders a list of comments."""
+    
+    page_to_load = int(page_to_load)
+    
+    obj_ctype = ContentType.objects.get(pk=obj_ctype_pk)
+    
+    comment_list = list(OslComment.objects.get_comments(obj_ctype, obj_pk, 
+        order_method, True, page_to_load))
+    
+    comment_count = OslComment.objects.filter(
+            content_type = obj_ctype,
+            object_pk = smart_unicode(obj_pk),
+            site__pk = settings.SITE_ID,
+            is_public = True,
+            inline_to_object = False
+        ).count()
+    num_comments_per_page = CommentsPerPageForContentType.objects.get_comments_per_page_for_content_type(
+        obj_ctype)
+    display_load_more = False
+    if num_comments_per_page * page_to_load < comment_count:
+        display_load_more = True
+    
+    return render_to_response(
+        'comments/inner_list.html', 
+        {
+            'comment_list': comment_list, 
+            'display_load_more': display_load_more,
+            'sorted_by': order_method, 
+            'object_ctype_pk': obj_ctype_pk, 
+            'object_pk': obj_pk, 
+            'next_comment_page': page_to_load + 1
+        },
+        RequestContext(request)
+    )
 
 @require_POST
 @permission_required('comments.can_moderate')

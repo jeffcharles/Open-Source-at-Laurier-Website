@@ -8,6 +8,7 @@ from django.db import models
 
 import markdown
 
+import osl_comments
 from osl_comments.signals import (comment_was_deleted_by_user,
     comment_was_edited, ip_address_ban_was_updated)
 import settings
@@ -42,18 +43,18 @@ class OslCommentManager(models.Manager):
         """
         ctype - content type (integer)
         object_pk - object primary key (string)
-        order_method - one of: latest, score, oldest
+        order_method - one of the order by constants set in __init__.py
         paginate - whether or not to paginate the comments (boolean)
         current_comment_page - the current page number
         """
         
-        if order_method == 'latest':
+        if order_method == osl_comments.ORDER_BY_NEWEST:
             first_order_by = 'thread_submit_date DESC'
             second_order_by = 'submit_date DESC'
-        elif order_method == 'score':
+        elif order_method == osl_comments.ORDER_BY_SCORE:
             first_order_by = 'parent_score DESC'
             second_order_by = 'score DESC'
-        elif order_method == 'oldest':
+        elif order_method == osl_comments.ORDER_BY_OLDEST:
             first_order_by = 'thread_submit_date ASC'
             second_order_by = 'submit_date ASC'
         else:

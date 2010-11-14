@@ -90,7 +90,7 @@ class AbstractShouldDisplayFormNode(template.Node):
             context['request'].GET.get(self.query_string_key) == str(comment.id)
         return ''
 
-class AbstractSortByUrlNode(template.Node):
+class AbstractSortByQsNode(template.Node):
     sort_by_value = None
     
     @classmethod
@@ -342,14 +342,14 @@ class OslCommentListNode(CommentListNode):
         
         sorted_by = context['request'].GET.get(SORT_BY_QUERY_STRING_KEY)
         
-        if sorted_by == SortByNewestUrlNode.sort_by_value:
-            order_method = 'latest'
-        elif sorted_by == SortByScoreUrlNode.sort_by_value:
-            order_method = 'score'
-        elif sorted_by == SortByOldestUrlNode.sort_by_value:
-            order_method = 'oldest'
+        if sorted_by == SortByNewestQsNode.sort_by_value:
+            order_method = osl_comments.ORDER_BY_NEWEST
+        elif sorted_by == SortByScoreQsNode.sort_by_value:
+            order_method = osl_comments.ORDER_BY_SCORE
+        elif sorted_by == SortByOldestQsNode.sort_by_value:
+            order_method = osl_comments.ORDER_BY_OLDEST
         else:
-            order_method = 'latest'
+            order_method = osl_comments.ORDER_BY_NEWEST
             
         qs = self.comment_model.objects.get_comments(ctype, object_pk,
             sorted_by, is_paginated(context), get_comment_page(context))
@@ -585,7 +585,10 @@ class RenderOslCommentListNode(OslCommentListNode):
                 "comment_list" : comment_list,
                 "comments_enabled" : self.comments_enabled.resolve(context),
                 "first_comment_parent": first_comment_parent,
-                "object": self.object_expr.resolve(context)
+                "object": self.object_expr.resolve(context),
+                "display_load_more": True,
+                "sorted_by": context['request'].GET.get(SORT_BY_QUERY_STRING_KEY,
+                    osl_comments.ORDER_BY_NEWEST)
             }, context)
             context.pop()
             return liststr
@@ -670,14 +673,14 @@ class ShouldDisplayReplyFormNode(AbstractShouldDisplayFormNode):
             context[self.as_varname] = False
         return ''
         
-class SortByNewestUrlNode(AbstractSortByUrlNode):
-    sort_by_value = 'newest'
+class SortByNewestQsNode(AbstractSortByQsNode):
+    sort_by_value = osl_comments.ORDER_BY_NEWEST
     
-class SortByOldestUrlNode(AbstractSortByUrlNode):
-    sort_by_value = 'oldest'
+class SortByOldestQsNode(AbstractSortByQsNode):
+    sort_by_value = osl_comments.ORDER_BY_OLDEST
     
-class SortByScoreUrlNode(AbstractSortByUrlNode):
-    sort_by_value = 'score'
+class SortByScoreQsNode(AbstractSortByQsNode):
+    sort_by_value = osl_comments.ORDER_BY_SCORE
         
 class UserIsBannedNode(template.Node):
     """Insert whether the current user is banned from commenting."""
@@ -974,37 +977,37 @@ def output_previous_comment_page_url(parser, token):
     return PreviousPageUrlNode.handle_token(parser, token)
 
 @register.tag
-def output_sort_by_newest_url(parser, token):
+def output_sort_by_newest_qs(parser, token):
     """
     Output the URL to sort the comments by descending date
     
     Syntax::
         
-        {% output_sort_by_newest_url %}
+        {% output_sort_by_newest_qs %}
     """
-    return SortByNewestUrlNode.handle_token(parser, token)
+    return SortByNewestQsNode.handle_token(parser, token)
     
 @register.tag
-def output_sort_by_oldest_url(parser, token):
+def output_sort_by_oldest_qs(parser, token):
     """
     Output the URL to sort the comments by ascending date
     
     Syntax::
         
-        {% output_sort_by_oldest_url %}
+        {% output_sort_by_oldest_qs %}
     """
-    return SortByOldestUrlNode.handle_token(parser, token)
+    return SortByOldestQsNode.handle_token(parser, token)
     
 @register.tag
-def output_sort_by_score_url(parser, token):
+def output_sort_by_score_qs(parser, token):
     """
     Output the URL to sort the comments by descending score
     
     Syntax::
     
-        {% output_sort_by_score_url %}
+        {% output_sort_by_score_qs %}
     """
-    return SortByScoreUrlNode.handle_token(parser, token)
+    return SortByScoreQsNode.handle_token(parser, token)
 
 @register.tag
 def render_anon_comment_form(parser, token):

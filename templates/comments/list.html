@@ -4,15 +4,14 @@
 {% else %}
     Sort by:
     <ul id="comment-sorting-links">
-        <li><a href="{% output_sort_by_newest_url %}">Newest</a></li>
-        <li><a href="{% output_sort_by_score_url %}">Highest score</a></li>
-        <li><a href="{% output_sort_by_oldest_url %}">Oldest</a></li>
+        <li><a href="{% output_sort_by_newest_qs %}">Newest</a></li>
+        <li><a href="{% output_sort_by_score_qs %}">Highest score</a></li>
+        <li><a href="{% output_sort_by_oldest_qs %}">Oldest</a></li>
     </ul>
-    {% user_is_banned_from_commenting as is_banned_from_commenting %}
-    {% votes_by_user request.user on comment_list as comment_votes %}
     {% get_object_ctype for object as object_ctype %}
     <ul id="comment-list">
         {% if not comment_list.0.parent %}
+            {% user_is_banned_from_commenting as is_banned_from_commenting %}
             {% with first_comment_parent as comment %}
                 <li class="comment comment-pagination-parent">
                     {% score_for_object comment as comment_score %}
@@ -24,28 +23,24 @@
                 </li>
             {% endwith %}
         {% endif %}
-        {% get_flags_by_user_for_comments by request.user for comment_list as flags %}
-        {% for comment in comment_list %}
-        <li class="comment{% if not comment.parent %} comment-child{% endif %}">
-            {% with comment.score as comment_score %}
-                {% dict_entry_for_item comment from comment_votes as vote %}
-                {% include "comments/comment.html" %}
+        {% with object_ctype.pk as object_ctype_pk %}
+            {% with object.pk as object_pk %}
+                {% with 2 as next_comment_page %}
+                    {% include "comments/inner_list.html" %}
+                {% endwith %}
             {% endwith %}
-        </li>
-        {% should_display_reply_form for comment as display_reply_form %}
-        {% if display_reply_form and not comment.is_removed and not comment.is_deleted_by_user and not is_banned_from_commenting %}
-            {% include "comments/reply_form_container.html" %}
-        {% endif %}
-        {% endfor %}
+        {% endwith %}
     </ul>
-    {% get_comment_paginator_page for object as comment_page %}
-    {% if comment_page.has_previous %}
-        <a href="{% output_previous_comment_page_url with comment_page %}">Previous</a>
-    {% endif %}
-    {% if comment_page.has_previous or comment_page.has_next %}
-        Page {{ comment_page.number }} of {{ comment_page.paginator.num_pages }}
-    {% endif %}
-    {% if comment_page.has_next %}
-        <a href="{% output_next_comment_page_url with comment_page %}">Next</a>
-    {% endif %}
+    <div class="comment-pagination">
+        {% get_comment_paginator_page for object as comment_page %}
+        {% if comment_page.has_previous %}
+            <a href="{% output_previous_comment_page_url with comment_page %}" rel="prev">Previous</a>
+        {% endif %}
+        {% if comment_page.has_previous or comment_page.has_next %}
+            Page {{ comment_page.number }} of {{ comment_page.paginator.num_pages }}
+        {% endif %}
+        {% if comment_page.has_next %}
+            <a href="{% output_next_comment_page_url with comment_page %}" rel="next">Next</a>
+        {% endif %}
+    </div>
 {% endif %}
