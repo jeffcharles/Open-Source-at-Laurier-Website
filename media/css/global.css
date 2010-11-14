@@ -223,6 +223,12 @@ form th.comment-column-header {
     vertical-align: top;
 }
 
+form th.comment-column-header > p {
+    font-size: 80%;
+    padding-top: 10px;
+    width: 100px;
+}
+
 form tr.error {
     background-color: #DE9988;
 }
