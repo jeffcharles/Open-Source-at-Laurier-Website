@@ -219,6 +219,10 @@ form th {
     text-align: right;
 }
 
+form th.comment-column-header {
+    vertical-align: top;
+}
+
 form tr.error {
     background-color: #DE9988;
 }
