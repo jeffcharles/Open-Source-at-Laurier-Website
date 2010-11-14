@@ -53,6 +53,7 @@ $(document).ready(function() {
             $.get(clickedAnchor.attr("data-ajax-url"), function(edit_form_html) {
                 commentBodyAndLinks.wrapAll("<div class='hidden' />");
                 commentContainer.children("div.comment-header").after(edit_form_html);
+                commentContainer.children("div.comment-header").next().find("textarea[name='comment']").markdownPreview();
             });
         }
         return false;
@@ -102,6 +103,7 @@ $(document).ready(function() {
         } else {
             $.get(clickedReplyLink.attr("data-ajax-url"), function(reply_form_html) {
                 commentLi.after(reply_form_html);
+                commentLi.next().find("textarea[name='comment']").markdownPreview();
             });
         }
         
@@ -110,5 +112,7 @@ $(document).ready(function() {
         
         return false;
     });
+    
+    $("textarea[name='comment']").markdownPreview();
     
 });

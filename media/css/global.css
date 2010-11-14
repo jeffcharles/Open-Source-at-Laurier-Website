@@ -171,6 +171,12 @@ body {
     margin-bottom: 2px;
 }
 
+div.preview {
+    background-color: #EEEEEE;
+    border: 1px dashed #000000;
+    min-height: 49px;
+}
+
 .downvote-arrow {
     background-image: url('/media/images/comment-arrows/down-arrow-default.png');
 }
