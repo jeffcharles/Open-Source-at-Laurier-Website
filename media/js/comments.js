@@ -53,7 +53,9 @@ $(document).ready(function() {
             $.get(clickedAnchor.attr("data-ajax-url"), function(edit_form_html) {
                 commentBodyAndLinks.wrapAll("<div class='hidden' />");
                 commentContainer.children("div.comment-header").after(edit_form_html);
-                commentContainer.children("div.comment-header").next().find("textarea[name='comment']").markdownPreview();
+                var editForm = commentContainer.children("div.comment-header").next();
+                editForm.find("textarea[name='comment']").markdownPreview();
+                editForm.find("input[name='preview']").remove();
             });
         }
         return false;
@@ -103,7 +105,9 @@ $(document).ready(function() {
         } else {
             $.get(clickedReplyLink.attr("data-ajax-url"), function(reply_form_html) {
                 commentLi.after(reply_form_html);
-                commentLi.next().find("textarea[name='comment']").markdownPreview();
+                var replyForm = commentLi.next();
+                replyForm.find("textarea[name='comment']").markdownPreview();
+                replyForm.find("input[name='preview']").remove();
             });
         }
         
@@ -114,5 +118,6 @@ $(document).ready(function() {
     });
     
     $("textarea[name='comment']").markdownPreview();
+    $("input[name='preview']").remove();
     
 });
