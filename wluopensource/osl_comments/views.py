@@ -157,7 +157,10 @@ def edit_comment(request, next=None):
         request = request
     )
     
-    return next_redirect(data, next, comment_edited)
+    if request.is_ajax():
+        return redirect('osl_comments.views.get_comment', comment_id=comment.pk)
+    else:
+        return next_redirect(data, next, comment_edited)
 
 comment_edited = confirmation_view(
     template = "comments/edit_confirmed.html",
@@ -199,7 +202,9 @@ def get_ajax_reply_form(request, obj_ctype_pk, obj_pk, comment_pk):
 def get_comment(request, comment_id):
     comment = get_object_or_404(OslComment, pk=comment_id)
     return render_to_response('comments/comment.html',
-        {'comment': comment}, context_instance=RequestContext(request))
+        {'comment': comment, 'comments_enabled': True, 
+        'comment_parent': comment.parent_comment == None}, 
+        context_instance=RequestContext(request))
 
 def load_more(request, obj_ctype_pk, obj_pk, order_method, page_to_load):
     """Renders a list of comments."""

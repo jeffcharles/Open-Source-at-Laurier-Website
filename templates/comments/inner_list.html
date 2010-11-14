@@ -6,7 +6,9 @@
 <li class="comment{% if not comment.parent %} comment-child{% endif %}">
     {% with comment.score as comment_score %}
         {% dict_entry_for_item comment from comment_votes as vote %}
-        {% include "comments/comment.html" %}
+        {% with comment.parent as comment_parent %}
+            {% include "comments/comment.html" %}
+        {% endwith %}
     {% endwith %}
 </li>
 {% should_display_reply_form for comment as display_reply_form %}

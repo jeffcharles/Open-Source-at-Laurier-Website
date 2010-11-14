@@ -24,6 +24,14 @@ $(document).ready(function() {
         return false;
     });
     
+    $("form.edit-comment input[name='post']").live('click', function() {
+        var editForm = $(this).closest("form.edit-comment");
+        $.post(editForm.attr("action"), editForm.serialize(), function(commentHtml) {
+            editForm.closest("li.comment").html(commentHtml);
+        });
+        return false;
+    });
+    
     $("form.post-comment input[name='cancel']").live('click', function() {
         var replyLi = $(this).closest("li.comment-reply-form");
         replyLi.addClass("hidden");
