@@ -575,7 +575,7 @@ class RenderOslCommentListNode(OslCommentListNode):
             context.push()
             
             comment_list = self.get_context_value_from_queryset(context, qs)
-            if not comment_list[0].parent:
+            if len(comment_list) > 0 and not comment_list[0].parent:
                 first_comment_parent = \
                     OslComment.objects.get(pk=comment_list[0].parent_comment_id)
             else:
