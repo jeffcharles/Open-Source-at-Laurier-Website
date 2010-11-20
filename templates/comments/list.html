@@ -1,4 +1,8 @@
 {% load osl_comments_lib voting_tags %}
+{% if flash.comment_response %}
+    <p class="flash">{{ flash.comment_response }}</p>
+{% endif %}
+<p class="flash hidden comment-posted-successfully">Your comment has been successfully posted</p>
 {% if not comment_list %}
     <p>There does not appear to be anything here.</p>
 {% else %}
@@ -44,3 +48,7 @@
         {% endif %}
     </div>
 {% endif %}
+<script type="text/javascript">
+    var commentSortMethod = "{{ sorted_by }}";
+    var userLoggedIn = {% if request.user.is_authenticated %}true{% else %}false{% endif %} // use for UI only! not for actual auth check
+</script>

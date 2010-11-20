@@ -2,17 +2,17 @@ $(document).ready(function() {
 
     (function() {
         if($("div.comment-pagination").children("a[rel='next']").length > 0) {
-            $("div.load-more-comments").removeClass("hidden");
+            $("li.load-more-comments").removeClass("hidden");
             $("div.comment-pagination").remove();
         }
     })();
     
-    $("div.load-more-comments > a").live('click', function() {
+    $("li.load-more-comments > a").live('click', function() {
         var loadMoreElement = $(this).parent();
         $.get($(this).attr("href"), function(commentListHtml) {
             loadMoreElement.after(commentListHtml);
             loadMoreElement.remove();
-            $("div.load-more-comments").removeClass("hidden");
+            $("li.load-more-comments").removeClass("hidden");
         });
         return false;
     });
@@ -39,6 +39,107 @@ $(document).ready(function() {
         var parentLi = replyLi.prev();
         parentLi.find("a.close-comment-reply").addClass("hidden");
         parentLi.find("a.open-comment-reply").removeClass("hidden");
+        
+        return false;
+    });
+    
+    $("form.post-comment input[name='post']").live('click', function() {
+        // figure out if this is a reply form or a post form
+        if($(this).closest("li.comment-reply-form").length > 0) {
+            // reply form
+            var commentReplyForm = $(this).closest("form");
+            var commentReplyFormLi = commentReplyForm.closest("li.comment-reply-form");
+            $.post(commentReplyForm.attr("action"), commentReplyForm.serialize(), function(commentHtml) {
+                var loadMorePresentInThread = (function() {
+                    var loadMoreExists = $("li.load-more-comments:not(:hidden)").length > 0;
+                    var entriesUntilEndOfThread = commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").length;
+                    var entriesUntilLoadMore = commentReplyFormLi.nextUntil("li.load-more-comments").length;
+                    return loadMoreExists && entriesUntilEndOfThread > entriesUntilLoadMore;
+                });
+                if(commentSortMethod == "newest") {
+                    var loadMoreIsNextElement = commentReplyFormLi.next("li.load-more-comments:not(:hidden)").length > 0;
+                    if(!loadMoreIsNextElement) {
+                        commentReplyFormLi.after("<li class='comment comment-child' />").next().append(commentHtml);
+                    } else {
+                        $("p.comment-posted-successfully").removeClass("hidden");
+                    }
+                } else if(commentSortMethod == "oldest") {
+                    if(!loadMorePresentInThread()) {
+                        commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").last().after("<li class='comment comment-child' />").next().append(commentHtml);
+                    } else {
+                        $("p.comment-posted-successfully").removeClass("hidden");
+                    }
+                } else if(commentSortMethod == "score") {
+                    var shouldDisplayComment = false;
+                    var elementToDisplayBelow = commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").last();
+                    
+                    var scoreToAppearAbove = (userLoggedIn) ? 1 : 0;
+                    commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").each(function(i, element) {
+                    element = $(element);
+                        if(parseInt(element.find("span.score-sum").html()) <= scoreToAppearAbove) {
+                            shouldDisplayComment = true;
+                            elementToDisplayBelow = element.prev();
+                            return false;
+                        }
+                    });
+                    
+                    if(!shouldDisplayComment) {
+                        shouldDisplayComment = !loadMorePresentInThread();
+                    }
+                    
+                    if(shouldDisplayComment) {
+                        elementToDisplayBelow.after("<li class='comment comment-child' />").next().append(commentHtml);
+                    } else {
+                        $("p.comment-posted-successfully").removeClass("hidden");
+                    }
+                } else {
+                    throw "Need to set which comment sort method has been used by assigning a value to commentSortMethod";
+                }
+                
+                var parentLi = commentReplyFormLi.prev();
+                parentLi.find("a.close-comment-reply").addClass("hidden");
+                parentLi.find("a.open-comment-reply").removeClass("hidden");
+                commentReplyFormLi.remove();
+            });
+        } else {
+            // post form
+            var commentForm = $(this).closest("form");
+            $.post(commentForm.attr("action"), commentForm.serialize(), function(commentHtml) {
+                if(commentSortMethod == "newest") {
+                    $("li.comment:first").before("<li class='comment' />").prev().append(commentHtml);
+                } else if(commentSortMethod == "oldest") {
+                    var loadMorePresent = $("li.load-more-comments:not('.hidden')").length > 0;
+                    if(!loadMorePresent) {
+                        $("li.comment:last").after("<li class='comment' />").next().append(commentHtml);
+                    } else {
+                        $("p.comment-posted-successfully").removeClass("hidden");
+                    }
+                } else if(commentSortMethod == "score") {
+                    var shouldDisplayComment = false;
+                    var elementToDisplayAbove;
+                    
+                    var scoreToAppearAbove = (userLoggedIn) ? 1 : 0;
+                    $("li.comment:not(.comment-child)").each(function(i, element) {
+                        element = $(element);
+                        if(parseInt(element.find("span.score-sum").html()) <= scoreToAppearAbove) {
+                            shouldDisplayComment = true;
+                            elementToDisplayAbove = element;
+                            return false;
+                        }
+                    });
+                    
+                    if(shouldDisplayComment) {
+                        elementToDisplayAbove.before("<li class='comment' />").prev().append(commentHtml);
+                    } else {
+                        $("p.comment-posted-successfully").removeClass("hidden");
+                    }
+                } else {
+                    throw "Need to set which comment sort method has been used by assigning a value to commentSortMethod";
+                }
+                
+                commentForm.find("textarea[name='comment']").val("");
+            });
+        }
         
         return false;
     });

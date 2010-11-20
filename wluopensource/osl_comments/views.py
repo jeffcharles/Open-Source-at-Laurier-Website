@@ -284,7 +284,10 @@ def post_comment(request, next=None, using=None):
         redirect_url[5] = ''.join(['c', comment_pk])
         response['location'] = urlparse.urlunparse(redirect_url)
     
-    return response
+    if request.is_ajax():
+        return redirect(get_comment, comment_id=comment_pk)
+    else:
+        return response
 
 def redirect_view(request, content_type_id, object_id):
     """
