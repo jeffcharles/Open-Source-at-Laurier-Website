@@ -33,6 +33,34 @@
     margin: 20px 0px 20px 0px;
 }
 
+blockquote.comment-body, div.preview {
+    line-height: 120%;
+}
+
+blockquote.comment-body blockquote, div.preview blockquote {
+    border-left: 5px solid #FF6600;
+    padding-left: 5px;
+}
+
+blockquote.comment-body code, blockquote.comment-body pre, div.preview code, div.preview pre {
+    background-color: #DDDDDD;
+    padding: 2px;
+}
+
+blockquote.comment-body h1, div.preview h1 {
+    border-bottom: none;
+}
+
+blockquote.comment-body li, div.preview li {
+    border-bottom: none !important;
+    margin-bottom: 6px !important;
+    padding: 0px !important;
+}
+
+blockquote.comment-body ul, div.preview ul {
+    list-style-type: disc !important;
+}
+
 body {
     background-color: #999999;
     color: #FFFFFF;
