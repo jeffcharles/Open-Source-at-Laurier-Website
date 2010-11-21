@@ -38,9 +38,11 @@
             }
             
             var converter = new Showdown.converter();
-            $this.bind('keyup.markdown-preview', function() {
+            var updatePreview = function() {
                 previewElement.html(converter.makeHtml($this.val()));
-            });
+            };
+            $this.bind('keyup.markdown-preview', updatePreview);
+            $this.bind('change.markdown-preview', updatePreview);
         });
         
     };
