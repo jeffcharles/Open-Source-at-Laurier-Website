@@ -324,12 +324,22 @@ p.error {
 }
 
 p.flash {
-    background-color: #FFFF99;
+    background-color: #DEFFDD;
+    border-radius: 10px;
     font-weight: bold;
     margin: auto;
+    -moz-border-radius: 10px;
     padding: 5px;
     text-align: center;
-    width: 75%;
+    -webkit-border-radius: 10px;
+    width: 50%;
+}
+
+p.flash.comment-posted-successfully {
+    position: fixed;
+    left: 25%;
+    top: 40px;
+    z-index: 2;
 }
 
 #primary-navbar {
