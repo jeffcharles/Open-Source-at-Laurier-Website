@@ -36,6 +36,10 @@ $(document).ready(function() {
         var replyLi = $(this).closest("li.comment-reply-form");
         replyLi.addClass("hidden");
         
+        var commentTextArea = replyLi.find("textarea[name='comment']");
+        commentTextArea.val("");
+        commentTextArea.trigger("change");
+        
         var parentLi = replyLi.prev();
         parentLi.find("a.close-comment-reply").addClass("hidden");
         parentLi.find("a.open-comment-reply").removeClass("hidden");
@@ -266,8 +270,13 @@ $(document).ready(function() {
     
     $("li.reply-to-comment > a.close-comment-reply").live('click', function() {
         var clickedLink = $(this);
+        var commentForm = clickedLink.closest("li.comment").next("li.comment-reply-form");
         
-        clickedLink.closest("li.comment").next("li.comment-reply-form").addClass("hidden");
+        commentForm.addClass("hidden");
+        
+        var commentTextArea = commentForm.find("textarea[name='comment']");
+        commentTextArea.val("");
+        commentTextArea.trigger("change");
         
         clickedLink.addClass("hidden");
         clickedLink.siblings("a.open-comment-reply").removeClass("hidden");
