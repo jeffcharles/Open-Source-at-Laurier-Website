@@ -49,10 +49,14 @@ $(document).ready(function() {
         
         $.post(commentForm.attr("action"), commentForm.serialize(), function(commentHtml) {
             var commentReplyFormLi;
+            var commentHasChildren;
             var loadMorePresentInThread;
             var commentWrapper;
             if(isReplyForm) {
                 commentReplyFormLi = commentForm.closest("li.comment-reply-form");
+                commentHasChildren = function() {
+                    return commentReplyFormLi.next("li.comment-child").length > 0;
+                };
                 loadMorePresentInThread = function() {
                     var loadMoreExists = $("li.load-more-comments:not(:hidden)").length > 0;
                     var entriesUntilEndOfThread = commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").length;
@@ -67,32 +71,38 @@ $(document).ready(function() {
             if(commentSortMethod == "newest" && isReplyForm) {
                 var loadMoreIsNextElement = commentReplyFormLi.next("li.load-more-comments:not(:hidden)").length > 0;
                 if(!loadMoreIsNextElement) {
-                    commentReplyFormLi.after(commentWrapper).next().append(commentHtml);
+                    $(commentHtml).insertAfter(commentReplyFormLi).wrapAll(commentWrapper);
                 } else {
                     $("p.comment-posted-successfully").removeClass("hidden");
                 }
             } else if(commentSortMethod == "newest") {
-                $("li.comment:first").before(commentWrapper).prev().append(commentHtml);
+                $(commentHtml).insertBefore("li.comment:first").wrapAll(commentWrapper);
             } else if(commentSortMethod == "oldest" && isReplyForm) {
                 if(!loadMorePresentInThread()) {
-                    commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").last().after(commentWrapper).next().append(commentHtml);
+                    if(commentHasChildren()) {
+                        $(commentHtml).insertBefore(commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").next()).wrapAll(commentWrapper);
+                    } else {
+                        $(commentHtml).insertAfter(commentReplyFormLi).wrapAll(commentWrapper);
+                    }
                 } else {
                     $("p.comment-posted-successfully").removeClass("hidden");
                 }
             } else if(commentSortMethod == "oldest") {
                 var loadMorePresent = $("li.load-more-comments:not('.hidden')").length > 0;
                 if(!loadMorePresent) {
-                    $("li.comment:last").after(commentWrapper).next().append(commentHtml);
+                    $(commentHtml).insertAfter("li.comment:last").wrapAll(commentWrapper);
                 } else {
                     $("p.comment-posted-successfully").removeClass("hidden");
                 }
             } else if(commentSortMethod == "score" && isReplyForm) {
                 var shouldDisplayComment = false;
-                var elementToDisplayBelow = commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").last();
+                var elementToDisplayBelow = (commentHasChildren()) ? 
+                    commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").last() : 
+                    commentReplyFormLi;
                 
                 var scoreToAppearAbove = (userLoggedIn) ? 1 : 0;
                 commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").each(function(i, element) {
-                element = $(element);
+                    element = $(element);
                     if(parseInt(element.find("span.score-sum").html()) <= scoreToAppearAbove) {
                         shouldDisplayComment = true;
                         elementToDisplayBelow = element.prev();
@@ -105,7 +115,7 @@ $(document).ready(function() {
                 }
                 
                 if(shouldDisplayComment) {
-                    elementToDisplayBelow.after(commentWrapper).next().append(commentHtml);
+                    $(commentHtml).insertAfter(elementToDisplayBelow).wrapAll(commentWrapper);
                 } else {
                     $("p.comment-posted-successfully").removeClass("hidden");
                 }
@@ -124,7 +134,7 @@ $(document).ready(function() {
                 });
                 
                 if(shouldDisplayComment) {
-                    elementToDisplayAbove.before(commentWrapper).prev().append(commentHtml);
+                    $(commentHtml).insertBefore(elementToDisplayAbove).wrapAll(commentWrapper);
                 } else {
                     $("p.comment-posted-successfully").removeClass("hidden");
                 }
