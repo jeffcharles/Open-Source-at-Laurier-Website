@@ -21,6 +21,9 @@ $(document).ready(function() {
         var commentContainer = $(this).closest("div.comment-nonscore");
         commentContainer.children("form.edit-comment").addClass("hidden");
         commentContainer.children("div.hidden").children("blockquote.comment-body, ul.comment-links").unwrap();
+        var commentTextArea = commentContainer.find("textarea[name='comment']");
+        commentTextArea.val(commentContainer.find("div.initial-comment").html());
+        commentTextArea.trigger("change");
         return false;
     });
     
@@ -245,7 +248,9 @@ $(document).ready(function() {
                 commentBodyAndLinks.wrapAll("<div class='hidden' />");
                 commentContainer.children("div.comment-header").after(edit_form_html);
                 var editForm = commentContainer.children("div.comment-header").next();
-                editForm.find("textarea[name='comment']").markdownPreview();
+                var commentTextArea = editForm.find("textarea[name='comment']");
+                commentTextArea.markdownPreview();
+                $("<div class='hidden initial-comment' />").insertAfter(commentTextArea).append(commentTextArea.val());
                 editForm.find("input[name='preview']").remove();
             });
         }
