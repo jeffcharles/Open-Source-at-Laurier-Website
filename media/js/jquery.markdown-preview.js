@@ -41,6 +41,7 @@
             var updatePreview = function() {
                 previewElement.html(converter.makeHtml($this.val()));
             };
+            updatePreview();
             $this.bind('keyup.markdown-preview', updatePreview);
             $this.bind('change.markdown-preview', updatePreview);
         });
