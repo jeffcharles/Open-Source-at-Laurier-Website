@@ -67,13 +67,16 @@ $(document).ready(function() {
             } else {
                 commentWrapper = "<li class='comment' />";
             }
+            var showCommentPostedMessage = function() {
+                $("p.comment-posted-successfully").removeClass("hidden");
+            };
             
             if(commentSortMethod == "newest" && isReplyForm) {
                 var loadMoreIsNextElement = commentReplyFormLi.next("li.load-more-comments:not(:hidden)").length > 0;
                 if(!loadMoreIsNextElement) {
                     $(commentHtml).insertAfter(commentReplyFormLi).wrapAll(commentWrapper);
                 } else {
-                    $("p.comment-posted-successfully").removeClass("hidden");
+                    showCommentPostedMessage();
                 }
             } else if(commentSortMethod == "newest") {
                 $(commentHtml).insertBefore("li.comment:first").wrapAll(commentWrapper);
@@ -85,7 +88,7 @@ $(document).ready(function() {
                         $(commentHtml).insertAfter(commentReplyFormLi).wrapAll(commentWrapper);
                     }
                 } else {
-                    $("p.comment-posted-successfully").removeClass("hidden");
+                    showCommentPostedMessage();
                 }
             } else if(commentSortMethod == "oldest") {
                 var loadMorePresent = $("li.load-more-comments:not('.hidden')").length > 0;
@@ -117,7 +120,7 @@ $(document).ready(function() {
                 if(shouldDisplayComment) {
                     $(commentHtml).insertAfter(elementToDisplayBelow).wrapAll(commentWrapper);
                 } else {
-                    $("p.comment-posted-successfully").removeClass("hidden");
+                    showCommentPostedMessage();
                 }
             } else if(commentSortMethod == "score") {
                 var shouldDisplayComment = false;
@@ -136,7 +139,7 @@ $(document).ready(function() {
                 if(shouldDisplayComment) {
                     $(commentHtml).insertBefore(elementToDisplayAbove).wrapAll(commentWrapper);
                 } else {
-                    $("p.comment-posted-successfully").removeClass("hidden");
+                    showCommentPostedMessage();
                 }
             } else {
                 throw "Need to set which comment sort method has been used by assigning a value to commentSortMethod";
