@@ -36,6 +36,7 @@ $(document).ready(function() {
         var replyLi = $(this).closest("li.comment-reply-form");
         replyLi.addClass("hidden");
         
+        replyLi.find("input[type='text']").val("");
         var commentTextArea = replyLi.find("textarea[name='comment']");
         commentTextArea.val("");
         commentTextArea.trigger("change");
@@ -275,6 +276,7 @@ $(document).ready(function() {
         
         commentForm.addClass("hidden");
         
+        commentForm.find("input[type='text']").val("");
         var commentTextArea = commentForm.find("textarea[name='comment']");
         commentTextArea.val("");
         commentTextArea.trigger("change");
