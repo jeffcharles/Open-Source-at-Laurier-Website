@@ -198,6 +198,7 @@ $(document).ready(function() {
                 parentLi.find("a.open-comment-reply").removeClass("hidden");
                 commentReplyFormLi.remove();
             } else {
+                commentForm.find("input[type='text']").val("");
                 var commentTextArea = commentForm.find("textarea[name='comment']");
                 commentTextArea.val("");
                 commentTextArea.trigger("change");
