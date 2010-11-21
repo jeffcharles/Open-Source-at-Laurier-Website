@@ -48,15 +48,102 @@ $(document).ready(function() {
         var commentForm = $(this).closest("form");
         
         $.post(commentForm.attr("action"), commentForm.serialize(), function(commentHtml) {
+            var commentPlacementDelegates = {
+            
+                replyAndNewest: function(commentHtml, commentWrapper, commentReplyFormLi) {
+                    var loadMoreIsNextElement = commentReplyFormLi.next("li.load-more-comments:not(:hidden)").length > 0;
+                    if(!loadMoreIsNextElement) {
+                        $(commentHtml).insertAfter(commentReplyFormLi).wrapAll(commentWrapper);
+                        return;
+                    }
+                    showCommentPostedMessage();
+                },
+                
+                postAndNewest: function(commentHtml, commentWrapper) {
+                    $(commentHtml).insertBefore("li.comment:first").wrapAll(commentWrapper);
+                },
+                
+                replyAndOldest: function(commentHtml, commentWrapper, showCommentPostedMessage, commentReplyFormLi, loadMorePresentInThread, commentHasChildren) {
+                
+                    if(!loadMorePresentInThread()) {
+                        if(commentHasChildren) {
+                            $(commentHtml).insertAfter(commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").last()).wrapAll(commentWrapper);
+                            return;
+                        }
+                        $(commentHtml).insertAfter(commentReplyFormLi).wrapAll(commentWrapper);
+                        return;
+                    }
+                    showCommentPostedMessage();
+                },
+                
+                postAndOldest: function(commentHtml, commentWrapper, showCommentPostedMessage) {
+                    var loadMorePresent = $("li.load-more-comments:not('.hidden')").length > 0;
+                    if(!loadMorePresent) {
+                        $(commentHtml).insertAfter("li.comment:last").wrapAll(commentWrapper);
+                        return;
+                    }
+                    showCommentPostedMessage();
+                },
+                
+                replyAndScore: function(commentHtml, commentWrapper, showCommentPostedMessage, commentReplyFormLi, commentHasChildren, loadMorePresentInThread, userLoggedIn) {
+                
+                    var shouldDisplayComment = false;
+                    var elementToDisplayBelow = (commentHasChildren) ? 
+                        commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").last() : 
+                        commentReplyFormLi;
+                    
+                    var scoreToAppearAbove = (userLoggedIn) ? 1 : 0;
+                    commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").each(function(i, element) {
+                        element = $(element);
+                        if(parseInt(element.find("span.score-sum").html()) <= scoreToAppearAbove) {
+                            shouldDisplayComment = true;
+                            elementToDisplayBelow = element.prev();
+                            return false;
+                        }
+                    });
+                    
+                    if(!shouldDisplayComment) {
+                        shouldDisplayComment = !loadMorePresentInThread();
+                    }
+                    
+                    if(shouldDisplayComment) {
+                        $(commentHtml).insertAfter(elementToDisplayBelow).wrapAll(commentWrapper);
+                        return;
+                    }
+                    showCommentPostedMessage();
+                },
+                
+                postAndScore: function(commentHtml, commentWrapper, showCommentPostedMessage, userLoggedIn) {
+                
+                    var shouldDisplayComment = false;
+                    var elementToDisplayAbove;
+                    
+                    var scoreToAppearAbove = (userLoggedIn) ? 1 : 0;
+                    $("li.comment:not(.comment-child)").each(function(i, element) {
+                        element = $(element);
+                        if(parseInt(element.find("span.score-sum").html()) <= scoreToAppearAbove) {
+                            shouldDisplayComment = true;
+                            elementToDisplayAbove = element;
+                            return false;
+                        }
+                    });
+                    
+                    if(shouldDisplayComment) {
+                        $(commentHtml).insertBefore(elementToDisplayAbove).wrapAll(commentWrapper);
+                        return;
+                    }
+                    showCommentPostedMessage();
+                }
+            };
+            
+            // variable setup
             var commentReplyFormLi;
             var commentHasChildren;
             var loadMorePresentInThread;
             var commentWrapper;
             if(isReplyForm) {
                 commentReplyFormLi = commentForm.closest("li.comment-reply-form");
-                commentHasChildren = function() {
-                    return commentReplyFormLi.next("li.comment-child").length > 0;
-                };
+                commentHasChildren = commentReplyFormLi.next("li.comment-child").length > 0;
                 loadMorePresentInThread = function() {
                     var loadMoreExists = $("li.load-more-comments:not(:hidden)").length > 0;
                     var entriesUntilEndOfThread = commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").length;
@@ -71,80 +158,36 @@ $(document).ready(function() {
                 $("p.comment-posted-successfully").removeClass("hidden");
             };
             
-            if(commentSortMethod == "newest" && isReplyForm) {
-                var loadMoreIsNextElement = commentReplyFormLi.next("li.load-more-comments:not(:hidden)").length > 0;
-                if(!loadMoreIsNextElement) {
-                    $(commentHtml).insertAfter(commentReplyFormLi).wrapAll(commentWrapper);
-                } else {
-                    showCommentPostedMessage();
+            // pick method based on sort order and whether this is a post or reply
+            (function() {
+                if(commentSortMethod == "newest" && isReplyForm) {
+                    commentPlacementDelegates.replyAndNewest(commentHtml, commentWrapper, commentReplyFormLi);
+                    return;
                 }
-            } else if(commentSortMethod == "newest") {
-                $(commentHtml).insertBefore("li.comment:first").wrapAll(commentWrapper);
-            } else if(commentSortMethod == "oldest" && isReplyForm) {
-                if(!loadMorePresentInThread()) {
-                    if(commentHasChildren()) {
-                        $(commentHtml).insertBefore(commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").next()).wrapAll(commentWrapper);
-                    } else {
-                        $(commentHtml).insertAfter(commentReplyFormLi).wrapAll(commentWrapper);
-                    }
-                } else {
-                    showCommentPostedMessage();
+                if(commentSortMethod == "newest" && !isReplyForm) {
+                    commentPlacementDelegates.postAndNewest(commentHtml, commentWrapper);
+                    return;
                 }
-            } else if(commentSortMethod == "oldest") {
-                var loadMorePresent = $("li.load-more-comments:not('.hidden')").length > 0;
-                if(!loadMorePresent) {
-                    $(commentHtml).insertAfter("li.comment:last").wrapAll(commentWrapper);
-                } else {
-                    $("p.comment-posted-successfully").removeClass("hidden");
+                if(commentSortMethod == "oldest" && isReplyForm) {
+                    commentPlacementDelegates.replyAndOldest(commentHtml, commentWrapper, showCommentPostedMessage, commentReplyFormLi, loadMorePresentInThread, commentHasChildren);
+                    return;
                 }
-            } else if(commentSortMethod == "score" && isReplyForm) {
-                var shouldDisplayComment = false;
-                var elementToDisplayBelow = (commentHasChildren()) ? 
-                    commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").last() : 
-                    commentReplyFormLi;
-                
-                var scoreToAppearAbove = (userLoggedIn) ? 1 : 0;
-                commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").each(function(i, element) {
-                    element = $(element);
-                    if(parseInt(element.find("span.score-sum").html()) <= scoreToAppearAbove) {
-                        shouldDisplayComment = true;
-                        elementToDisplayBelow = element.prev();
-                        return false;
-                    }
-                });
-                
-                if(!shouldDisplayComment) {
-                    shouldDisplayComment = !loadMorePresentInThread();
+                if(commentSortMethod == "oldest" && !isReplyForm) {
+                    commentPlacementDelegates.postAndOldest(commentHtml, commentWrapper, showCommentPostedMessage);
+                    return;
                 }
-                
-                if(shouldDisplayComment) {
-                    $(commentHtml).insertAfter(elementToDisplayBelow).wrapAll(commentWrapper);
-                } else {
-                    showCommentPostedMessage();
+                if(commentSortMethod == "score" && isReplyForm) {
+                    commentPlacementDelegates.replyAndScore(commentHtml, commentWrapper, showCommentPostedMessage, commentReplyFormLi, commentHasChildren, loadMorePresentInThread, userLoggedIn);
+                    return;
                 }
-            } else if(commentSortMethod == "score") {
-                var shouldDisplayComment = false;
-                var elementToDisplayAbove;
-                
-                var scoreToAppearAbove = (userLoggedIn) ? 1 : 0;
-                $("li.comment:not(.comment-child)").each(function(i, element) {
-                    element = $(element);
-                    if(parseInt(element.find("span.score-sum").html()) <= scoreToAppearAbove) {
-                        shouldDisplayComment = true;
-                        elementToDisplayAbove = element;
-                        return false;
-                    }
-                });
-                
-                if(shouldDisplayComment) {
-                    $(commentHtml).insertBefore(elementToDisplayAbove).wrapAll(commentWrapper);
-                } else {
-                    showCommentPostedMessage();
+                if(commentSortMethod == "score" && !isReplyForm) {
+                    commentPlacementDelegates.postAndScore(commentHtml, commentWrapper, showCommentPostedMessage, userLoggedIn);
+                    return;
                 }
-            } else {
                 throw "Need to set which comment sort method has been used by assigning a value to commentSortMethod";
-            }
+            })();
             
+            // clean up form
             if(isReplyForm) {
                 var parentLi = commentReplyFormLi.prev();
                 parentLi.find("a.close-comment-reply").addClass("hidden");
