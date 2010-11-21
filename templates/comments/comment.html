@@ -32,7 +32,7 @@
             <ul class="comment-links">
                 {% if comment_parent and comments_enabled and not is_banned_from_commenting %}
                     <li class="reply-to-comment">
-                        <a class="open-comment-reply" href="{% output_comment_reply_url for comment %}" data-ajax-url="{% url osl_comments.views.get_ajax_reply_form obj_ctype_pk=comment.content_type.pk obj_pk=comment.object_pk comment_pk=comment.pk %}">Reply</a>
+                        <a class="open-comment-reply" href="{% output_comment_reply_url for comment %}" data-ajax-url="{% url osl_comments.views.get_ajax_reply_form obj_ctype_pk=comment.content_type_id obj_pk=comment.object_pk comment_pk=comment.pk %}">Reply</a>
                         <a class="close-comment-reply hidden" href="#">Close Reply</a>
                     </li>
                 {% endif %}
