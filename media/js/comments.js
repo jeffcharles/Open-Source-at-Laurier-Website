@@ -52,10 +52,22 @@ $(document).ready(function() {
     });
     
     $("form.post-comment input[name='post']").live('click', function() {
+        var isInCommentList = $(this).closest("section#comments").length > 0;
+        if(!isInCommentList) {
+            return true;
+        }
+        
         var isReplyForm = $(this).closest("li.comment-reply-form").length > 0;
         var commentForm = $(this).closest("form");
         
         $.post(commentForm.attr("action"), commentForm.serialize(), function(commentHtml) {
+            // check to see if this is an error page and load it into content if it is
+            var isFullPage = $(commentHtml).find("div#content").length > 0;
+            if(isFullPage) {
+                $("div#content").html($(commentHtml).find("div#content").html());
+                return false;
+            }
+            
             var commentPlacementDelegates = {
             
                 replyAndNewest: function(commentHtml, commentWrapper, commentReplyFormLi) {
