@@ -65,6 +65,8 @@ $(document).ready(function() {
             var isFullPage = $(commentHtml).find("div#content").length > 0;
             if(isFullPage) {
                 $("div#content").html($(commentHtml).find("div#content").html());
+                $("textarea[name='comment']").markdownPreview();
+                $("input[name='preview']").remove();
                 return false;
             }
             
