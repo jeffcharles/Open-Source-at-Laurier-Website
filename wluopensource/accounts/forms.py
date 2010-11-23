@@ -6,7 +6,7 @@ from django.forms import ModelForm
 from accounts.models import UserProfile
 
 class OslUserCreationForm(UserCreationForm):
-    email = forms.EmailField(required=False)
+    email = forms.EmailField()
     
     def save(self, commit=True):
         user = super(OslUserCreationForm, self).save(commit=False)

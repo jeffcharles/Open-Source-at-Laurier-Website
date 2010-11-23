@@ -36,7 +36,7 @@ urlpatterns = patterns('',
     
     url('^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
         {'sitemaps': sitemaps}),
-    (r'^social_registration', include('socialregistration.urls')),
+    (r'^social_registration', include('osl_socialregistration.urls')),
     url(r'^terms/$', 'osl_flatpages.views.get', {'page': 'Terms'}, 
         name="terms"),
 )
