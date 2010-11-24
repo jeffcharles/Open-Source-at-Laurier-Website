@@ -140,6 +140,7 @@ INSTALLED_APPS = (
     'notification',
     'osl_comments',
     'osl_flatpages',
+    'osl_voting',
     'socialregistration',
     'tagging',
     'voting'
