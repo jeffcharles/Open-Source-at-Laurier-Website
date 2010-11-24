@@ -18,6 +18,8 @@ from django.utils.encoding import smart_unicode
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 
+from voting.models import Vote
+
 from osl_comments import signals
 from osl_comments.forms import OslEditCommentForm
 from osl_comments.models import (CommentsBannedFromIpAddress, 
@@ -203,7 +205,9 @@ def get_comment(request, comment_id):
     comment = get_object_or_404(OslComment, pk=comment_id)
     return render_to_response('comments/comment.html',
         {'comment': comment, 'comments_enabled': True, 
-        'comment_parent': comment.parent_comment == None}, 
+        'comment_parent': comment.parent_comment == None,
+        'comment_score': Vote.objects.get_score(comment)['score'],
+        'vote': Vote.objects.get_for_user(comment, request.user)}, 
         context_instance=RequestContext(request))
 
 def load_more(request, obj_ctype_pk, obj_pk, order_method, page_to_load):
