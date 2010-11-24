@@ -48,19 +48,6 @@ class OslCommentManager(models.Manager):
         current_comment_page - the current page number
         """
         
-        if order_method == osl_comments.ORDER_BY_NEWEST:
-            first_order_by = 'thread_submit_date DESC'
-            second_order_by = 'submit_date DESC'
-        elif order_method == osl_comments.ORDER_BY_SCORE:
-            first_order_by = 'parent_score DESC'
-            second_order_by = 'score DESC'
-        elif order_method == osl_comments.ORDER_BY_OLDEST:
-            first_order_by = 'thread_submit_date ASC'
-            second_order_by = 'submit_date ASC'
-        else:
-            first_order_by = 'thread_submit_date DESC'
-            second_order_by = 'submit_date DESC'
-        
         num_comments_per_page = CommentsPerPageForContentType.objects.get_comments_per_page_for_content_type(
             ctype)
         
@@ -245,18 +232,43 @@ class OslCommentManager(models.Manager):
                     oc2.inline_to_object = False AND
                     oc2.parent_comment_id IS NOT NULL
                 ) AS t
-            ORDER BY
-                %(first_thread_order_by)s,
-                thread_id ASC,
-                parent DESC,
-                %(second_thread_order_by)s
         """ % {
             'content_type': ctype.id,
             'object_pk': "'%s'" % object_pk,
-            'site_id': settings.SITE_ID,
-            'first_thread_order_by': first_order_by,
-            'second_thread_order_by': second_order_by
+            'site_id': settings.SITE_ID
         }
+        
+        if order_method == osl_comments.ORDER_BY_SCORE:
+            get_threaded_comments_sql += """
+                ORDER BY
+                    parent_score DESC,
+                    thread_submit_date DESC,
+                    thread_id ASC,
+                    parent DESC,
+                    score DESC,
+                    submit_date DESC
+            """
+        else:
+            if order_method == osl_comments.ORDER_BY_NEWEST:
+                first_order_by = 'thread_submit_date DESC'
+                second_order_by = 'submit_date DESC'
+            elif order_method == osl_comments.ORDER_BY_OLDEST:
+                first_order_by = 'thread_submit_date ASC'
+                second_order_by = 'submit_date ASC'
+            else:
+                first_order_by = 'thread_submit_date DESC'
+                second_order_by = 'submit_date DESC'
+            
+            get_threaded_comments_sql += """
+                ORDER BY
+                    %(first_thread_order_by)s,
+                    thread_id ASC,
+                    parent DESC,
+                    %(second_thread_order_by)s
+            """ % {
+                'first_thread_order_by': first_order_by,
+                'second_thread_order_by': second_order_by
+            }
         
         limit_sql = """
             LIMIT
