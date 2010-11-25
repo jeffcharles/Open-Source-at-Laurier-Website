@@ -2,7 +2,7 @@ $(document).ready(function() {
 
     (function() {
         if($("div.comment-pagination").children("a[rel='next']").length > 0) {
-            $("li.load-more-comments").removeClass("hidden");
+            $("li.load-more-comments").show();
             $("div.comment-pagination").remove();
         }
     })();
@@ -12,15 +12,15 @@ $(document).ready(function() {
         $.get($(this).attr("href"), function(commentListHtml) {
             loadMoreElement.after(commentListHtml);
             loadMoreElement.remove();
-            $("li.load-more-comments").removeClass("hidden");
+            $("li.load-more-comments").show();
         });
         return false;
     });
 
     $("form.edit-comment input[name='cancel']").live('click', function() {
         var commentContainer = $(this).closest("div.comment-nonscore");
-        commentContainer.children("form.edit-comment").addClass("hidden");
-        commentContainer.children("div.hidden").children("blockquote.comment-body, ul.comment-links").unwrap();
+        commentContainer.children("form.edit-comment").hide();
+        commentContainer.children("div:hidden").children("blockquote.comment-body, ul.comment-links").unwrap();
         var commentTextArea = commentContainer.find("textarea[name='comment']");
         commentTextArea.val(commentContainer.find("div.initial-comment").html());
         commentTextArea.trigger("change");
@@ -37,7 +37,7 @@ $(document).ready(function() {
     
     $("form.post-comment input[name='cancel']").live('click', function() {
         var replyLi = $(this).closest("li.comment-reply-form");
-        replyLi.addClass("hidden");
+        replyLi.hide();
         
         replyLi.find("input[type='text']").val("");
         var commentTextArea = replyLi.find("textarea[name='comment']");
@@ -45,8 +45,8 @@ $(document).ready(function() {
         commentTextArea.trigger("change");
         
         var parentLi = replyLi.prev();
-        parentLi.find("a.close-comment-reply").addClass("hidden");
-        parentLi.find("a.open-comment-reply").removeClass("hidden");
+        parentLi.find("a.close-comment-reply").hide();
+        parentLi.find("a.open-comment-reply").show();
         
         return false;
     });
@@ -99,7 +99,7 @@ $(document).ready(function() {
                 },
                 
                 postAndOldest: function(commentHtml, commentWrapper, showCommentPostedMessage) {
-                    var loadMorePresent = $("li.load-more-comments:not('.hidden')").length > 0;
+                    var loadMorePresent = $("li.load-more-comments:not(:hidden)").length > 0;
                     if(!loadMorePresent) {
                         $(commentHtml).insertAfter("li.comment:last").wrapAll(commentWrapper);
                         return;
@@ -177,7 +177,7 @@ $(document).ready(function() {
                 commentWrapper = "<li class='comment' />";
             }
             var showCommentPostedMessage = function() {
-                $("p.comment-posted-successfully").removeClass("hidden");
+                $("p.comment-posted-successfully").show();
             };
             
             // pick method based on sort order and whether this is a post or reply
@@ -212,8 +212,8 @@ $(document).ready(function() {
             // clean up form
             if(isReplyForm) {
                 var parentLi = commentReplyFormLi.prev();
-                parentLi.find("a.close-comment-reply").addClass("hidden");
-                parentLi.find("a.open-comment-reply").removeClass("hidden");
+                parentLi.find("a.close-comment-reply").hide();
+                parentLi.find("a.open-comment-reply").show();
                 commentReplyFormLi.remove();
             } else {
                 commentForm.find("input[type='text']").val("");
@@ -228,15 +228,15 @@ $(document).ready(function() {
     
     $("li.comment-action-confirmation-required > a").live('click', function() {
         var clickedAnchor = $(this);
-        clickedAnchor.addClass("hidden");
-        clickedAnchor.siblings("span.action-confirmation").removeClass("hidden");
+        clickedAnchor.hide();
+        clickedAnchor.siblings("span.action-confirmation").show();
         return false;
     });
     
     $("li.comment-action-confirmation-required > span.action-confirmation > a.no").live('click', function() {
         var activeSpan = $(this).parent();
-        activeSpan.addClass("hidden");
-        activeSpan.siblings("a.hidden").removeClass("hidden");
+        activeSpan.hide();
+        activeSpan.siblings("a:hidden").show();
         return false;
     });
     
@@ -255,16 +255,16 @@ $(document).ready(function() {
         var commentBodyAndLinks = commentContainer.children("blockquote.comment-body, ul.comment-links");
         var editFormExists = editForm.length;
         if(editFormExists) {
-            commentBodyAndLinks.wrapAll("<div class='hidden' />");
-            editForm.removeClass("hidden");
+            commentBodyAndLinks.wrapAll("<div style='display: none;' />");
+            editForm.show();
         } else {
             $.get(clickedAnchor.attr("data-ajax-url"), function(edit_form_html) {
-                commentBodyAndLinks.wrapAll("<div class='hidden' />");
+                commentBodyAndLinks.wrapAll("<div style='display: none;' />");
                 commentContainer.children("div.comment-header").after(edit_form_html);
                 var editForm = commentContainer.children("div.comment-header").next();
                 var commentTextArea = editForm.find("textarea[name='comment']");
                 commentTextArea.markdownPreview();
-                $("<div class='hidden initial-comment' />").insertAfter(commentTextArea).append(commentTextArea.val());
+                $("<div class='initial-comment' style='display: none;' />").insertAfter(commentTextArea).append(commentTextArea.val());
                 editForm.find("input[name='preview']").remove();
             });
         }
@@ -275,8 +275,8 @@ $(document).ready(function() {
         var clickedAnchor = $(this);
         var parentSpan = $(this).parent();
         $.post(clickedAnchor.attr("href"), function() {
-            parentSpan.addClass("hidden");
-            parentSpan.siblings("span.action-performed").removeClass("hidden");
+            parentSpan.hide();
+            parentSpan.siblings("span.action-performed").show();
         });
         return false;
     });
@@ -293,23 +293,23 @@ $(document).ready(function() {
         var clickedLink = $(this);
         var commentForm = clickedLink.closest("li.comment").next("li.comment-reply-form");
         
-        commentForm.addClass("hidden");
+        commentForm.hide();
         
         commentForm.find("input[type='text']").val("");
         var commentTextArea = commentForm.find("textarea[name='comment']");
         commentTextArea.val("");
         commentTextArea.trigger("change");
         
-        clickedLink.addClass("hidden");
-        clickedLink.siblings("a.open-comment-reply").removeClass("hidden");
+        clickedLink.hide();
+        clickedLink.siblings("a.open-comment-reply").show();
         
         return false;
     });
     
     $("li.reply-to-comment > a.open-comment-reply").live('click', function() {
-        $("li.comment-reply-form").addClass("hidden");
-        $("a.close-comment-reply").addClass("hidden");
-        $("a.open-comment-reply").removeClass("hidden");
+        $("li.comment-reply-form").hide();
+        $("a.close-comment-reply").hide();
+        $("a.open-comment-reply").show();
         
         var clickedReplyLink = $(this);
         
@@ -317,7 +317,7 @@ $(document).ready(function() {
         var replyForm = commentLi.next("li.comment-reply-form");
         var replyFormExists = replyForm.length > 0;
         if(replyFormExists) {
-            replyForm.removeClass("hidden");
+            replyForm.show();
         } else {
             $.get(clickedReplyLink.attr("data-ajax-url"), function(reply_form_html) {
                 commentLi.after(reply_form_html);
@@ -327,8 +327,8 @@ $(document).ready(function() {
             });
         }
         
-        clickedReplyLink.addClass("hidden");
-        clickedReplyLink.siblings("a.close-comment-reply").removeClass("hidden");
+        clickedReplyLink.hide();
+        clickedReplyLink.siblings("a.close-comment-reply").show();
         
         return false;
     });

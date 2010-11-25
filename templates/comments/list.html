@@ -2,7 +2,7 @@
 {% if flash.comment_response %}
     <p class="flash">{{ flash.comment_response }}</p>
 {% endif %}
-<p class="flash hidden comment-posted-successfully">Your comment has been successfully posted</p>
+<p class="flash comment-posted-successfully" style="display: none;">Your comment has been successfully posted</p>
 {% if not comment_list %}
     <p>There does not appear to be anything here.</p>
 {% else %}

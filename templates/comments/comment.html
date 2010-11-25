@@ -33,7 +33,7 @@
                 {% if comment_parent and comments_enabled and not is_banned_from_commenting %}
                     <li class="reply-to-comment">
                         <a class="open-comment-reply" href="{% output_comment_reply_url for comment %}" data-ajax-url="{% url osl_comments.views.get_ajax_reply_form obj_ctype_pk=comment.content_type_id obj_pk=comment.object_pk comment_pk=comment.pk %}">Reply</a>
-                        <a class="close-comment-reply hidden" href="#">Close Reply</a>
+                        <a class="close-comment-reply" href="#" style="display: none;">Close Reply</a>
                     </li>
                 {% endif %}
                 {% if request.user.is_authenticated and comment.user_id == request.user.id and comments_enabled and not is_banned_from_commenting %}
@@ -44,21 +44,21 @@
                 {% if request.user.is_authenticated and comment.user_id == request.user.id %}
                     <li class="delete-comment comment-action-confirmation-required">
                         <a href="{% url osl_comments.views.delete_comment comment.id %}">Delete</a>
-                        <span class="hidden action-confirmation">Are you sure? <a class="yes" href="{% url osl_comments.views.delete_comment comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
+                        <span class="action-confirmation" style="display: none;">Are you sure? <a class="yes" href="{% url osl_comments.views.delete_comment comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
                     </li>
                 {% endif %}
                 {% if request.user.is_authenticated and comment.user_id != request.user.id %}
                     {% if perms.comments.can_moderate %}
                         <li class="moderate-comment comment-action-confirmation-required">
                             <a href="{% url comments-delete comment.id %}">Moderate this comment</a>
-                            <span class="hidden action-confirmation">Are you sure? <a class="yes" href="{% url osl_comments.views.moderate comment_id=comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
+                            <span class="action-confirmation" style="display: none;">Are you sure? <a class="yes" href="{% url osl_comments.views.moderate comment_id=comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
                         </li>
                     {% else %}
                         <li class="flag-comment comment-action-confirmation-required">
                             {% bool_entry_from_flags comment from flags as flagged %}
-                            <a {% if flagged %}class="hidden" {% endif %}href="{% url comments-flag comment.id %}">Report this comment</a>
-                            <span class="hidden action-confirmation">Are you sure? <a class="yes" href="{% url osl_comments.views.flag comment_id=comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
-                            <span class="{% if not flagged %}hidden {% endif %}action-performed">Comment reported</span>
+                            <a {% if flagged %}style="display: none;" {% endif %}href="{% url comments-flag comment.id %}">Report this comment</a>
+                            <span class="action-confirmation" style="display: none;">Are you sure? <a class="yes" href="{% url osl_comments.views.flag comment_id=comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
+                            <span class="action-performed"{% if not flagged %} style="display: none;"{% endif %}>Comment reported</span>
                         </li>
                     {% endif %}
                 {% endif %}
