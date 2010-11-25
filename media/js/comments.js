@@ -319,13 +319,16 @@ $(document).ready(function() {
         if(replyFormExists) {
             replyForm.stop(true, true).slideDown();
         } else {
-            $.get(clickedReplyLink.attr("data-ajax-url"), function(reply_form_html) {
-                commentLi.after("<div style='display: none;' />").next().append(reply_form_html);
-                var replyForm = commentLi.next().children();
-                replyForm.hide().unwrap();
-                replyForm.find("textarea[name='comment']").markdownPreview();
-                replyForm.find("input[name='preview']").remove();
-                replyForm.stop(true, true).slideDown();
+            commentLi.after("<li style='display: none; padding-left: 100px;' />").next().append("<img src='/media/images/ajax-loader.gif' alt='Loading...' style='display: inline;' /> Loading...");
+            commentLi.next().slideDown(function() {
+                $.get(clickedReplyLink.attr("data-ajax-url"), function(reply_form_html) {
+                    commentLi.next().html(reply_form_html);
+                    var replyForm = commentLi.next().children();
+                    replyForm.hide().unwrap();
+                    replyForm.find("textarea[name='comment']").markdownPreview();
+                    replyForm.find("input[name='preview']").remove();
+                    replyForm.stop(true, true).slideDown();
+                });
             });
         }
         
