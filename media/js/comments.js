@@ -37,12 +37,12 @@ $(document).ready(function() {
     
     $("form.post-comment input[name='cancel']").live('click', function() {
         var replyLi = $(this).closest("li.comment-reply-form");
-        replyLi.hide();
-        
-        replyLi.find("input[type='text']").val("");
-        var commentTextArea = replyLi.find("textarea[name='comment']");
-        commentTextArea.val("");
-        commentTextArea.trigger("change");
+        replyLi.stop(true, true).slideUp(function() {
+            replyLi.find("input[type='text']").val("");
+            var commentTextArea = replyLi.find("textarea[name='comment']");
+            commentTextArea.val("");
+            commentTextArea.trigger("change");
+        });
         
         var parentLi = replyLi.prev();
         parentLi.find("a.close-comment-reply").hide();
@@ -293,12 +293,12 @@ $(document).ready(function() {
         var clickedLink = $(this);
         var commentForm = clickedLink.closest("li.comment").next("li.comment-reply-form");
         
-        commentForm.hide();
-        
-        commentForm.find("input[type='text']").val("");
-        var commentTextArea = commentForm.find("textarea[name='comment']");
-        commentTextArea.val("");
-        commentTextArea.trigger("change");
+        commentForm.stop(true, true).slideUp(function() {
+            commentForm.find("input[type='text']").val("");
+            var commentTextArea = commentForm.find("textarea[name='comment']");
+            commentTextArea.val("");
+            commentTextArea.trigger("change");
+        });
         
         clickedLink.hide();
         clickedLink.siblings("a.open-comment-reply").show();
@@ -307,7 +307,7 @@ $(document).ready(function() {
     });
     
     $("li.reply-to-comment > a.open-comment-reply").live('click', function() {
-        $("li.comment-reply-form").hide();
+        $("li.comment-reply-form").stop(true, true).slideUp();
         $("a.close-comment-reply").hide();
         $("a.open-comment-reply").show();
         
@@ -317,13 +317,15 @@ $(document).ready(function() {
         var replyForm = commentLi.next("li.comment-reply-form");
         var replyFormExists = replyForm.length > 0;
         if(replyFormExists) {
-            replyForm.show();
+            replyForm.stop(true, true).slideDown();
         } else {
             $.get(clickedReplyLink.attr("data-ajax-url"), function(reply_form_html) {
-                commentLi.after(reply_form_html);
-                var replyForm = commentLi.next();
+                commentLi.after("<div style='display: none;' />").next().append(reply_form_html);
+                var replyForm = commentLi.next().children();
+                replyForm.hide().unwrap();
                 replyForm.find("textarea[name='comment']").markdownPreview();
                 replyForm.find("input[name='preview']").remove();
+                replyForm.stop(true, true).slideDown();
             });
         }
         
