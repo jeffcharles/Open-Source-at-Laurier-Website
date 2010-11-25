@@ -101,7 +101,7 @@ body {
     color: #666666;
     float: left;
     font-size: 20px;
-    text-align: center;
+    margin: auto;
     width: 30px;
 }
 
@@ -197,6 +197,16 @@ body {
 
 #content ul.errorlist li {
     margin-bottom: 2px;
+}
+
+div.score-sum {
+    height: 24px;
+    margin: auto;
+    text-align: center;
+}
+
+div.score-sum > img {
+    margin: auto;
 }
 
 div.preview {
