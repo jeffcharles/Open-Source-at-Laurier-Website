@@ -210,17 +210,25 @@ def get_comment(request, comment_id):
         'vote': Vote.objects.get_for_user(comment, request.user)}, 
         context_instance=RequestContext(request))
 
-def load_more(request, obj_ctype_pk, obj_pk, order_method, page_to_load, 
-    comments_enabled):
+def load_more(request, obj_ctype_pk, obj_pk, order_method, comments_enabled):
     """Renders a list of comments."""
     
-    page_to_load = int(page_to_load)
+    OFFSET_QUERY_STRING_KEY = 'offset'
+    if OFFSET_QUERY_STRING_KEY not in request.GET:
+        return HttpResponseBadRequest('Need to provide an offset key value in the query string')
+    offset = request.GET[OFFSET_QUERY_STRING_KEY]
+    offset = int(offset)
+    
     comments_enabled = bool(comments_enabled)
     
     obj_ctype = ContentType.objects.get(pk=obj_ctype_pk)
     
-    comment_list = list(OslComment.objects.get_comments(obj_ctype, obj_pk, 
-        order_method, True, page_to_load))
+    comment_list = list(OslComment.objects.get_comments(
+        ctype=obj_ctype, 
+        object_pk=obj_pk, 
+        order_method=order_method, 
+        offset=offset
+    ))
     
     comment_count = OslComment.objects.filter(
             content_type = obj_ctype,
@@ -232,7 +240,7 @@ def load_more(request, obj_ctype_pk, obj_pk, order_method, page_to_load,
     num_comments_per_page = CommentsPerPageForContentType.objects.get_comments_per_page_for_content_type(
         obj_ctype)
     display_load_more = False
-    if num_comments_per_page * page_to_load < comment_count:
+    if offset + num_comments_per_page < comment_count:
         display_load_more = True
     
     return render_to_response(
@@ -243,8 +251,7 @@ def load_more(request, obj_ctype_pk, obj_pk, order_method, page_to_load,
             'display_load_more': display_load_more,
             'sorted_by': order_method, 
             'object_ctype_pk': obj_ctype_pk, 
-            'object_pk': obj_pk, 
-            'next_comment_page': page_to_load + 1
+            'object_pk': obj_pk
         },
         RequestContext(request)
     )

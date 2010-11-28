@@ -37,19 +37,35 @@ def ip_address_ban_update_success_flash_handler(sender, **kwargs):
 ip_address_ban_was_updated.connect(ip_address_ban_update_success_flash_handler)
 
 class OslCommentManager(models.Manager):
+
+    _num_comments_per_page = None
     
-    def get_comments(self, ctype, object_pk, order_method, paginate, 
-        current_comment_page):
+    def _get_num_comments_per_page(self, ctype):
+        if self._num_comments_per_page == None:
+            self._num_comments_per_page = CommentsPerPageForContentType.objects.get_comments_per_page_for_content_type(
+            ctype)
+        return self._num_comments_per_page
+
+    def get_comments(self, ctype, object_pk, order_method, paginate=True, 
+        comment_page=None, offset=None):
+        
+        if comment_page == None and offset == None:
+            raise Exception("Either comment_page or offset argument needs to be provided")
+        if offset == None:
+            offset = (comment_page - 1) * self._get_num_comments_per_page(ctype)
+        return self._get_comments(ctype, object_pk, order_method, paginate, 
+            offset)
+
+    def _get_comments(self, ctype, object_pk, order_method, paginate, offset):
         """
         ctype - content type (integer)
         object_pk - object primary key (string)
         order_method - one of the order by constants set in __init__.py
         paginate - whether or not to paginate the comments (boolean)
-        current_comment_page - the current page number
+        offset - the offset
         """
         
-        num_comments_per_page = CommentsPerPageForContentType.objects.get_comments_per_page_for_content_type(
-            ctype)
+        num_comments_per_page = self._get_num_comments_per_page(ctype)
         
         get_threaded_comments_sql = """
             SELECT
@@ -277,7 +293,7 @@ class OslCommentManager(models.Manager):
                 %(offset)d
         """ % {
             'limit': num_comments_per_page, 
-            'offset': (current_comment_page - 1) * num_comments_per_page
+            'offset': offset
         }
         
         if paginate:

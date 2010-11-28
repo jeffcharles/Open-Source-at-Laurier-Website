@@ -352,7 +352,8 @@ class OslCommentListNode(CommentListNode):
             order_method = osl_comments.ORDER_BY_NEWEST
             
         qs = self.comment_model.objects.get_comments(ctype, object_pk,
-            sorted_by, is_paginated(context), get_comment_page(context))
+            sorted_by, paginate=is_paginated(context), 
+            comment_page=get_comment_page(context))
 
         return qs
     

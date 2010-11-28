@@ -13,7 +13,8 @@ $(document).ready(function() {
     $("li.load-more-comments > a").live('click', function() {
         var loadMoreElement = $(this).parent();
         loadMoreElement.html(ajaxLoaderHtml);
-        $.get($(this).attr("href"), function(commentListHtml) {
+        commentsOnPage = $("li.comment").length;
+        $.get($(this).attr("href") + "?offset=" + commentsOnPage, function(commentListHtml) {
             $(commentListHtml).wrapAll("<div style='display: none;' />").parent().insertAfter(loadMoreElement);
             var lastComment = loadMoreElement.prev();
             loadMoreElement.remove();

@@ -17,5 +17,5 @@
 {% endif %}
 {% endfor %}
 {% if display_load_more %}
-    <li class="load-more-comments" style="display: none;"><a href="{% url osl_comments.views.load_more object_ctype_pk object_pk sorted_by next_comment_page comments_enabled %}">Load More Comments...</a></li>
+    <li class="load-more-comments" style="display: none;"><a href="{% url osl_comments.views.load_more object_ctype_pk object_pk sorted_by comments_enabled %}">Load More Comments...</a></li>
 {% endif %}

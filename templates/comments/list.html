@@ -29,9 +29,7 @@
         {% endif %}
         {% with object_ctype.pk as object_ctype_pk %}
             {% with object.pk as object_pk %}
-                {% with 2 as next_comment_page %}
-                    {% include "comments/inner_list.html" %}
-                {% endwith %}
+                {% include "comments/inner_list.html" %}
             {% endwith %}
         {% endwith %}
     </ul>
