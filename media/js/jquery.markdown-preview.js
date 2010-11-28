@@ -39,7 +39,11 @@
             
             var converter = new Showdown.converter();
             var updatePreview = function() {
-                previewElement.html(converter.makeHtml($(this).val()));
+                if(this.nodeName !== undefined) {
+                    previewElement.html(converter.makeHtml($(this).val()));
+                } else {
+                    previewElement.html(converter.makeHtml($this.val()));
+                }
             };
             updatePreview();
             $this.bind('keyup.markdown-preview', updatePreview);
