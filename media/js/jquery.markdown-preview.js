@@ -18,7 +18,7 @@
                 throw "Either insert preview div should be set to true or an existing preview element needs to be provided";
             }
             
-            $this = $(this)
+            $this = $(this);
             var previewElement = $(settings['preview-element']);
             
             if(settings['insert-preview-div']) {
@@ -39,7 +39,7 @@
             
             var converter = new Showdown.converter();
             var updatePreview = function() {
-                previewElement.html(converter.makeHtml($this.val()));
+                previewElement.html(converter.makeHtml($(this).val()));
             };
             updatePreview();
             $this.bind('keyup.markdown-preview', updatePreview);
