@@ -206,7 +206,9 @@ $(document).ready(function() {
                 commentWrapper = "<li class='comment' />";
             }
             var showCommentPostedMessage = function() {
-                $("p.comment-posted-successfully").show();
+                $("p.comment-posted-successfully").fadeIn(function() {
+                    $(this).delay(3000).fadeOut();
+                });
             };
             
             // pick method based on sort order and whether this is a post or reply
