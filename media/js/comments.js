@@ -89,6 +89,14 @@ $(document).ready(function() {
         var isReplyForm = $(this).closest("li.comment-reply-form").length > 0;
         var commentForm = $(this).closest("form");
         
+        if(isReplyForm) {
+            commentForm.find("input[name='post']").remove();
+            commentForm.find("input[name='cancel']").remove();
+        } else {
+            commentForm.find("input[name='post']").hide();
+        }
+        commentForm.children().last().after(ajaxSubmittingHtml);
+        
         $.post(commentForm.attr("action"), commentForm.serialize(), function(commentHtml) {
             // check to see if this is an error page and load it into content if it is
             var isFullPage = $(commentHtml).find("div#content").length > 0;
@@ -253,6 +261,8 @@ $(document).ready(function() {
                 var commentTextArea = commentForm.find("textarea[name='comment']");
                 commentTextArea.val("");
                 commentTextArea.trigger("change");
+                commentForm.children().last().remove();
+                commentForm.find("input[name='post']").show();
             }
         });
         
