@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
-    var ajaxLoaderHtml = "<div style='padding-left: 100px; padding-top: 10px;'><img src='/media/images/ajax-loader.gif' alt='Loading...' style='display: inline; margin: 0px 5px 0px 0px;' /><span>Loading...</span></div>";
+    var ajaxLoaderHtml = "<div style='margin-bottom: 20px; padding-left: 100px; padding-top: 10px;'><img src='/media/images/ajax-loader.gif' alt='Loading...' style='display: inline; margin: 0px 5px 0px 0px;' /><span>Loading...</span></div>";
+    var ajaxSubmittingHtml = "<div style='margin-bottom: 20px; margin-left: 131px; margin-top: -10px;'><img src='/media/images/ajax-loader.gif' alt='Loading...' style='display: inline; margin: 0px 5px 0px 0px;' /><span>Submitting...</span></div>";
 
     (function() {
         if($("div.comment-pagination").children("a[rel='next']").length > 0) {
@@ -38,6 +39,9 @@ $(document).ready(function() {
     
     $("form.edit-comment input[name='post']").live('click', function() {
         var editForm = $(this).closest("form.edit-comment");
+        editForm.find("input[name='post']").remove();
+        editForm.find("input[name='cancel']").remove();
+        editForm.children().last().after(ajaxSubmittingHtml);
         $.post(editForm.attr("action"), editForm.serialize(), function(commentHtml) {
             var commentLi = editForm.closest("li.comment");
             commentLi.children().wrapAll("<div />").parent().fadeOut(function() {
