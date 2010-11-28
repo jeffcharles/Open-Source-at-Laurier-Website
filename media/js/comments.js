@@ -245,7 +245,9 @@ $(document).ready(function() {
                 var parentLi = commentReplyFormLi.prev();
                 parentLi.find("a.close-comment-reply").hide();
                 parentLi.find("a.open-comment-reply").show();
-                commentReplyFormLi.remove();
+                commentReplyFormLi.slideUp(function() {
+                    commentReplyFormLi.remove();
+                });
             } else {
                 commentForm.find("input[type='text']").val("");
                 var commentTextArea = commentForm.find("textarea[name='comment']");
