@@ -12,6 +12,7 @@ $(document).ready(function() {
     
     $("li.load-more-comments > a").live('click', function() {
         var loadMoreElement = $(this).parent();
+        loadMoreElement.html(ajaxLoaderHtml);
         $.get($(this).attr("href"), function(commentListHtml) {
             loadMoreElement.after(commentListHtml);
             loadMoreElement.remove();
