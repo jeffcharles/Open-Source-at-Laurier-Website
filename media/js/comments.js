@@ -378,13 +378,18 @@ $(document).ready(function() {
         var commentLi = clickedAnchor.closest("li.comment");
         commentLi.children().wrapAll("<div />");
         var wrapper = commentLi.children();
-        wrapper.fadeOut(function() {
-            wrapper.after(ajaxLoaderHtml);
+        wrapper.children().wrapAll("<div />");
+        var secondWrapper = wrapper.children();
+        wrapper.height(wrapper.height());
+        secondWrapper.fadeOut(function() {
+            secondWrapper.after(ajaxLoaderHtml);
             $.post(clickedAnchor.attr("href"), function(comment_html) {
-                wrapper.next().remove();
-                wrapper.html(comment_html);
-                wrapper.fadeIn(function() {
-                    $(this).children().unwrap();
+                secondWrapper.next().remove();
+                secondWrapper.html(comment_html);
+                wrapper.animate({height: secondWrapper.height()}, function() {
+                    secondWrapper.fadeIn(function() {
+                        $(this).children().unwrap().unwrap();
+                    });
                 });
             });
         });
