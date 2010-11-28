@@ -112,24 +112,32 @@ $(document).ready(function() {
                 replyAndNewest: function(commentHtml, commentWrapper, commentReplyFormLi) {
                     var loadMoreIsNextElement = commentReplyFormLi.next("li.load-more-comments:not(:hidden)").length > 0;
                     if(!loadMoreIsNextElement) {
-                        $(commentHtml).insertAfter(commentReplyFormLi).wrapAll(commentWrapper);
+                        $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertAfter(commentReplyFormLi).wrapAll(commentWrapper).fadeIn(function() {
+                            $(this).children().unwrap();
+                        });
                         return;
                     }
                     showCommentPostedMessage();
                 },
                 
                 postAndNewest: function(commentHtml, commentWrapper) {
-                    $(commentHtml).insertBefore("li.comment:first").wrapAll(commentWrapper);
+                    $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertBefore("li.comment:first").wrapAll(commentWrapper).fadeIn(function() {
+                        $(this).children().unwrap();
+                    });
                 },
                 
                 replyAndOldest: function(commentHtml, commentWrapper, showCommentPostedMessage, commentReplyFormLi, loadMorePresentInThread, commentHasChildren) {
                 
                     if(!loadMorePresentInThread()) {
                         if(commentHasChildren) {
-                            $(commentHtml).insertAfter(commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").last()).wrapAll(commentWrapper);
+                            $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertAfter(commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").last()).wrapAll(commentWrapper).fadeIn(function() {
+                                $(this).children().unwrap();
+                            });
                             return;
                         }
-                        $(commentHtml).insertAfter(commentReplyFormLi).wrapAll(commentWrapper);
+                        $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertAfter(commentReplyFormLi).wrapAll(commentWrapper).fadeIn(function() {
+                            $(this).children().unwrap();
+                        });
                         return;
                     }
                     showCommentPostedMessage();
@@ -138,7 +146,9 @@ $(document).ready(function() {
                 postAndOldest: function(commentHtml, commentWrapper, showCommentPostedMessage) {
                     var loadMorePresent = $("li.load-more-comments:not(:hidden)").length > 0;
                     if(!loadMorePresent) {
-                        $(commentHtml).insertAfter("li.comment:last").wrapAll(commentWrapper);
+                        $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertAfter("li.comment:last").wrapAll(commentWrapper).fadeIn(function() {
+                            $(this).children().unwrap();
+                        });
                         return;
                     }
                     showCommentPostedMessage();
@@ -154,7 +164,7 @@ $(document).ready(function() {
                     var scoreToAppearAbove = (userLoggedIn) ? 1 : 0;
                     commentReplyFormLi.nextUntil("li.comment:not(.comment-child)").each(function(i, element) {
                         element = $(element);
-                        if(parseInt(element.find("span.score-sum").html()) <= scoreToAppearAbove) {
+                        if(parseInt(element.find("div.score-sum").html()) <= scoreToAppearAbove) {
                             shouldDisplayComment = true;
                             elementToDisplayBelow = element.prev();
                             return false;
@@ -166,7 +176,9 @@ $(document).ready(function() {
                     }
                     
                     if(shouldDisplayComment) {
-                        $(commentHtml).insertAfter(elementToDisplayBelow).wrapAll(commentWrapper);
+                        $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertAfter(elementToDisplayBelow).wrapAll(commentWrapper).fadeIn(function() {
+                            $(this).children().unwrap();
+                        });
                         return;
                     }
                     showCommentPostedMessage();
@@ -180,7 +192,7 @@ $(document).ready(function() {
                     var scoreToAppearAbove = (userLoggedIn) ? 1 : 0;
                     $("li.comment:not(.comment-child)").each(function(i, element) {
                         element = $(element);
-                        if(parseInt(element.find("span.score-sum").html()) <= scoreToAppearAbove) {
+                        if(parseInt(element.find("div.score-sum").html()) <= scoreToAppearAbove) {
                             shouldDisplayComment = true;
                             elementToDisplayAbove = element;
                             return false;
@@ -188,7 +200,9 @@ $(document).ready(function() {
                     });
                     
                     if(shouldDisplayComment) {
-                        $(commentHtml).insertBefore(elementToDisplayAbove).wrapAll(commentWrapper);
+                        $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertBefore(elementToDisplayAbove).wrapAll(commentWrapper).fadeIn(function() {
+                            $(this).children().unwrap();
+                        });
                         return;
                     }
                     showCommentPostedMessage();
