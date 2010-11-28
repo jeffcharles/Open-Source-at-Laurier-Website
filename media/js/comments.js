@@ -29,11 +29,15 @@ $(document).ready(function() {
         var commentContainer = $(this).closest("div.comment-nonscore");
         var commentHeader = commentContainer.children("div.comment-header");
         var commentBodyAndLinksDiv = commentContainer.children("div:hidden");
-        commentContainer.children("form.edit-comment").fadeOut(null, function() {
-            commentContainer.animate({height: commentHeader.height() + commentBodyAndLinksDiv.height()}, function() {
+        commentContainer.children().wrapAll("<div />");
+        var wrapper = commentContainer.children();
+        wrapper.height(wrapper.height());
+        wrapper.children("form.edit-comment").fadeOut(null, function() {
+            wrapper.animate({height: commentHeader.height() + commentBodyAndLinksDiv.height()}, function() {
                 commentBodyAndLinksDiv.fadeIn(null, function() {
                     $(this).children("blockquote.comment-body, ul.comment-links").unwrap();
                 });
+                wrapper.children().unwrap();
                 var commentTextArea = commentContainer.find("textarea[name='comment']");
                 commentTextArea.val(commentContainer.find("div.initial-comment").html());
                 commentTextArea.trigger("change");
@@ -324,8 +328,11 @@ $(document).ready(function() {
         var editFormExists = editForm.length;
         if(editFormExists) {
             commentBodyAndLinks.wrapAll("<div />").parent().fadeOut(function() {
-                commentContainer.animate({height: commentHeader.height() + editForm.height()}, function() {
+                commentContainer.children().wrapAll("<div />");
+                var wrapper = commentContainer.children();
+                wrapper.animate({height: commentHeader.height() + editForm.height()}, function() {
                     editForm.fadeIn();
+                    $(this).children().unwrap();
                 });
             });
         } else {
@@ -339,8 +346,11 @@ $(document).ready(function() {
                     commentTextArea.markdownPreview();
                     $("<div class='initial-comment' style='display: none;' />").insertAfter(commentTextArea).append(commentTextArea.val());
                     editForm.find("input[name='preview']").remove();
-                    commentContainer.animate({height: commentHeader.height() + editForm.height()}, function() {
+                    commentContainer.children().wrapAll("<div />");
+                    var wrapper = commentContainer.children();
+                    wrapper.animate({height: commentHeader.height() + editForm.height()}, function() {
                         editForm.fadeIn();
+                        $(this).children().unwrap();
                     });
                 });
             });
