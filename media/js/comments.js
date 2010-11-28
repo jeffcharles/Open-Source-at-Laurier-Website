@@ -350,8 +350,18 @@ $(document).ready(function() {
     
     $("li.moderate-comment > span.action-confirmation > a.yes").live('click', function() {
         var clickedAnchor = $(this);
-        $.post(clickedAnchor.attr("href"), function(comment_html) {
-            clickedAnchor.closest("li.comment").html(comment_html);
+        var commentLi = clickedAnchor.closest("li.comment");
+        commentLi.children().wrapAll("<div />");
+        var wrapper = commentLi.children();
+        wrapper.fadeOut(function() {
+            wrapper.after(ajaxLoaderHtml);
+            $.post(clickedAnchor.attr("href"), function(comment_html) {
+                wrapper.next().remove();
+                wrapper.html(comment_html);
+                wrapper.fadeIn(function() {
+                    $(this).children().unwrap();
+                });
+            });
         });
         return false;
     });
