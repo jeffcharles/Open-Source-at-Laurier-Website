@@ -210,10 +210,12 @@ def get_comment(request, comment_id):
         'vote': Vote.objects.get_for_user(comment, request.user)}, 
         context_instance=RequestContext(request))
 
-def load_more(request, obj_ctype_pk, obj_pk, order_method, page_to_load):
+def load_more(request, obj_ctype_pk, obj_pk, order_method, page_to_load, 
+    comments_enabled):
     """Renders a list of comments."""
     
     page_to_load = int(page_to_load)
+    comments_enabled = bool(comments_enabled)
     
     obj_ctype = ContentType.objects.get(pk=obj_ctype_pk)
     
@@ -236,7 +238,8 @@ def load_more(request, obj_ctype_pk, obj_pk, order_method, page_to_load):
     return render_to_response(
         'comments/inner_list.html', 
         {
-            'comment_list': comment_list, 
+            'comment_list': comment_list,
+            'comments_enabled': comments_enabled, 
             'display_load_more': display_load_more,
             'sorted_by': order_method, 
             'object_ctype_pk': obj_ctype_pk, 
