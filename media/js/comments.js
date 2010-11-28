@@ -14,9 +14,13 @@ $(document).ready(function() {
         var loadMoreElement = $(this).parent();
         loadMoreElement.html(ajaxLoaderHtml);
         $.get($(this).attr("href"), function(commentListHtml) {
-            loadMoreElement.after(commentListHtml);
+            $(commentListHtml).wrapAll("<div style='display: none;' />").parent().insertAfter(loadMoreElement);
+            var lastComment = loadMoreElement.prev();
             loadMoreElement.remove();
-            $("li.load-more-comments").show();
+            lastComment.next().slideDown(function() {
+                $(this).children().unwrap();
+                $("li.load-more-comments").show();
+            });
         });
         return false;
     });
