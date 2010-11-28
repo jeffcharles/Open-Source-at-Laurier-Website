@@ -1,5 +1,7 @@
 $(document).ready(function() {
 
+    var ajaxLoaderHtml = "<div style='padding-left: 100px; padding-top: 10px;'><img src='/media/images/ajax-loader.gif' alt='Loading...' style='display: inline; margin: 0px 5px 0px 0px;' /><span>Loading...</span></div>";
+
     (function() {
         if($("div.comment-pagination").children("a[rel='next']").length > 0) {
             $("li.load-more-comments").show();
@@ -281,7 +283,9 @@ $(document).ready(function() {
             });
         } else {
             commentBodyAndLinks.wrapAll("<div />").parent().fadeOut(null, function() {
+                commentHeader.after(ajaxLoaderHtml);
                 $.get(clickedAnchor.attr("data-ajax-url"), function(edit_form_html) {
+                    commentHeader.next().remove();
                     commentHeader.after("<div style='display: none;' />").next().append(edit_form_html).children().hide().unwrap();
                     var editForm = commentContainer.children("div.comment-header").next();
                     var commentTextArea = editForm.find("textarea[name='comment']");
@@ -345,7 +349,7 @@ $(document).ready(function() {
         if(replyFormExists) {
             replyForm.stop(true, true).slideDown();
         } else {
-            commentLi.after("<li style='display: none; padding-left: 100px;' />").next().append("<img src='/media/images/ajax-loader.gif' alt='Loading...' style='display: inline;' /> Loading...");
+            commentLi.after("<li style='display: none;' />").next().append(ajaxLoaderHtml);
             commentLi.next().slideDown(function() {
                 $.get(clickedReplyLink.attr("data-ajax-url"), function(reply_form_html) {
                     commentLi.next().html(reply_form_html);
