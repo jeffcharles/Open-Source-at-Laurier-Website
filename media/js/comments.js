@@ -19,13 +19,17 @@ $(document).ready(function() {
 
     $("form.edit-comment input[name='cancel']").live('click', function() {
         var commentContainer = $(this).closest("div.comment-nonscore");
+        var commentHeader = commentContainer.children("div.comment-header");
+        var commentBodyAndLinksDiv = commentContainer.children("div:hidden");
         commentContainer.children("form.edit-comment").fadeOut(null, function() {
-            commentContainer.children("div:hidden").fadeIn(null, function() {
-                $(this).children("blockquote.comment-body, ul.comment-links").unwrap();
+            commentContainer.animate({height: commentHeader.height() + commentBodyAndLinksDiv.height()}, function() {
+                commentBodyAndLinksDiv.fadeIn(null, function() {
+                    $(this).children("blockquote.comment-body, ul.comment-links").unwrap();
+                });
+                var commentTextArea = commentContainer.find("textarea[name='comment']");
+                commentTextArea.val(commentContainer.find("div.initial-comment").html());
+                commentTextArea.trigger("change");
             });
-            var commentTextArea = commentContainer.find("textarea[name='comment']");
-            commentTextArea.val(commentContainer.find("div.initial-comment").html());
-            commentTextArea.trigger("change");
         });
         return false;
     });
@@ -259,23 +263,28 @@ $(document).ready(function() {
     $("li.edit-comment > a").live('click', function() {
         var clickedAnchor = $(this);
         var commentContainer = $(this).closest("div.comment-nonscore");
+        var commentHeader = commentContainer.children("div.comment-header");
         var editForm = commentContainer.children("form.edit-comment");
         var commentBodyAndLinks = commentContainer.children("blockquote.comment-body, ul.comment-links");
         var editFormExists = editForm.length;
         if(editFormExists) {
             commentBodyAndLinks.wrapAll("<div />").parent().fadeOut(function() {
-                editForm.fadeIn();
+                commentContainer.animate({height: commentHeader.height() + editForm.height()}, function() {
+                    editForm.fadeIn();
+                });
             });
         } else {
             commentBodyAndLinks.wrapAll("<div />").parent().fadeOut(null, function() {
                 $.get(clickedAnchor.attr("data-ajax-url"), function(edit_form_html) {
-                    commentContainer.children("div.comment-header").after("<div style='display: none;' />").next().append(edit_form_html).children().hide().unwrap();
+                    commentHeader.after("<div style='display: none;' />").next().append(edit_form_html).children().hide().unwrap();
                     var editForm = commentContainer.children("div.comment-header").next();
                     var commentTextArea = editForm.find("textarea[name='comment']");
                     commentTextArea.markdownPreview();
                     $("<div class='initial-comment' style='display: none;' />").insertAfter(commentTextArea).append(commentTextArea.val());
                     editForm.find("input[name='preview']").remove();
-                    editForm.fadeIn();
+                    commentContainer.animate({height: commentHeader.height() + editForm.height()}, function() {
+                        editForm.fadeIn();
+                    });
                 });
             });
         }
