@@ -39,8 +39,14 @@ $(document).ready(function() {
         $.post(editForm.attr("action"), editForm.serialize(), function(commentHtml) {
             var commentLi = editForm.closest("li.comment");
             commentLi.children().wrapAll("<div />").parent().fadeOut(function() {
-                commentLi.children().html(commentHtml).fadeIn(function() {
-                    $(this).children().unwrap();
+                commentLi.children().wrap("<div />");
+                commentLi.children().height(commentLi.children().children().height());
+                commentLi.children().children().html(commentHtml);
+                commentLi.children().animate({height: commentLi.children().children().height()}, function() {
+                    commentLi.children().children().unwrap();
+                    commentLi.children().fadeIn(function() {
+                        $(this).children().unwrap();
+                    });
                 });
             });
         });
