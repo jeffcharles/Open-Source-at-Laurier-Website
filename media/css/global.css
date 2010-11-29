@@ -278,7 +278,7 @@ form tr.error td, tr.error th {
     padding-top: 7px;
 }
 
-form tr.required th {
+form tr.required th label {
     font-weight: bold;
 }
 
