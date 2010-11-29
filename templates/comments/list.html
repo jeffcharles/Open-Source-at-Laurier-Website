@@ -1,51 +1,59 @@
 {% load osl_comments_lib voting_tags %}
-{% if flash.comment_response %}
-    <p class="flash">{{ flash.comment_response }}</p>
-{% endif %}
-<p class="flash comment-posted-successfully" style="display: none;">Your comment has been successfully posted</p>
-{% if not comment_list %}
-    <p>There does not appear to be anything here.</p>
-{% else %}
-    Sort by:
-    <ul id="comment-sorting-links">
-        <li><a href="{% output_sort_by_newest_qs %}">Newest</a></li>
-        <li><a href="{% output_sort_by_score_qs %}">Top</a></li>
-        <li><a href="{% output_sort_by_oldest_qs %}">Oldest</a></li>
-    </ul>
-    {% get_object_ctype for object as object_ctype %}
-    <ul id="comment-list">
-        {% if not comment_list.0.parent %}
-            {% user_is_banned_from_commenting as is_banned_from_commenting %}
-            {% with first_comment_parent as comment %}
-                <li class="comment comment-pagination-parent">
-                    {% score_for_object comment as comment_score %}
-                    {% with comment_score.score as comment_score %}
-                        {% vote_by_user request.user on comment as vote %}
-                        {% get_flags_by_user_for_comments by request.user for comment as flags %}
-                        {% include "comments/comment.html" %}
-                    {% endwith %}
-                </li>
+<section id="comments">
+    <h1>Comments</h1>
+        {% is_edit_form_present as edit_form_present %}
+        {% is_reply_form_present as reply_form_present %}
+        {% user_is_banned_from_commenting as is_banned_from_commenting %}
+        {% if comments_enabled and not edit_form_present and not reply_form_present and not is_banned_from_commenting %}
+            {% render_anon_comment_form for object %}
+        {% endif %}
+    {% if flash.comment_response %}
+        <p class="flash">{{ flash.comment_response }}</p>
+    {% endif %}
+    <p class="flash comment-posted-successfully" style="display: none;">Your comment has been successfully posted</p>
+    {% if not comment_list %}
+        <p>There does not appear to be anything here.</p>
+    {% else %}
+        Sort by:
+        <ul id="comment-sorting-links">
+            <li><a href="{% output_sort_by_newest_qs %}">Newest</a></li>
+            <li><a href="{% output_sort_by_score_qs %}">Top</a></li>
+            <li><a href="{% output_sort_by_oldest_qs %}">Oldest</a></li>
+        </ul>
+        {% get_object_ctype for object as object_ctype %}
+        <ul id="comment-list">
+            {% if not comment_list.0.parent %}
+                {% with first_comment_parent as comment %}
+                    <li class="comment comment-pagination-parent">
+                        {% score_for_object comment as comment_score %}
+                        {% with comment_score.score as comment_score %}
+                            {% vote_by_user request.user on comment as vote %}
+                            {% get_flags_by_user_for_comments by request.user for comment as flags %}
+                            {% include "comments/comment.html" %}
+                        {% endwith %}
+                    </li>
+                {% endwith %}
+            {% endif %}
+            {% with object_ctype.pk as object_ctype_pk %}
+                {% with object.pk as object_pk %}
+                    {% include "comments/inner_list.html" %}
+                {% endwith %}
             {% endwith %}
-        {% endif %}
-        {% with object_ctype.pk as object_ctype_pk %}
-            {% with object.pk as object_pk %}
-                {% include "comments/inner_list.html" %}
-            {% endwith %}
-        {% endwith %}
-    </ul>
-    <div class="comment-pagination">
-        {% get_comment_paginator_page for object as comment_page %}
-        {% if comment_page.has_previous %}
-            <a href="{% output_previous_comment_page_url with comment_page %}" rel="prev">Previous</a>
-        {% endif %}
-        {% if comment_page.has_previous or comment_page.has_next %}
-            Page {{ comment_page.number }} of {{ comment_page.paginator.num_pages }}
-        {% endif %}
-        {% if comment_page.has_next %}
-            <a href="{% output_next_comment_page_url with comment_page %}" rel="next">Next</a>
-        {% endif %}
-    </div>
-{% endif %}
+        </ul>
+        <div class="comment-pagination">
+            {% get_comment_paginator_page for object as comment_page %}
+            {% if comment_page.has_previous %}
+                <a href="{% output_previous_comment_page_url with comment_page %}" rel="prev">Previous</a>
+            {% endif %}
+            {% if comment_page.has_previous or comment_page.has_next %}
+                Page {{ comment_page.number }} of {{ comment_page.paginator.num_pages }}
+            {% endif %}
+            {% if comment_page.has_next %}
+                <a href="{% output_next_comment_page_url with comment_page %}" rel="next">Next</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>
 <script type="text/javascript">
     var commentSortMethod = "{{ sorted_by }}";
     var userLoggedIn = {% if request.user.is_authenticated %}true{% else %}false{% endif %} // use for UI only! not for actual auth check
