@@ -6,6 +6,9 @@ from django.forms import ModelForm
 from accounts.models import UserProfile
 
 class OslUserCreationForm(UserCreationForm):
+    error_css_class = 'error'
+    required_css_class = 'required'
+
     email = forms.EmailField()
     
     def save(self, commit=True):
@@ -17,6 +20,7 @@ class OslUserCreationForm(UserCreationForm):
 
 class UserInfoChangeForm(ModelForm):
     error_css_class = 'error'
+    required_css_class = 'required'
 
     class Meta:
         model = User
@@ -24,6 +28,7 @@ class UserInfoChangeForm(ModelForm):
         
 class UserProfileChangeForm(ModelForm):
     error_css_class = 'error'
+    required_css_class = 'required'
     
     class Meta:
         model = UserProfile

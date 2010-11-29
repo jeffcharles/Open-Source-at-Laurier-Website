@@ -4,6 +4,8 @@ from django.contrib.comments.forms import CommentForm, CommentSecurityForm
 from osl_comments.models import OslComment
 
 class AuthOslCommentForm(CommentSecurityForm):
+    required_css_class = 'required'
+
     comment = CommentForm.base_fields['comment']
     honeypot = CommentForm.base_fields['honeypot']
     parent_comment_id = forms.IntegerField(widget=forms.HiddenInput, 
@@ -23,6 +25,7 @@ class AuthOslCommentForm(CommentSecurityForm):
         return data
         
 class AnonOslCommentForm(CommentForm, AuthOslCommentForm):
+    required_css_class = 'required'
 
     def get_comment_create_data(self):
         data = CommentForm.get_comment_create_data(self)
@@ -33,6 +36,8 @@ class AnonOslCommentForm(CommentForm, AuthOslCommentForm):
         return AuthOslCommentForm.get_comment_model(self)
 
 class OslEditCommentForm(forms.Form):
+    required_css_class = 'required'
+
     comment = CommentForm.base_fields['comment']
     comment_id = forms.IntegerField(widget=forms.HiddenInput)
     

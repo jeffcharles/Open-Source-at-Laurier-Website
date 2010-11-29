@@ -278,6 +278,10 @@ form tr.error td, tr.error th {
     padding-top: 7px;
 }
 
+form tr.required th {
+    font-weight: bold;
+}
+
 h1 {
     border-bottom: thin dotted black;
     color: black;
