@@ -115,14 +115,9 @@ $(document).ready(function() {
             var commentPlacementDelegates = {
             
                 replyAndNewest: function(commentHtml, commentWrapper, commentReplyFormLi) {
-                    var loadMoreIsNextElement = commentReplyFormLi.next("li.load-more-comments:not(:hidden)").length > 0;
-                    if(!loadMoreIsNextElement) {
-                        $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertAfter(commentReplyFormLi).wrapAll(commentWrapper).fadeIn(function() {
-                            $(this).children().unwrap();
-                        });
-                        return;
-                    }
-                    showCommentPostedMessage();
+                    $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertAfter(commentReplyFormLi).wrapAll(commentWrapper).fadeIn(function() {
+                        $(this).children().unwrap();
+                    });
                 },
                 
                 postAndNewest: function(commentHtml, commentWrapper) {
@@ -143,9 +138,7 @@ $(document).ready(function() {
                         $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertAfter(commentReplyFormLi).wrapAll(commentWrapper).fadeIn(function() {
                             $(this).children().unwrap();
                         });
-                        return;
                     }
-                    showCommentPostedMessage();
                 },
                 
                 postAndOldest: function(commentHtml, commentWrapper, showCommentPostedMessage) {
@@ -154,9 +147,7 @@ $(document).ready(function() {
                         $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertAfter("li.comment:last").wrapAll(commentWrapper).fadeIn(function() {
                             $(this).children().unwrap();
                         });
-                        return;
                     }
-                    showCommentPostedMessage();
                 },
                 
                 replyAndScore: function(commentHtml, commentWrapper, showCommentPostedMessage, commentReplyFormLi, commentHasChildren, loadMorePresentInThread, userLoggedIn) {
@@ -184,9 +175,7 @@ $(document).ready(function() {
                         $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertAfter(elementToDisplayBelow).wrapAll(commentWrapper).fadeIn(function() {
                             $(this).children().unwrap();
                         });
-                        return;
                     }
-                    showCommentPostedMessage();
                 },
                 
                 postAndScore: function(commentHtml, commentWrapper, showCommentPostedMessage, userLoggedIn) {
@@ -208,9 +197,7 @@ $(document).ready(function() {
                         $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertBefore(elementToDisplayAbove).wrapAll(commentWrapper).fadeIn(function() {
                             $(this).children().unwrap();
                         });
-                        return;
                     }
-                    showCommentPostedMessage();
                 }
             };
             
@@ -249,23 +236,24 @@ $(document).ready(function() {
                     return;
                 }
                 if(commentSortMethod == "oldest" && isReplyForm) {
-                    commentPlacementDelegates.replyAndOldest(commentHtml, commentWrapper, showCommentPostedMessage, commentReplyFormLi, loadMorePresentInThread, commentHasChildren);
+                    commentPlacementDelegates.replyAndOldest(commentHtml, commentWrapper, commentReplyFormLi, loadMorePresentInThread, commentHasChildren);
                     return;
                 }
                 if(commentSortMethod == "oldest" && !isReplyForm) {
-                    commentPlacementDelegates.postAndOldest(commentHtml, commentWrapper, showCommentPostedMessage);
+                    commentPlacementDelegates.postAndOldest(commentHtml, commentWrapper);
                     return;
                 }
                 if(commentSortMethod == "score" && isReplyForm) {
-                    commentPlacementDelegates.replyAndScore(commentHtml, commentWrapper, showCommentPostedMessage, commentReplyFormLi, commentHasChildren, loadMorePresentInThread, userLoggedIn);
+                    commentPlacementDelegates.replyAndScore(commentHtml, commentWrapper, commentReplyFormLi, commentHasChildren, loadMorePresentInThread, userLoggedIn);
                     return;
                 }
                 if(commentSortMethod == "score" && !isReplyForm) {
-                    commentPlacementDelegates.postAndScore(commentHtml, commentWrapper, showCommentPostedMessage, userLoggedIn);
+                    commentPlacementDelegates.postAndScore(commentHtml, commentWrapper, userLoggedIn);
                     return;
                 }
                 throw "Need to set which comment sort method has been used by assigning a value to commentSortMethod";
             })();
+            showCommentPostedMessage();
             
             // clean up form
             if(isReplyForm) {
