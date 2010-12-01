@@ -97,25 +97,24 @@ class OslCommentManager(models.Manager):
             """
         get_threaded_comments_sql += """
             FROM (
-                WITH parent_comments_result_set AS (
-                    SELECT
-                        dc.id,
-                        oc.comment_ptr_id,
-                        True AS parent,
-                        dc.content_type_id,
-                        dc.object_pk,
-                        dc.id AS thread_id,
-                        dc.user_id,
-                        dc.user_name,
-                        dc.user_url,
-                        dc.comment,
-                        dc.submit_date AS thread_submit_date,
-                        dc.submit_date,
-                        dc.is_removed,
-                        oc.edit_timestamp,
-                        oc.transformed_comment,
-                        oc.is_deleted_by_user,
-                        oc.parent_comment_id,
+                SELECT
+                    dc.id,
+                    oc.comment_ptr_id,
+                    True AS parent,
+                    dc.content_type_id,
+                    dc.object_pk,
+                    dc.id AS thread_id,
+                    dc.user_id,
+                    dc.user_name,
+                    dc.user_url,
+                    dc.comment,
+                    dc.submit_date AS thread_submit_date,
+                    dc.submit_date,
+                    dc.is_removed,
+                    oc.edit_timestamp,
+                    oc.transformed_comment,
+                    oc.is_deleted_by_user,
+                    oc.parent_comment_id,
         """
         if order_method == 'score':
             get_threaded_comments_sql += """
@@ -127,36 +126,34 @@ class OslCommentManager(models.Manager):
                         score.raw_score
         """
         get_threaded_comments_sql += """
+                FROM
+                    django_comments AS dc
+                JOIN
+                    osl_comments_oslcomment AS oc 
+                    ON dc.id = oc.comment_ptr_id 
+                LEFT JOIN (
+                    SELECT
+                        object_id,
+                        SUM(vote) AS raw_score
                     FROM
-                        django_comments AS dc
-                    JOIN
-                        osl_comments_oslcomment AS oc 
-                        ON dc.id = oc.comment_ptr_id 
-                    LEFT JOIN (
-                        SELECT
-                            object_id,
-                            SUM(vote) AS raw_score
-                        FROM
-                            votes
-                        JOIN 
-                            django_content_type
-                            ON votes.content_type_id = django_content_type.id
-                        WHERE
-                            app_label = 'osl_comments' AND
-                            model = 'oslcomment'
-                        GROUP BY
-                            object_id
-                    ) AS score
-                        ON dc.id = score.object_id
+                        votes
+                    JOIN 
+                        django_content_type
+                        ON votes.content_type_id = django_content_type.id
                     WHERE
-                        dc.content_type_id = %(content_type)d AND
-                        dc.object_pk = %(object_pk)s AND
-                        dc.site_id = %(site_id)d AND
-                        dc.is_public = TRUE AND
-                        oc.inline_to_object = False AND
-                        oc.parent_comment_id IS NULL
-                )
-                SELECT * FROM parent_comments_result_set
+                        app_label = 'osl_comments' AND
+                        model = 'oslcomment'
+                    GROUP BY
+                        object_id
+                ) AS score
+                    ON dc.id = score.object_id
+                WHERE
+                    dc.content_type_id = %(content_type)d AND
+                    dc.object_pk = %(object_pk)s AND
+                    dc.site_id = %(site_id)d AND
+                    dc.is_public = TRUE AND
+                    oc.inline_to_object = False AND
+                    oc.parent_comment_id IS NULL
                 UNION ALL
                 SELECT
                     dc2.id,
@@ -169,7 +166,7 @@ class OslCommentManager(models.Manager):
                     dc2.user_name,
                     dc2.user_url,
                     dc2.comment,
-                    pcrs.submit_date AS thread_submit_date,
+                    dc3.submit_date AS thread_submit_date,
                     dc2.submit_date,
                     dc2.is_removed,
                     oc2.edit_timestamp,
@@ -197,8 +194,8 @@ class OslCommentManager(models.Manager):
                     osl_comments_oslcomment AS oc2
                     ON dc2.id = oc2.comment_ptr_id
                 JOIN
-                    parent_comments_result_set AS pcrs
-                    ON pcrs.id = oc2.parent_comment_id
+                    django_comments AS dc3
+                    ON dc3.id = oc2.parent_comment_id
                 LEFT JOIN (
                     SELECT
                         object_id,
