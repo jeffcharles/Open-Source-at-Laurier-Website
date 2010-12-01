@@ -99,7 +99,7 @@ def edit_comment(request, next=None):
         return CommentPostBadRequest(
             "No comment matching with PK %r exists." % comment_id
         )
-    except (ValueError, ValidationError), e:
+    except (ValueError, ValidationError) as e:
         return CommentPostBadRequest(
             "Attempting to get comment PK %r raised %s" % 
             (escape(comment_id), e.__class__.__name__)
