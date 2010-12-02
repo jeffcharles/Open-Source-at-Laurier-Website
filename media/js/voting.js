@@ -1,6 +1,9 @@
 $(document).ready(function() {
     
     $("div.vote-box > a").live('click', function(event) {
+        if(!userLoggedIn) {
+            location = loginPageUrl;
+        }
         var selectedAnchor = $(this);
         var voteBox = $(selectedAnchor.parent());
         var voteBoxContainer = voteBox.parent();
