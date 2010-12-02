@@ -114,6 +114,14 @@ $(document).ready(function() {
             
             var commentPlacementDelegates = {
             
+                noPriorComments: function(commentHtml, commentWrapper) {
+                    $("section#comments > p:last").fadeOut(function() {
+                        $(commentHtml).wrapAll("<div style='display: none;' />").wrapAll("<ul id='comment-list' />").wrapAll(commentWrapper).parent().parent().parent().insertAfter(this).fadeIn(function() {
+                            $(this).children().unwrap();
+                        });
+                    });
+                },
+            
                 replyAndNewest: function(commentHtml, commentWrapper, commentReplyFormLi) {
                     $(commentHtml).wrapAll("<div style='display: none;' />").parent().insertAfter(commentReplyFormLi).wrapAll(commentWrapper).fadeIn(function() {
                         $(this).children().unwrap();
@@ -206,6 +214,7 @@ $(document).ready(function() {
             var commentHasChildren;
             var loadMorePresentInThread;
             var commentWrapper;
+            var noPriorComments = $("li.comments").length < 1;
             if(isReplyForm) {
                 commentReplyFormLi = commentForm.closest("li.comment-reply-form");
                 commentHasChildren = commentReplyFormLi.next("li.comment-child").length > 0;
@@ -227,6 +236,10 @@ $(document).ready(function() {
             
             // pick method based on sort order and whether this is a post or reply
             (function() {
+                if(noPriorComments) {
+                    commentPlacementDelegates.noPriorComments(commentHtml, commentWrapper);
+                    return;
+                }
                 if(commentSortMethod == "newest" && isReplyForm) {
                     commentPlacementDelegates.replyAndNewest(commentHtml, commentWrapper, commentReplyFormLi);
                     return;
