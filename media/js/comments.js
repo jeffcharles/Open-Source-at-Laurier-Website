@@ -47,8 +47,8 @@ $(document).ready(function() {
         return false;
     });
     
-    $("form.edit-comment input[name='post']").live('click', function() {
-        var editForm = $(this).closest("form.edit-comment");
+    $("form.edit-comment").live('submit', function() {
+        var editForm = $(this);
         editForm.find("input[name='post']").remove();
         editForm.find("input[name='cancel']").remove();
         editForm.children().last().after(ajaxSubmittingHtml);
@@ -85,14 +85,14 @@ $(document).ready(function() {
         return false;
     });
     
-    $("form.post-comment input[name='post']").live('click', function() {
+    $("form.post-comment").live('submit', function() {
         var isInCommentList = $(this).closest("section#comments").length > 0;
         if(!isInCommentList) {
             return true;
         }
         
         var isReplyForm = $(this).closest("li.comment-reply-form").length > 0;
-        var commentForm = $(this).closest("form");
+        var commentForm = $(this);
         
         if(isReplyForm) {
             commentForm.find("input[name='post']").remove();
@@ -214,7 +214,7 @@ $(document).ready(function() {
             var commentHasChildren;
             var loadMorePresentInThread;
             var commentWrapper;
-            var noPriorComments = $("li.comments").length < 1;
+            var noPriorComments = $("li.comment").length < 1;
             if(isReplyForm) {
                 commentReplyFormLi = commentForm.closest("li.comment-reply-form");
                 commentHasChildren = commentReplyFormLi.next("li.comment-child").length > 0;
