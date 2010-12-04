@@ -203,6 +203,27 @@ body {
     margin-bottom: 2px;
 }
 
+div#comment-sorting {
+    background-color: #333333;
+    color: #CCCCCC;
+    margin: 0px;
+    padding: 10px;
+}
+
+div#comment-sorting a {
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+div#comment-sorting li {
+    margin: 0px 6px 0px 6px;
+    padding: 10px 6px 11px 6px !important;
+}
+
+div#comment-sorting li.selected {
+    background-color: #FF6600;
+}
+
 div.score-sum {
     height: 24px;
     margin: auto;

@@ -15,13 +15,15 @@
         <p>There does not appear to be anything here.</p>
     {% else %}
         {% get_object_ctype for object as object_ctype %}
-        <a name="comment-sorting"></a>
-        Sort by:
-        <ul id="comment-sorting-links">
-            <li{% if sorted_by == "newest" %} class="selected"{% endif %}><a href="{% output_sort_by_newest_qs %}#comment-sorting" data-ajax-url="{% url get_comments_by_newest obj_ctype_pk=object_ctype.pk obj_pk=object.pk comments_enabled=comments_enabled %}?offset=0">Newest</a></li>
-            <li{% if sorted_by == "score" %} class="selected"{% endif %}><a href="{% output_sort_by_score_qs %}#comment-sorting" data-ajax-url="{% url get_comments_by_score obj_ctype_pk=object_ctype.pk obj_pk=object.pk comments_enabled=comments_enabled %}?offset=0">Top</a></li>
-            <li{% if sorted_by == "oldest" %} class="selected"{% endif %}><a href="{% output_sort_by_oldest_qs %}#comment-sorting" data-ajax-url="{% url get_comments_by_oldest obj_ctype_pk=object_ctype.pk obj_pk=object.pk comments_enabled=comments_enabled %}?offset=0">Oldest</a></li>
-        </ul>
+        <div id="comment-sorting">
+            <a name="comment-sorting"></a>
+            Sort by:
+            <ul id="comment-sorting-links">
+                <li{% if sorted_by == "newest" %} class="selected"{% endif %}><a href="{% output_sort_by_newest_qs %}#comment-sorting" data-ajax-url="{% url get_comments_by_newest obj_ctype_pk=object_ctype.pk obj_pk=object.pk comments_enabled=comments_enabled %}?offset=0">Newest</a></li>
+                <li{% if sorted_by == "score" %} class="selected"{% endif %}><a href="{% output_sort_by_score_qs %}#comment-sorting" data-ajax-url="{% url get_comments_by_score obj_ctype_pk=object_ctype.pk obj_pk=object.pk comments_enabled=comments_enabled %}?offset=0">Top</a></li>
+                <li{% if sorted_by == "oldest" %} class="selected"{% endif %}><a href="{% output_sort_by_oldest_qs %}#comment-sorting" data-ajax-url="{% url get_comments_by_oldest obj_ctype_pk=object_ctype.pk obj_pk=object.pk comments_enabled=comments_enabled %}?offset=0">Oldest</a></li>
+            </ul>
+        </div>
         <ul id="comment-list">
             {% if not comment_list.0.parent %}
                 {% with first_comment_parent as comment %}
