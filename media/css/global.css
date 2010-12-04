@@ -148,17 +148,12 @@ body {
     padding-bottom: 2.0em;
 }
 
-#content #comments li {
-    border-bottom: 1px dotted #333333;
-    padding-bottom: 10px;
-    padding-top: 10px;
-}
-
 #content #comments #comment-list li.comment-child {
     padding-left: 3.0em;
 }
 
 #content #comments > #comment-list > li, #content #comments > #comment-list > div > li, #content #comments > #comment-list > div > div > li {
+    border-bottom: 1px dotted #333333;
     padding: 10px;
 }
 
