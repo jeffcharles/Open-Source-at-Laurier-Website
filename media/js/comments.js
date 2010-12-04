@@ -468,6 +468,30 @@ $(document).ready(function() {
         return false;
     });
     
+    $("ul#comment-sorting-links > li > a").click(function() {
+        $("ul#comment-sorting-links > li").removeClass("selected");
+        $(this).parent().addClass("selected");
+        
+        var ajaxUrl = $(this).attr("data-ajax-url");
+        var commentList = $("ul#comment-list");
+        var wrapper = commentList.children().wrapAll("<div />").parent();
+        var secondWrapper = wrapper.children().wrapAll("<div />").parent();
+        wrapper.height(wrapper.height());
+        secondWrapper.fadeOut(function() {
+            secondWrapper.before(ajaxLoaderHtml);
+            $.get(ajaxUrl, function(commentsHtml) {
+                secondWrapper.prev().remove();
+                secondWrapper.html(commentsHtml);
+                wrapper.animate({height: secondWrapper.height()}, function() {
+                    secondWrapper.fadeIn(function() {
+                        $(this).children().unwrap().unwrap();
+                    });
+                });
+            });
+        });
+        return false;
+    });
+    
     $("textarea[name='comment']").markdownPreview();
     $("input[name='preview']").remove();
     
