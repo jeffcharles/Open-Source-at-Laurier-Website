@@ -210,7 +210,7 @@ def get_comment(request, comment_id):
         'vote': Vote.objects.get_for_user(comment, request.user)}, 
         context_instance=RequestContext(request))
 
-def load_more(request, obj_ctype_pk, obj_pk, order_method, comments_enabled):
+def get_comments(request, obj_ctype_pk, obj_pk, order_method, comments_enabled):
     """Renders a list of comments."""
     
     OFFSET_QUERY_STRING_KEY = 'offset'
