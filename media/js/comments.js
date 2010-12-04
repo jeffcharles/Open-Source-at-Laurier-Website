@@ -13,9 +13,30 @@ $(document).ready(function() {
     $("li.load-more-comments > a").live('click', function() {
         var loadMoreElement = $(this).parent();
         loadMoreElement.html(ajaxLoaderHtml);
+        
+        var commentIdsOnPage = [];
+        var namedCommentAnchors = $("a[name^='c']");
+        namedCommentAnchors.each(function() {
+            var commentId = parseInt($(this).attr("name").substring(1));
+            if(!isNaN(commentId)) {
+                commentIdsOnPage.push(commentId);
+            }
+        });
+        
         commentsOnPage = $("li.comment").length;
         $.get($(this).attr("href") + "?offset=" + commentsOnPage, function(commentListHtml) {
             $(commentListHtml).wrapAll("<div style='display: none;' />").parent().insertAfter(loadMoreElement);
+            
+            var returnedComments = loadMoreElement.next();
+            var returnedNamedCommentAnchors = returnedComments.find("a[name^='c']");
+            returnedNamedCommentAnchors.each(function() {
+                var commentId = parseInt($(this).attr("name").substring(1));
+                var returnedCommentAlreadyOnPage = $.inArray(commentId, commentIdsOnPage) > -1;
+                if(returnedCommentAlreadyOnPage) {
+                    $(this).closest("li").remove();
+                }
+            });
+            
             var lastComment = loadMoreElement.prev();
             loadMoreElement.remove();
             lastComment.next().slideDown(function() {
