@@ -105,17 +105,6 @@ body {
     width: 30px;
 }
 
-#comment-sorting-links {
-    display: inline;
-    margin-left: 5px;
-}
-
-#comment-sorting-links li {
-    border-bottom: 0px solid #FFFFFF !important;
-    display: inline;
-    margin: 0px 5px 0px 5px;
-}
-
 #comments h1 {
     font-size: 26px;
 }
@@ -210,7 +199,13 @@ div#comment-sorting a {
     text-decoration: none;
 }
 
-div#comment-sorting li {
+div#comment-sorting > ul {
+    display: inline;
+    margin: 0px 0px 0px 5px;
+}
+
+div#comment-sorting > ul > li {
+    display: inline;
     margin: 0px 6px 0px 6px;
     padding: 10px 6px 10px 6px !important;
 }
