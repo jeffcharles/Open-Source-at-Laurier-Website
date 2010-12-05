@@ -138,6 +138,7 @@ INSTALLED_APPS = (
     'articles',
     'announcements',
     'debug_toolbar',
+    'django_extensions',
     'mailer',
     'notification',
     'osl_comments',
