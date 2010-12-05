@@ -7,12 +7,12 @@ wsgiref>=0.1.2
 django-tagging==0.3.1
 django-announcements==0.1.0
 django-debug-toolbar==0.8.3
-django-extensions
 django-flash==1.7.1
 django-mailer==0.1.0
 django-notification==0.1.5
 django-voting==0.1
 
+-e git+http://github.com/django-extensions/django-extensions.git#egg=django_extensions
 -e git+http://github.com/facebook/python-sdk.git#egg=facebook
 -e git+http://github.com/flashingpumpkin/django-socialregistration.git#egg=socialregistration
 
