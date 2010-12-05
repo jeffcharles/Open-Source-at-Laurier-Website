@@ -355,27 +355,27 @@ $(document).ready(function() {
         var commentBodyAndLinks = commentContainer.children("blockquote.comment-body, ul.comment-links");
         var editFormExists = editForm.length;
         if(editFormExists) {
+            var wrapper = commentContainer.children().wrapAll("<div />").parent();
+            wrapper.height(wrapper.height());
             commentBodyAndLinks.wrapAll("<div />").parent().fadeOut(function() {
-                commentContainer.children().wrapAll("<div />");
-                var wrapper = commentContainer.children();
                 wrapper.animate({height: commentHeader.height() + editForm.height()}, function() {
                     editForm.fadeIn();
                     $(this).children().unwrap();
                 });
             });
         } else {
+            var wrapper = commentContainer.children().wrapAll("<div />").parent();
+            wrapper.height(wrapper.height());
             commentBodyAndLinks.wrapAll("<div />").parent().fadeOut(null, function() {
                 commentHeader.after(ajaxLoaderHtml);
                 $.get(clickedAnchor.attr("data-ajax-url"), function(edit_form_html) {
                     commentHeader.next().remove();
                     commentHeader.after("<div style='display: none;' />").next().append(edit_form_html).children().hide().unwrap();
-                    var editForm = commentContainer.children("div.comment-header").next();
+                    var editForm = wrapper.children("div.comment-header").next();
                     var commentTextArea = editForm.find("textarea[name='comment']");
                     commentTextArea.markdownPreview();
                     $("<div class='initial-comment' style='display: none;' />").insertAfter(commentTextArea).append(commentTextArea.val());
                     editForm.find("input[name='preview']").remove();
-                    commentContainer.children().wrapAll("<div />");
-                    var wrapper = commentContainer.children();
                     wrapper.animate({height: commentHeader.height() + editForm.height()}, function() {
                         editForm.fadeIn();
                         $(this).children().unwrap();

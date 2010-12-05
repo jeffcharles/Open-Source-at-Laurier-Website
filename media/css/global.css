@@ -146,10 +146,6 @@ body {
     padding: 10px;
 }
 
-#content #comments > #comment-list > li:not(.load-more-comments), #content #comments > #comment-list > div > li:not(.load-more-comments), #content #comments > #comment-list > div > div > li:not(.load-more-comments) {
-    min-height: 78px;
-}
-
 #content img {
     margin-bottom: 5px;
     margin-top: 5px;
