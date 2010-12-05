@@ -474,10 +474,11 @@ $(document).ready(function() {
         
         var ajaxUrl = $(this).attr("data-ajax-url");
         
-        commentSortMethod = (ajaxUrl.indexOf("newest") > -1) ?
-            "newest" : (ajaxUrl.indexOf("score") > -1) ?
-            "score" : (ajaxUrl.indexOf("oldest") > -1) ?
-            "oldest" : (function() { throw "No comment sort method set" })(); 
+        commentSortMethod = 
+            (ajaxUrl.indexOf("newest") > -1) ? "newest" : 
+            (ajaxUrl.indexOf("score") > -1) ? "score" : 
+            (ajaxUrl.indexOf("oldest") > -1) ? "oldest" : 
+            (function() { throw "No comment sort method set" })(); 
         
         var commentList = $("ul#comment-list");
         var wrapper = commentList.children().wrapAll("<div />").parent();
