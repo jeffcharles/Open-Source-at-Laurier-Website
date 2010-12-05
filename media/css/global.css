@@ -212,7 +212,7 @@ div#comment-sorting a {
 
 div#comment-sorting li {
     margin: 0px 6px 0px 6px;
-    padding: 10px 6px 11px 6px !important;
+    padding: 10px 6px 10px 6px !important;
 }
 
 div#comment-sorting li.selected {
