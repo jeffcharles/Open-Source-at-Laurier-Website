@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Delete your comment{% endblock %}
+
+{% block content %}
+<h1>Really delete this comment?</h1>
+
+{% if comment.user_url %}<a href="{{ comment.user_url }}">{{ comment.user_name }}</a>{% else %}{{ comment.user_name }}{% endif %} posted {{ comment.submit_date|timesince }} ago:
+<blockquote>{{ comment.transformed_comment|safe }}</blockquote>
+
+<form action="." method="post">{% csrf_token %}
+    {% if next %}
+        <input type="hidden" name="next" value="{{ next }}" id="next" />
+    {% else %}
+        {% if request.META.HTTP_REFERER %}
+            <input type="hidden" name="next" value="{{ request.META.HTTP_REFERER|safe }}" />
+        {% endif %}
+    {% endif %}
+    <p class="submit">
+        <input type="submit" name="submit" value="Delete" /> or <a href="{{ comment.get_absolute_url }}">cancel</a>
+    </p>
+</form>
+{% endblock %}

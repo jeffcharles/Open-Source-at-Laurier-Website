@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Examine IP Address Ban Status{% endblock %}
+
+{% block content %}
+<h1>Examine IP Address Ban Status</h1>
+
+<p>IP address is currently {% if not banned %}not {% endif %}banned.</p>
+
+<form action="" method="post">{% csrf_token %}
+    {% if next %}
+        <input type="hidden" name="next" value="{{ next }}" id="next" />
+    {% else %}
+        {% if request.META.HTTP_REFERER %}
+            <input type="hidden" name="next" value="{{ request.META.HTTP_REFERER|safe }}" />
+        {% endif %}
+    {% endif %}
+    <input type="hidden" name="ban" value="{% if banned %}False{% else %}True{% endif %}" />
+    <input type="submit" value="{% if banned %}Un-ban{% else %}Ban{% endif %}" />
+</form>
+{% endblock %}
+

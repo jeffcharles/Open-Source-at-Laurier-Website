@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm your {{ direction }} vote{% endblock %}
+
+{% block content %}
+
+<h1>Confirm your {{ direction }} vote</h1>
+
+{% if comment.user_url %}<a href="{{ comment.user_url }}">{{ comment.user_name }}</a>{% else %}{{ comment.user_name }}{% endif %} posted {{ comment.submit_date|timesince }} ago:
+<blockquote>{{ comment.transformed_comment|safe }}</blockquote>
+
+<form action="" method="POST">{% csrf_token %}
+    <input type="submit" value="Confirm" /> or <a href="{{ comment.get_absolute_url }}">cancel</a>
+</form>
+
+{% endblock %}
+

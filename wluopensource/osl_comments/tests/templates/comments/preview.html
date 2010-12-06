@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Preview your comment{% endblock %}
+
+{% block content %}
+{% load comments markup %}
+{% if form.errors %}
+    <h1>{% with form.errors|length as counter %}Please correct the error{{ counter|pluralize }} below{% endwith %}</h1>
+    <form action="{% comment_form_target %}" method="post">
+        {% include "comments/comment_form.html" %}
+    </form>
+{% else %}
+    <h1>Preview your comment</h1>
+    <blockquote>{{ comment|markdown }}</blockquote>
+    <p> and <input type="submit" name="submit" class="submit-post" value="Post your comment" id="submit" /> or make changes:</p>
+{% endif %}
+{% endblock %}

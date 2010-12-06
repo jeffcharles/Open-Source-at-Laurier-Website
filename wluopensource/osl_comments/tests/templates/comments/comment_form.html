@@ -1,0 +1,32 @@
+{% csrf_token %}
+    <table cellpadding="0" cellspacing="0">
+    <tr><td colspan="2"><span style="font-weight: bold;">Bold</span> fields are required</td></tr>
+    {% if next %}
+        <input type="hidden" name="next" value="{{ next }}" />
+    {% else %}
+        <input type="hidden" name="next" value="{{ request.path }}" />
+    {% endif %}
+    {% for field in form %}
+    {% if field.is_hidden %}
+        {{ field }}
+    {% else %}
+        <tr class="{{ field.css_classes }} {% if field.errors %}error{% endif %}"
+            {% ifequal field.name "honeypot" %} style="display:none;"{% endifequal %}>
+            <th{% if field.name == "comment" %} class="comment-column-header"{% endif %}>{{ field.label_tag }}:{% if field.name == "comment" %}<p>(accepts <a href="http://daringfireball.net/projects/markdown/syntax">Markdown syntax</a>)</p>{% endif %}</th>
+            <td>{{ field }}</td>
+            <td>{% if field.errors %}{{ field.errors }}{% endif %}</td>
+        </tr>
+    {% endif %}
+    {% endfor %}
+        <tr class="submit">
+            <td></td><td>
+                <input type="submit" name="post" class="submit-post" value="Post" />
+                <input type="submit" name="preview" class="submit-preview" value="Preview" />
+                {% if cancel_url %}
+                    <input type="hidden" name="cancel_url" value="{{ cancel_url }}" />
+                    <input type="submit" name="cancel" class="submit-cancel" value="Cancel" />
+                {% endif %}
+            </td><td></td>
+        </tr>
+    </table>
+</form>
