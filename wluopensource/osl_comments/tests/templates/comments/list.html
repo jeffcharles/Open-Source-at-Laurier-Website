@@ -60,5 +60,4 @@
 <script type="text/javascript">
     var commentSortMethod = "{{ sorted_by }}";
     var userLoggedIn = {% if request.user.is_authenticated %}true{% else %}false{% endif %} // use for UI only! not for actual auth check
-    var loginPageUrl = "{% url django.contrib.auth.views.login %}?next={{ request.get_full_path }}";
 </script>

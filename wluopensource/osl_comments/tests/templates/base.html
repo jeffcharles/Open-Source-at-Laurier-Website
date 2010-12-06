@@ -3,8 +3,6 @@
     <head>
         <meta charset="utf-8">
         <title>{% block title %}{% endblock %}</title>
-        <link rel="alternate" type="application/rss+xml" title="Open Source at Laurier articles (RSS)" href="{% url articles_rss %}" />
-        <link rel="alternate" type="application/atom+xml" title="Open Source at Laurier articles (Atom)" href="{% url articles_atom %}" />
     </head>
     <body>
         {% block content %}{% endblock %}

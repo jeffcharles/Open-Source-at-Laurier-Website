@@ -1,1 +1,1 @@
-from osl_comments.tests import CommentsTestCase
+from osl_comments.tests.tests import CommentsTestCase
