@@ -303,6 +303,99 @@ class OslCommentManager(models.Manager):
         return qs
 
 class OslComment(Comment):
+    """
+    >>> import datetime
+    >>> c1 = OslComment(content_type_id=1, object_pk=1, site_id=1, \
+            user_id=None, user_name='test', user_email='test@test.ca', \
+            user_url='', comment='1', ip_address='127.0.0.1', \
+            parent_comment_id=None, submit_date=datetime.datetime.now())
+    >>> c1.save()
+    >>> c1a = OslComment(content_type_id=1, object_pk=1, site_id=1, \
+            user_id=None, user_name='test', user_email='test@test.ca', \
+            user_url='', comment='1a', ip_address='127.0.0.1', \
+            parent_comment_id=c1.id, submit_date=datetime.datetime.now())
+    >>> c1a.save()
+    >>> c2 = OslComment(content_type_id=1, object_pk=1, site_id=1, \
+            user_id=None, user_name='test', user_email='test@test.ca', \
+            user_url='', comment='2', ip_address='127.0.0.1', \
+            parent_comment_id=None, submit_date=datetime.datetime.now())
+    >>> c2.save()
+    >>> c1b = OslComment(content_type_id=1, object_pk=1, site_id=1, \
+            user_id=None, user_name='test', user_email='test@test.ca', \
+            user_url='', comment='1b', ip_address='127.0.0.1', \
+            parent_comment_id=c1.id, submit_date=datetime.datetime.now())
+    >>> c1b.save()
+    >>> c2a = OslComment(content_type_id=1, object_pk=1, site_id=1, \
+            user_id=None, user_name='test', user_email='test@test.ca', \
+            user_url='', comment='2a', ip_address='127.0.0.1', \
+            parent_comment_id=c2.id, submit_date=datetime.datetime.now())
+    >>> c2a.save()
+    >>> c3 = OslComment(content_type_id=1, object_pk=1, site_id=1, \
+            user_id=None, user_name='test', user_email='test@test.ca', \
+            user_url='', comment='3', ip_address='127.0.0.1', \
+            parent_comment_id=None, submit_date=datetime.datetime.now())
+    >>> c3.save()
+    >>> c1c = OslComment(content_type_id=1, object_pk=1, site_id=1, \
+            user_id=None, user_name='test', user_email='test@test.ca', \
+            user_url='', comment='1c', ip_address='127.0.0.1', \
+            parent_comment_id=c1.id, submit_date=datetime.datetime.now())
+    >>> c1c.save()
+    >>> c3a = OslComment(content_type_id=1, object_pk=1, site_id=1, \
+            user_id=None, user_name='test', user_email='test@test.ca', \
+            user_url='', comment='3a', ip_address='127.0.0.1', \
+            parent_comment_id=c3.id, submit_date=datetime.datetime.now())
+    >>> c3a.save()
+    >>> c2b = OslComment(content_type_id=1, object_pk=1, site_id=1, \
+            user_id=None, user_name='test', user_email='test@test.ca', \
+            user_url='', comment='2b', ip_address='127.0.0.1', \
+            parent_comment_id=c2.id, submit_date=datetime.datetime.now())
+    >>> c2b.save()
+    >>> c3b = OslComment(content_type_id=1, object_pk=1, site_id=1, \
+            user_id=None, user_name='test', user_email='test@test.ca', \
+            user_url='', comment='3b', ip_address='127.0.0.1', \
+            parent_comment_id=c3.id, submit_date=datetime.datetime.now())
+    >>> c3b.save()
+    >>> c3c = OslComment(content_type_id=1, object_pk=1, site_id=1, \
+            user_id=None, user_name='test', user_email='test@test.ca', \
+            user_url='', comment='3c', ip_address='127.0.0.1', \
+            parent_comment_id=c3.id, submit_date=datetime.datetime.now())
+    >>> c3c.save()
+    >>> c2c = OslComment(content_type_id=1, object_pk=1, site_id=1, \
+            user_id=None, user_name='test', user_email='test@test.ca', \
+            user_url='', comment='2c', ip_address='127.0.0.1', \
+            parent_comment_id=c2.id, submit_date=datetime.datetime.now())
+    >>> c2c.save()
+    
+    >>> from voting.models import Vote
+    >>> from django.contrib.auth.models import User
+    >>> user = User.objects.create_user('tester', 'tester@test.ca', 'password')
+    >>> Vote.objects.record_vote(c1b, user, 1)
+    >>> Vote.objects.record_vote(c2, user, 1)
+    >>> Vote.objects.record_vote(c2a, user, 1)
+    >>> Vote.objects.record_vote(c3c, user, 1)
+    
+    >>> from django.contrib.contenttypes.models import ContentType
+    >>> ctype = ContentType.objects.get(id=1)
+    
+    >>> comments_by_newest = list(OslComment.objects.get_comments(ctype, '1', \
+            'newest', comment_page=1))
+    >>> [comment.comment for comment in comments_by_newest]
+    [u'3', u'3c', u'3b', u'3a', u'2', u'2c', u'2b', u'2a', u'1', u'1c', u'1b', \
+        u'1a']
+        
+    >>> comments_by_oldest = list(OslComment.objects.get_comments(ctype, '1', \
+            'oldest', comment_page=1))
+    >>> [comment.comment for comment in comments_by_oldest]
+    [u'1', u'1a', u'1b', u'1c', u'2', u'2a', u'2b', u'2c', u'3', u'3a', u'3b', \
+        u'3c']
+    
+    >>> comments_by_score = list(OslComment.objects.get_comments(ctype, '1', \
+            'score', comment_page=1))
+    >>> [comment.comment for comment in comments_by_score]
+    [u'2', u'2a', u'2c', u'2b', u'3', u'3c', u'3b', u'3a', u'1', u'1b', u'1c', \
+        u'1a']
+    """
+
     parent_comment = models.ForeignKey(Comment, blank=True, db_index=True, null=True, related_name='parent_comment')
     inline_to_object = models.BooleanField(db_index=True, default=False)
     edit_timestamp = models.DateTimeField()
