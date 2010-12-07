@@ -48,6 +48,13 @@ def delete_comment(request, comment_id, next=None):
         t = loader.get_template('comments/delete_by_user_forbidden.html')
         c = RequestContext(request)
         return HttpResponseForbidden(t.render(c))
+    
+    # Check that user is not banned from commenting
+    user_ip_address = request.META['REMOTE_ADDR']
+    user_is_banned = \
+        CommentsBannedFromIpAddress.objects.is_banned(user_ip_address)
+    if user_is_banned:
+        return HttpResponseForbidden()
 
     # Delete on POST
     if request.method == 'POST':

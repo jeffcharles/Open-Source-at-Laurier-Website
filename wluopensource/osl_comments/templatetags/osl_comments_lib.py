@@ -702,16 +702,10 @@ class UserIsBannedNode(template.Node):
     
     def render(self, context):
         user_ip_address = context['request'].META['REMOTE_ADDR']
-        user_is_banned = False
-        try:
-            user_is_banned = \
-                CommentsBannedFromIpAddress.objects.get(
-                ip_address = user_ip_address).comments_banned
-        except CommentsBannedFromIpAddress.DoesNotExist:
-            user_is_banned = False
-        finally:
-            context[self.as_varname] = user_is_banned
-            return ''
+        user_is_banned = \
+            CommentsBannedFromIpAddress.objects.is_banned(user_ip_address)
+        context[self.as_varname] = user_is_banned
+        return ''
 
 @register.tag
 def bool_entry_from_flags(parser, token):

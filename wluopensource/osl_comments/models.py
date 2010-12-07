@@ -13,9 +13,21 @@ from osl_comments.signals import (comment_was_deleted_by_user,
     comment_was_edited, ip_address_ban_was_updated)
 import settings
 
+class CommentsBannedManager(models.Manager):
+    
+    def is_banned(self, ip_address):
+        comments_banned = False
+        try:
+            comments_banned = self.get(ip_address=ip_address).comments_banned
+        except CommentsBannedFromIpAddress.DoesNotExist:
+            comments_banned = False
+        finally:
+            return comments_banned
+
 class CommentsBannedFromIpAddress(models.Model):
     ip_address = models.IPAddressField(primary_key=True)
     comments_banned = models.BooleanField(default=True)
+    objects = CommentsBannedManager()
     
     def __unicode__(self):
         return "%s, Banned: %s" % (self.ip_address, self.comments_banned)
