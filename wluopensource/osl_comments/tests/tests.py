@@ -4,6 +4,8 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.client import Client
 
+from osl_comments.models import CommentsBannedFromIpAddress
+
 class CommentsTestCase(TestCase):
     fixtures = ['comments_test_data.json']
     urls = 'osl_comments.tests.urls'
@@ -65,6 +67,18 @@ class CommentsTestCase(TestCase):
         
     def testSuperUserNoCommentsArticleAccess(self):
         self.client.login(username='jeff', password='password')
+        response = self.client.get('/articles/view/no-comments/')
+        self.assertEquals(response.status_code, 200)
+    
+    def testBannedFromCommentingLotsOfCommentsArticleAccess(self):
+        ban = CommentsBannedFromIpAddress(ip_address='127.0.0.1')
+        ban.save()
+        response = self.client.get('/articles/view/lots-comments/')
+        self.assertEquals(response.status_code, 200)
+    
+    def testBannedFromCommentingNoCommentsArticleAccess(self):
+        ban = CommentsBannedFromIpAddress(ip_address='127.0.0.1')
+        ban.save()
         response = self.client.get('/articles/view/no-comments/')
         self.assertEquals(response.status_code, 200)
 
