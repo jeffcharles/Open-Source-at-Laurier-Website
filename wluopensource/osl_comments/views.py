@@ -114,7 +114,7 @@ def edit_comment(request, next=None):
     
     # ensure user editing is same user who posted comment
     if comment.user != request.user:
-        return CommentPostBadRequest("Cannot edit another user's comment.")
+        return HttpResponseForbidden("Cannot edit another user's comment.")
     
     # does the user want to preview the comment?
     preview = 'preview' in data
