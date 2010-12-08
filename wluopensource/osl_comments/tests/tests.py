@@ -177,3 +177,167 @@ class CommentsTestCase(TestCase):
         response = self.client.post('/comments/delete_comment/1000/')
         self.assertEquals(response.status_code, 404)
     
+    ## Edit comment tests ##
+    
+    def testNominalEditCommentStatus(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/edit/', 
+            data={'comment': 'changed', 'comment_id': '1'})
+        self.assertEquals(response.status_code, 302)
+    
+    def testNominalEditCommentLocation(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/edit/', 
+            data={'comment': 'changed', 'comment_id': '1'})
+        self.assertEquals(response['location'], 
+            'http://testserver/comments/edited/')
+    
+    def testNominalEditCommentInitialValue(self):
+        oc = OslComment.objects.get(pk=1)
+        self.assertEquals(oc.comment, u'First!')
+    
+    def testNominalEditCommentResult(self):
+        self.client.login(username='jeff', password='password')
+        self.client.post('/comments/edit/', 
+            data={'comment': 'changed', 'comment_id': '1'})
+        oc = OslComment.objects.get(pk=1)
+        self.assertEquals(oc.comment, u'changed')
+    
+    def testEditCommentAuthRequiredStatus(self):
+        response = self.client.post('/comments/edit/', 
+            data={'comment': 'changed', 'comment_id': '1'})
+        self.assertEquals(response.status_code, 302)
+        
+    def testEditCommentAuthRequiredLocation(self):
+        response = self.client.post('/comments/edit/', 
+            data={'comment': 'changed', 'comment_id': '1'})
+        self.assertEquals(response['location'], 
+            'http://testserver/accounts/login/?next=/comments/edit/')
+    
+    def testEditCommentAuthRequiredResult(self):
+        self.client.post('/comments/edit/', 
+            data={'comment': 'changed', 'comment_id': '1'})
+        oc = OslComment.objects.get(pk=1)
+        self.assertEquals(oc.comment, u'First!')
+    
+    def testEditCommentForSameUserStatus(self):
+        self.client.login(username='auth_user', password='password')
+        response = self.client.post('/comments/edit/',
+            data={'comment': 'changed', 'comment_id': '1'})
+        self.assertEquals(response.status_code, 403)
+    
+    def testEditCommentForSameUserResult(self):
+        self.client.login(username='auth_user', password='password')
+        self.client.post('/comments/edit/',
+            data={'comment': 'changed', 'comment_id': '1'})
+        oc = OslComment.objects.get(pk=1)
+        self.assertEquals(oc.comment, u'First!')
+    
+    def testEditCommentByBannedUserStatus(self):
+        ban = CommentsBannedFromIpAddress(ip_address='127.0.0.1')
+        ban.save()
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/edit/',
+            data={'comment': 'changed', 'comment_id': '1'})
+        self.assertEquals(response.status_code, 400)
+    
+    def testEditCommentByBannedUserResult(self):
+        ban = CommentsBannedFromIpAddress(ip_address='127.0.0.1')
+        ban.save()
+        self.client.login(username='jeff', password='password')
+        self.client.post('/comments/edit/',
+            data={'comment': 'changed', 'comment_id': '1'})
+        oc = OslComment.objects.get(pk=1)
+        self.assertEquals(oc.comment, u'First!')
+    
+    def testEditCommentWithGetStatus(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.get('/comments/edit/')
+        self.assertEquals(response.status_code, 405)
+    
+    def testEditCommentWithGetResult(self):
+        self.client.login(username='jeff', password='password')
+        self.client.get('/comments/edit/')
+        oc = OslComment.objects.get(pk=1)
+        self.assertEquals(oc.comment, u'First!')
+    
+    def testEditCommentWithAjaxStatus(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/edit/',
+            data={'comment': 'changed', 'comment_id': '1'}, 
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response.status_code, 302)
+    
+    def testEditCommentWithAjaxLocation(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/edit/', 
+            data={'comment': 'changed', 'comment_id': '1'}, 
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response['location'],
+            'http://testserver/comments/comment/1/')
+    
+    def testEditCommentPreviewStatus(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/edit/', 
+            data={'comment': 'changed', 'comment_id': '1', 
+            'preview': 'preview'})
+        self.assertEquals(response.status_code, 200)
+    
+    def testEditCommentPreviewResult(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/edit/', 
+            data={'comment': 'changed', 'comment_id': '1', 
+            'preview': 'preview'})
+        oc = OslComment.objects.get(pk=1)
+        self.assertEquals(oc.comment, u'First!')
+    
+    def testEditCommentCancelStatus(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/edit/', 
+            data={'comment': 'changed', 'comment_id': '1', 
+            'cancel': 'cancel', 'cancel_url': '/cancelled/'})
+        self.assertEquals(response.status_code, 302)
+    
+    def testEditCommentCancelLocation(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/edit/', 
+            data={'comment': 'changed', 'comment_id': '1', 
+            'cancel': 'cancel', 'cancel_url': '/cancelled/'})
+        self.assertEquals(response['location'], 'http://testserver/cancelled/')
+    
+    def testEditCommentCancelResult(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/edit/', 
+            data={'comment': 'changed', 'comment_id': '1', 
+            'cancel': 'cancel', 'cancel_url': '/cancelled/'})
+        oc = OslComment.objects.get(pk=1)
+        self.assertEquals(oc.comment, u'First!')
+    
+    def testEditCommentDefaultTransformedComment(self):
+        oc = OslComment.objects.get(pk=1)
+        self.assertEquals(oc.transformed_comment, u'<p>First!</p>')
+    
+    def testEditCommentTransformsComment(self):
+        self.client.login(username='jeff', password='password')
+        self.client.post('/comments/edit/',
+            data={'comment': 'changed', 'comment_id': '1'})
+        oc = OslComment.objects.get(pk=1)
+        self.assertEquals(oc.transformed_comment, u'<p>changed</p>')
+    
+    def testEditCommentUpdatesEditTimestamp(self):
+        oc = OslComment.objects.get(pk=1)
+        orig_edit_timestamp = oc.edit_timestamp
+        
+        self.client.login(username='jeff', password='password')
+        self.client.post('/comments/edit/',
+            data={'comment': 'changed', 'comment_id': '1'})
+        
+        oc = OslComment.objects.get(pk=1)
+        self.assertTrue(oc.edit_timestamp > orig_edit_timestamp)
+    
+    def testEditCommentOnNonExistantCommentStatus(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/edit/',
+            data={'comment': 'changed', 'comment_id': '1000'})
+        self.assertEquals(response.status_code, 404)
+
