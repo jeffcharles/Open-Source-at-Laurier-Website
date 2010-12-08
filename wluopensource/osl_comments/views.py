@@ -11,7 +11,7 @@ from django.contrib.comments.views.utils import confirmation_view, next_redirect
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import (HttpResponse, HttpResponseBadRequest, 
-    HttpResponseForbidden)
+    HttpResponseForbidden, HttpResponseNotFound)
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext, loader
 from django.utils.encoding import smart_unicode
@@ -103,7 +103,7 @@ def edit_comment(request, next=None):
     try:
         comment = OslComment.objects.get(pk=comment_id)
     except ObjectDoesNotExist:
-        return CommentPostBadRequest(
+        return HttpResponseNotFound(
             "No comment matching with PK %r exists." % comment_id
         )
     except (ValueError, ValidationError) as e:
