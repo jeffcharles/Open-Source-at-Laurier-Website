@@ -57,7 +57,7 @@
                         <li class="flag-comment comment-action-confirmation-required">
                             {% bool_entry_from_flags comment from flags as flagged %}
                             <a {% if flagged %}style="display: none;" {% endif %}href="{% url comments-flag comment.id %}">Report this comment</a>
-                            <span class="action-confirmation" style="display: none;">Are you sure? <a class="yes" href="{% url osl_comments.views.flag comment_id=comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
+                            <span class="action-confirmation" style="display: none;">Are you sure? <a class="yes" href="{% url comments-flag comment.id %}">Yes</a> <a class="no" href="#">No</a></span>
                             <span class="action-performed"{% if not flagged %} style="display: none;"{% endif %}>Comment reported</span>
                         </li>
                     {% endif %}

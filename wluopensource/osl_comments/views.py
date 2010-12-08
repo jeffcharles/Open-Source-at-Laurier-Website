@@ -176,20 +176,6 @@ comment_edited = confirmation_view(
     doc = """Display a "comment was edited" success page."""
 )
 
-@require_POST
-@login_required
-def flag(request, comment_id, next=None):
-    if not request.is_ajax:
-        return redirect('django.contrib.comments.views.moderation.flag', 
-            comment_id)
-            
-    from django.contrib.comment.views.moderation import perform_flag
-    comment = get_object_or_404(OslComment, pk=comment_id, 
-        site__pk=settings.SITE_ID)
-    perform_flag(request, comment)
-    
-    return HttpResponse(status=200)
-
 def get_ajax_edit_form(request, comment_pk):
     comment = OslComment.objects.get(pk=comment_pk)
     return render_to_response(
