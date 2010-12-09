@@ -383,5 +383,83 @@ class CommentsTestCase(TestCase):
         response = self.client.get(
             '/comments/get_comments/1/1/newest/True/?offset=0',
             HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEquals(response.status_code, 200)        
+        self.assertEquals(response.status_code, 200)     
+    
+    ## Moderate tests ##
+    
+    def testNominalModerateStatus(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/moderate/40/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response.status_code, 302)
+        
+    def testNominalModerateLocation(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/moderate/40/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response['location'], 
+            'http://testserver/comments/comment/40/')
+    
+    def testNominalModerateResult(self):
+        self.client.login(username='jeff', password='password')
+        self.client.post('/comments/moderate/40/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        oc = OslComment.objects.get(pk=40)
+        self.assertEquals(oc.is_removed, True)
+    
+    def testModerateWithNoAuthStatus(self):
+        response = self.client.post('/comments/moderate/40/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response.status_code, 302)
+    
+    def testModerateWithNoAuthLocation(self):
+        response = self.client.post('/comments/moderate/40/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response['location'], 
+            'http://testserver/accounts/login/?next=/comments/moderate/40/')
+    
+    def testModerateWithNoAuthResult(self):
+        self.client.post('/comments/moderate/40/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        oc = OslComment.objects.get(pk=40)
+        self.assertEquals(oc.is_removed, False)
+    
+    def testModerateWithoutPermissionStatus(self):
+        self.client.login(username='auth_user', password='password')
+        response = self.client.post('/comments/moderate/1/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response.status_code, 302)
+    
+    def testModerateWithoutPermissionLocation(self):
+        self.client.login(username='auth_user', password='password')
+        response = self.client.post('/comments/moderate/1/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response['location'], 
+            'http://testserver/accounts/login/?next=/comments/moderate/1/')
+    
+    def testModerateWithoutPermissionResult(self):
+        self.client.login(username='auth_user', password='password')
+        self.client.post('/comments/moderate/1/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        oc = OslComment.objects.get(pk=1)
+        self.assertEquals(oc.is_removed, False)
+    
+    def testModerateWithGetStatus(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.get('/comments/moderate/40/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response.status_code, 405)
+    
+    def testModerateWithGetResult(self):
+        self.client.login(username='jeff', password='password')
+        self.client.get('/comments/moderate/40/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        oc = OslComment.objects.get(pk=40)
+        self.assertEquals(oc.is_removed, False)
+    
+    def testModerateWithNonExistantComment(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/moderate/1000/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response.status_code, 404)
 
