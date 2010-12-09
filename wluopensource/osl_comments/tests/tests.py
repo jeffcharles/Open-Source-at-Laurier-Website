@@ -364,4 +364,16 @@ class CommentsTestCase(TestCase):
         response = self.client.get('/comments/reply_form/1/1/1000/',
             HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEquals(response.status_code, 404)
+    
+    ## Get comment tests ##
+    
+    def testGetComment(self):
+        response = self.client.get('/comments/comment/1/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response.status_code, 200)
+    
+    def testGetNonExistantComment(self):
+        response = self.client.get('/comments/comment/1000/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response.status_code, 404)
 
