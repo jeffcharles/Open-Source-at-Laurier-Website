@@ -188,7 +188,8 @@ def get_ajax_edit_form(request, comment_pk):
 def get_ajax_reply_form(request, obj_ctype_pk, obj_pk, comment_pk):
     obj_model = ContentType.objects.get(pk=obj_ctype_pk).model_class()
     obj = obj_model.objects.get(pk=obj_pk)
-    comment = OslComment.objects.get(pk=comment_pk)
+    comment = get_object_or_404(comment_app.get_model(), pk=comment_pk, 
+        site__pk=settings.SITE_ID)
     return render_to_response(
         "comments/reply_form_container.html",
         {'object': obj, 'comment': comment},
