@@ -462,4 +462,14 @@ class CommentsTestCase(TestCase):
         response = self.client.post('/comments/moderate/1000/',
             HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEquals(response.status_code, 404)
+    
+    ## Redirect view tests ##
+    
+    def testRedirectViewStatus(self):
+        response = self.client.get('/comments/ocr/13/1/')
+        self.assertEquals(response.status_code, 302)
+    
+    def testRedirectViewLocation(self):
+        response = self.client.get('/comments/ocr/13/1/')
+        self.assertEquals(response['location'], 'http://example.com/articles/view/lots-comments/?np=1')
 
