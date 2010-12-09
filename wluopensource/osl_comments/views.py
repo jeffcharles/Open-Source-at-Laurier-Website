@@ -177,7 +177,8 @@ comment_edited = confirmation_view(
 )
 
 def get_ajax_edit_form(request, comment_pk):
-    comment = OslComment.objects.get(pk=comment_pk)
+    comment = get_object_or_404(comment_app.get_model(), pk=comment_pk, 
+        site__pk=settings.SITE_ID)
     return render_to_response(
         "comments/render_edit_form.html",
         {'comment': comment},
