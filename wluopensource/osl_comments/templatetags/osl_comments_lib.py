@@ -499,10 +499,10 @@ class RenderAnonOslCommentFormNode(AnonOslCommentFormNode,
             if not context['request'].is_ajax():
                 next_url = context['request'].get_full_path()
             else:
-                next_url = context['request'].META['HTTP_REFERER']
+                next_url = None
             
             cancel_url = None
-            if self.parent_comment:
+            if self.parent_comment and not context['request'].is_ajax():
                 url = list(urlparse.urlparse(next_url))
                 url_qs = urlparse.parse_qs(url[4])
                 if REPLY_QUERY_STRING_KEY in url_qs:
