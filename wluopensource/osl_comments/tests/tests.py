@@ -340,4 +340,16 @@ class CommentsTestCase(TestCase):
         response = self.client.post('/comments/edit/',
             data={'comment': 'changed', 'comment_id': '1000'})
         self.assertEquals(response.status_code, 404)
+    
+    ## Get AJAX edit form tests ##
+    
+    def testGetAjaxEditForm(self):
+        response = self.client.get('/comments/edit_form/1/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response.status_code, 200)
+    
+    def testGetAjaxEditFormForNonExistantComment(self):
+        response = self.client.get('/comments/edit_form/1000/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response.status_code, 404)
 
