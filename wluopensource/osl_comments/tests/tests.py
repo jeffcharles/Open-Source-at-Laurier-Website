@@ -352,4 +352,16 @@ class CommentsTestCase(TestCase):
         response = self.client.get('/comments/edit_form/1000/',
             HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEquals(response.status_code, 404)
+    
+    ## Get AJAX reply form tests ##
+    
+    def testGetAjaxReplyForm(self):
+        response = self.client.get('/comments/reply_form/1/1/1/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response.status_code, 200)
+        
+    def testGetAjaxReplyFormForNonExistantComment(self):
+        response = self.client.get('/comments/reply_form/1/1/1000/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEquals(response.status_code, 404)
 
