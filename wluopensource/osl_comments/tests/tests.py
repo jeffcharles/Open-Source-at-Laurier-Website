@@ -4,7 +4,6 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.client import Client
 
-from articles.models import Article
 from osl_comments.models import CommentsBannedFromIpAddress, OslComment
 
 class CommentsTestCase(TestCase):
