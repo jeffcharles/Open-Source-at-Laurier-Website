@@ -472,4 +472,79 @@ class CommentsTestCase(TestCase):
     def testRedirectViewLocation(self):
         response = self.client.get('/comments/ocr/13/1/')
         self.assertEquals(response['location'], 'http://example.com/articles/view/lots-comments/?np=1')
+    
+    ## Update IP address ban ##
+    
+    def testNominalUpdateBanStatus(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/ip_address_ban/1/',
+            data={'ban': 'True'})
+        self.assertEquals(response.status_code, 302)
+    
+    def testNominalUpdateBanLocation(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/ip_address_ban/1/',
+            data={'ban': 'True'})
+        self.assertEquals(response['location'], 
+            'http://testserver/comments/ip_address_ban_update_done/')
+    
+    def testNominalUpdateBanResult(self):
+        self.client.login(username='jeff', password='password')
+        self.client.post('/comments/ip_address_ban/1/',
+            data={'ban': 'True'})
+        is_banned = CommentsBannedFromIpAddress.objects.is_banned('127.0.0.1')
+        self.assertEquals(is_banned, True)
+    
+    def testUpdateBanNoAuthStatus(self):
+        response = self.client.post('/comments/ip_address_ban/1/',
+            data={'ban': 'True'})
+        self.assertEquals(response.status_code, 302)
+    
+    def testUpdateBanNoAuthLocation(self):
+        response = self.client.post('/comments/ip_address_ban/1/',
+            data={'ban': 'True'})
+        self.assertEquals(response['location'], 
+            'http://testserver/accounts/login/?next=/comments/ip_address_ban/1/')
+    
+    def testUpdateBanNoAuthResult(self):
+        response = self.client.post('/comments/ip_address_ban/1/',
+            data={'ban': 'True'})
+        is_banned = CommentsBannedFromIpAddress.objects.is_banned('127.0.0.1')
+        self.assertEquals(is_banned, False)
+    
+    def testUpdateBanWithoutPermissionStatus(self):
+        self.client.login(username='auth_user', password='password')
+        response = self.client.post('/comments/ip_address_ban/1/')
+        self.assertEquals(response.status_code, 302)
+        
+    def testUpdateBanWithoutPermissionLocation(self):
+        self.client.login(username='auth_user', password='password')
+        response = self.client.post('/comments/ip_address_ban/1/',
+            data={'ban': 'True'})
+        self.assertEquals(response['location'], 
+            'http://testserver/accounts/login/?next=/comments/ip_address_ban/1/')
+    
+    def testUpdateBanWithoutPermissionResult(self):
+        self.client.login(user='auth_user', password='password')
+        response = self.client.post('/comments/ip_address_ban/1/',
+            data={'ban': 'True'})
+        is_banned = CommentsBannedFromIpAddress.objects.is_banned('127.0.0.1')
+        self.assertEquals(is_banned, False)
+    
+    def testUpdateBanWithGetStatus(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.get('/comments/ip_address_ban/1/')
+        self.assertEquals(response.status_code, 200)
+    
+    def testUpdateBanWithGetResult(self):
+        self.client.login(username='jeff', password='password')
+        self.client.get('/comments/ip_address_ban/1/')
+        is_banned = CommentsBannedFromIpAddress.objects.is_banned('127.0.0.1')
+        self.assertEquals(is_banned, False)
+    
+    def testUpdateBanOnNonExistantComment(self):
+        self.client.login(username='jeff', password='password')
+        response = self.client.post('/comments/ip_address_ban/1000/',
+            data={'ban': 'True'})
+        self.assertEquals(response.status_code, 404)
 
