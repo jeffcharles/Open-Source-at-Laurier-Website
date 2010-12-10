@@ -326,18 +326,12 @@ def redirect_view(request, content_type_id, object_id):
 @login_required
 @permission_required('osl_comments.can_ban')
 def update_ip_address_ban(request, comment_id, next=None):
-    try:
-        comment = OslComment.objects.get(pk=comment_id)
-    except OslComment.DoesNotExist:
-        return HttpResponseBadRequest()
+    
+    comment = get_object_or_404(OslComment, pk=comment_id)
         
     if request.method == 'GET':
-        try:    
-            banned = \
-                CommentsBannedFromIpAddress.objects.get(
-                ip_address=comment.ip_address).comments_banned
-        except CommentsBannedFromIpAddress.DoesNotExist:
-            banned = False
+        banned = \
+            CommentsBannedFromIpAddress.objects.is_banned(comment.ip_address)
         return render_to_response('comments/update_ip_address_ban.html',
             {'banned': banned},
             RequestContext(request)
