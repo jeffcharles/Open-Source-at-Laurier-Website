@@ -3,12 +3,14 @@
     <input id="google-openid-button" type="submit" value="" />
 </form>
 
+{% comment %}
 {% load facebook_tags %}
 {% facebook_button %}
 {% facebook_js %}
 
 {% load twitter_tags %}
 {% twitter_button %}
+{% endcomment %}
 
 {% load openid_tags %}
 {% openid_form %}
