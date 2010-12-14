@@ -17,7 +17,7 @@ The following third party software is recommended for your development machine:
 * pip (Virtual environment aware Python package manager)
 
 1. Open a terminal
-2. Type the following: sudo apt-get install python python-dev python-setuptools libpq-dev postgresql git-core
+2. Type the following: sudo apt-get install python python-dev python-setuptools libpq-dev postgresql pgadmin3 git-core
 3. Answer “Y” to any of the prompts that follow
 4. Ensure everything has been downloaded and installed correctly
 5. Now type the following: sudo easy_install virtualenv virtualenvwrapper pip
@@ -41,7 +41,7 @@ The following third party software is recommended for your development machine:
 7. Have PostgreSQL use password-based authentication locally instead of Ident-based authentication:
     1. Open `/etc/postgresql/8.4/main/pg_hba.conf` (e.g., `gksudo gedit /etc/postgresql/8.4/main/pg_hba.conf`)
     2. Change `local all all ident` to `local all all md5`
-8. Restart the PostgreSQL server (e.g., `sudo /etc/init.d/postgresql-8.4 restart`)
+8. Restart the PostgreSQL server (e.g., `sudo /etc/init.d/postgresql restart`)
 
 ### Download the website source code ###
 
@@ -83,8 +83,18 @@ SECRET_KEY = 'qggt_qnf$k_k)6o@makif34ka8(xhhew&oziw3vr6_u^546*+6'
 2.Go to the project application directory (e.g., `osl-main-website/wluopensource`)
 3.Download, compile, and install the required python packages by typing: `pip install -r requirements.txt`
 
+### Create the database and populate it with initial data ###
+
+1. Go to the project application directory (e.g., `osl-main-website/wluopensource`)
+2. Run `python manage.py syncdb`
+
+### Run the test webserver ###
+
+1. Go to the project application directory (e.g., `osl-main-website/wluopensource`)
+2. Run `python manage.py runserver`
+
 ### Steps to take when you want to work on the website source code ###
 
 Whenever you want to work on the source code, ensure that the appropriate servers are running (typically just PostgreSQL) and that the correct virtual environment is active (type: `workon osl_main-website` to activate the virtual environment).
 
-See Django documentation for further instructions (e.g., initially setting up the database) as our process is the same.
+See Django documentation for information on the framework our website was built with.
